@@ -11,7 +11,7 @@
 ![Status](https://img.shields.io/badge/status-under%20review-orange)
 ![Venue](https://img.shields.io/badge/venue-IEEE%20TNNLS-blue)
 ![Environment](https://img.shields.io/badge/env-conda-44A833)
-![Artifacts](https://img.shields.io/badge/artifacts-Zenodo%20(DOI%20pending)-lightgrey)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.22881193.svg)](https://doi.org/10.5281/zenodo.22881193)
 
 [Overview](#overview) ·
 [Pipeline](#pipeline) ·
