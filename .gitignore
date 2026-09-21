@@ -67,3 +67,5 @@ data/processed/
 
 # Large intermediate NDVI predictions — not part of the RL audit
 reports/ndvi_imputation_predictions.csv
+# Local helper scripts
+make_zenodo_bundle.ps1
