@@ -434,7 +434,7 @@ If you use this code, please cite the manuscript:
   title  = {Protocol-Dependent Verdicts in Offline Reinforcement Learning:
             An Audit of Estimator, Baseline, and Distribution Sensitivity
             on a Groundwater Pumping Task},
-  author = {Biswal, Sumit Kumar and Biswal, Dr.Bhramara Bar Biswawl},
+  author = {Sumit Kumar and Biswal, Dr.Bhramara Bar Biswawl},
   note   = {Submitted to IEEE Transactions on Neural Networks and Learning Systems}
 }
 ```
