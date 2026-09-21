@@ -1,0 +1,16 @@
+{
+  "total_rows": 61913,
+  "observed_exact_source0": 61913,
+  "spatial_fallback_source1": 0,
+  "imputed_source2": 0,
+  "still_missing": 0,
+  "coverage_before": 1.0,
+  "coverage_after_exact": 1.0,
+  "coverage_after_spatial": 1.0,
+  "coverage_after_imputed": 1.0,
+  "winner_experiment": "A",
+  "winner_model": "hist_gradient_boosting",
+  "winner_criterion": "spatial_block_r2",
+  "spatial_fallback_radius_km": 20.0,
+  "spatial_time_window_days": 0
+}

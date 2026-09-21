@@ -1,0 +1,131 @@
+{
+  "candidate": "hgbr_depth",
+  "target_mode": "depth",
+  "feature_columns": [
+    "chirps",
+    "gldas",
+    "sentinel2_ndvi",
+    "grace",
+    "srtm_elevation",
+    "srtm_slope",
+    "month_sin",
+    "month_cos",
+    "chirps_roll3",
+    "gldas_roll3",
+    "target_lag1",
+    "lag_age_days",
+    "chirps_age_days",
+    "gldas_age_days",
+    "sentinel2_ndvi_age_days",
+    "grace_age_days"
+  ],
+  "max_gap_days": 90,
+  "lag_max_gap_days": 120,
+  "extra_rolling": [],
+  "with_spatial_coords": false,
+  "with_terrain": false,
+  "with_distance": false,
+  "training_wells_csv": "data/processed/training_wells.csv",
+  "lag_fallback_days": 365,
+  "covariate_fallback_days": 400,
+  "interval_halfwidth_m": 2.7063070203285404,
+  "model_params": {
+    "categorical_features": "from_dtype",
+    "early_stopping": false,
+    "interaction_cst": null,
+    "l2_regularization": 1.0,
+    "learning_rate": 0.06,
+    "loss": "squared_error",
+    "max_bins": 255,
+    "max_depth": null,
+    "max_features": 1.0,
+    "max_iter": 300,
+    "max_leaf_nodes": 31,
+    "min_samples_leaf": 20,
+    "monotonic_cst": null,
+    "n_iter_no_change": 10,
+    "quantile": null,
+    "random_state": 42,
+    "scoring": "loss",
+    "tol": 1e-07,
+    "validation_fraction": 0.1,
+    "verbose": 0,
+    "warm_start": false
+  },
+  "cv_table": [
+    {
+      "cv_rmse_mean": 1.948307805337206,
+      "cv_rmse_folds": [
+        2.607342579234036,
+        1.3534479454011943,
+        1.9766298172015653,
+        1.8558108795120287
+      ],
+      "cv_r2_mean": 0.5748577762339608,
+      "cv_r2_folds": [
+        0.49443135432856067,
+        0.6806424284522565,
+        0.5831020987410629,
+        0.5412552234139634
+      ],
+      "candidate": "rf_depth",
+      "target_mode": "depth"
+    },
+    {
+      "cv_rmse_mean": 1.9627722872833557,
+      "cv_rmse_folds": [
+        2.6233442064815478,
+        1.3864373454771217,
+        2.0160653175272265,
+        1.825242279647527
+      ],
+      "cv_r2_mean": 0.5689089858255083,
+      "cv_r2_folds": [
+        0.4882068209121365,
+        0.6648844355128571,
+        0.5663011993996512,
+        0.5562434874773887
+      ],
+      "candidate": "rf_residual",
+      "target_mode": "residual"
+    },
+    {
+      "cv_rmse_mean": 1.9128092488533062,
+      "cv_rmse_folds": [
+        2.5033208047552593,
+        1.3711252355355645,
+        1.9576008484265155,
+        1.819190106695885
+      ],
+      "cv_r2_mean": 0.5891210660598059,
+      "cv_r2_folds": [
+        0.5339666938766019,
+        0.6722457355404894,
+        0.5910903937817914,
+        0.5591814410403406
+      ],
+      "candidate": "hgbr_depth",
+      "target_mode": "depth"
+    },
+    {
+      "cv_rmse_mean": 1.9351683184867812,
+      "cv_rmse_folds": [
+        2.5732062498998753,
+        1.3627889429358266,
+        1.9961558505108503,
+        1.8085222306005726
+      ],
+      "cv_r2_mean": 0.5807407535092379,
+      "cv_r2_folds": [
+        0.507582891882719,
+        0.6762190407798263,
+        0.5748248084715013,
+        0.5643362729029051
+      ],
+      "candidate": "hgbr_residual",
+      "target_mode": "residual"
+    }
+  ],
+  "n_training_rows": 76350,
+  "leakage_note": "Held-out wells used nowhere in training, CV, or selection; lag/baselines derive only from training-well kriging."
+}

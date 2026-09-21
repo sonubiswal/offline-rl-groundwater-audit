@@ -1,0 +1,8 @@
+variable,type,note,ks_stat,ks_p,mean_eval,mean_skip,smd,n_eval,n_skip,smd_flag,chi2_stat,chi2_p
+depth_m,continuous,groundwater depth (m),0.05046218207765127,0.0002478196368743969,6.84155098847959,6.201640974639483,0.11102019909725296,14062.0,2011.0,,,
+lat,continuous,latitude,0.03182959516995876,0.05543087788824341,18.73749670459394,18.84408943311785,-0.0573929309440597,14062.0,2011.0,,,
+lon,continuous,longitude,0.03502652634235215,0.026071041307189957,76.95995840136537,76.87676344604674,0.03627115993785605,14062.0,2011.0,,,
+rainfall_mm,continuous,nearest CHIRPS composite at cell (<=400d),,,,,,14062.0,0.0,,,
+season,categorical,"evaluated fraction range 87%..89%; worst levels: post-monsoon=87%, monsoon=88%, pre-monsoon=89%",,,,,,,,,13.067552680325894,0.0014535065375704851
+year,categorical,"evaluated fraction range 0%..100%; worst levels: 2013=0%, 2014=100%, 2015=100%",,,,,,,,,16073.000000000002,0.0
+well_id,categorical,"evaluated fraction range 0%..100%; worst levels: W_21.9833_76.4639=0%, W_21.4069_78.0417=0%, W_19.05_77.65=0%",,,,,,,,,1298.7712964774632,3.3791140423584235e-37

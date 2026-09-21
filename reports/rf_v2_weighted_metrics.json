@@ -1,0 +1,74 @@
+{
+  "model_rf_v2": {
+    "n": 14062,
+    "rmse": 5.3744428083335904,
+    "mae": 3.520436916187052,
+    "r2": 0.16422136402258636,
+    "within_well_r2": 0.11521794643339234
+  },
+  "baseline_kriging_only": {
+    "n": 14062,
+    "rmse": 5.4035921272777925,
+    "mae": 3.4364101537279206,
+    "r2": 0.1551307676919671
+  },
+  "baseline_persistence": {
+    "n": 14062,
+    "rmse": 5.868966201979132,
+    "mae": 3.88490105212786,
+    "r2": 0.0033387090368101058
+  },
+  "bootstrap_ci_rmse_improvement": {
+    "vs_kriging_only": {
+      "lower_95": -0.02243161438425336,
+      "upper_95": 0.0811642961696427,
+      "significant_at_5pct": false
+    },
+    "vs_persistence": {
+      "lower_95": 0.4404785451180365,
+      "upper_95": 0.5519562099620493,
+      "significant_at_5pct": true
+    }
+  },
+  "season_metrics": [
+    {
+      "season": "monsoon",
+      "n": 3305,
+      "model_n": 3305,
+      "model_rmse": 5.224137346113982,
+      "model_mae": 3.6434571616086435,
+      "model_r2": 0.12834853159591797,
+      "kriging_rmse": 5.160920797408195,
+      "persistence_rmse": 6.1324923776607845
+    },
+    {
+      "season": "post-monsoon",
+      "n": 7589,
+      "model_n": 7589,
+      "model_rmse": 4.755199372789545,
+      "model_mae": 3.2045432775058296,
+      "model_r2": 0.14619253406313526,
+      "kriging_rmse": 4.878421643353142,
+      "persistence_rmse": 5.1276339481882065
+    },
+    {
+      "season": "pre-monsoon",
+      "n": 3168,
+      "model_n": 3168,
+      "model_rmse": 6.750773921497965,
+      "model_mae": 4.148825461904678,
+      "model_r2": 0.07292735038247755,
+      "kriging_rmse": 6.693931595560116,
+      "persistence_rmse": 7.118558636165421
+    }
+  ],
+  "interval_halfwidth_m": null,
+  "interval_empirical_coverage_heldout": null,
+  "n_out_of_bbox_evaluated": 0,
+  "production_baseline_reference": {
+    "r2": 0.198,
+    "rmse": 5.226,
+    "mae": 3.371,
+    "source": "validation_methodology.md Section 12"
+  }
+}

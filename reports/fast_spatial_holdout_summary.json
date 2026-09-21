@@ -1,0 +1,80 @@
+{
+  "test": "fast_spatial_holdout",
+  "candidate": "hgbr_residual",
+  "target_mode": "residual",
+  "caveat": "Kriged target surface held fixed across folds; only the RF training set was region-restricted. Cells inside each held-out quadrant may still carry information from training wells via kriging's spatial smoothing.",
+  "pooled": {
+    "model": {
+      "n": 14062,
+      "rmse": 5.572678535614221,
+      "mae": 3.657904934953177,
+      "r2": 0.1014290866266685
+    },
+    "kriging_only": {
+      "n": 14062,
+      "rmse": 5.4035921272777925,
+      "mae": 3.4364101537279206,
+      "r2": 0.155130767691967
+    },
+    "persistence": {
+      "n": 14062,
+      "rmse": 5.868966201979132,
+      "mae": 3.884901052127859,
+      "r2": 0.0033387090368099948
+    }
+  },
+  "per_quadrant": [
+    {
+      "quadrant": "NW",
+      "n_train_rows": 104448,
+      "n_excluded_rows": 34816,
+      "n_held_out_readings": 3167,
+      "model_rmse": 5.845778167455092,
+      "model_mae": 3.6507771524249164,
+      "model_r2": 0.1156621656895569,
+      "kriging_rmse": 6.04316566245717,
+      "kriging_r2": 0.05493312028574593,
+      "persistence_rmse": 6.441010556575111,
+      "persistence_r2": -0.07359768330315686
+    },
+    {
+      "quadrant": "NE",
+      "n_train_rows": 104448,
+      "n_excluded_rows": 34816,
+      "n_held_out_readings": 3540,
+      "model_rmse": 4.683949951478747,
+      "model_mae": 3.141110912927038,
+      "model_r2": 0.10361903035692488,
+      "kriging_rmse": 4.4583605631133505,
+      "kriging_r2": 0.18788316604237387,
+      "persistence_rmse": 5.155632031375863,
+      "persistence_r2": -0.08600534421776085
+    },
+    {
+      "quadrant": "SW",
+      "n_train_rows": 104448,
+      "n_excluded_rows": 34816,
+      "n_held_out_readings": 3106,
+      "model_rmse": 4.303207357024333,
+      "model_mae": 3.317649051013756,
+      "model_r2": 0.0564698624962886,
+      "kriging_rmse": 3.981967441728659,
+      "kriging_r2": 0.19208320094309295,
+      "persistence_rmse": 4.487210653508958,
+      "persistence_r2": -0.025945155966688116
+    },
+    {
+      "quadrant": "SE",
+      "n_train_rows": 104448,
+      "n_excluded_rows": 34816,
+      "n_held_out_readings": 4249,
+      "model_rmse": 6.744583427397295,
+      "model_mae": 4.34250349949904,
+      "model_r2": 0.08966280674286753,
+      "kriging_rmse": 6.423542858487821,
+      "kriging_r2": 0.1742638900126292,
+      "persistence_rmse": 6.797677036554134,
+      "persistence_r2": 0.07527397826053173
+    }
+  ]
+}

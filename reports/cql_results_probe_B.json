@@ -1,0 +1,91 @@
+{
+  "alpha_sweep_diagnostic": {
+    "skipped": true
+  },
+  "alpha_used": 4.0,
+  "alpha_source": "--alpha flag",
+  "target_update_interval_used": 500,
+  "target_update_interval_source": "--target-update-interval flag",
+  "n_steps_used": 8000,
+  "n_steps_per_epoch_used": 2000,
+  "is_short_probe": true,
+  "qfunc": "mean",
+  "q_func_factory": "MeanQFunctionFactory",
+  "n_quantiles": null,
+  "clip_grad_norm": 1.0,
+  "oversample_factor": 3,
+  "model_dir": "models_probe_B",
+  "per_seed": [
+    {
+      "seed": 42,
+      "alpha": 4.0,
+      "val_action_match": {
+        "overall": 0.7088888888888889,
+        "random": 0.21417910447761193,
+        "greedy_extraction": 0.95,
+        "conservative": 0.8857142857142857
+      },
+      "test_action_match": {
+        "overall": 0.6975555555555556,
+        "random": 0.20144927536231885,
+        "greedy_extraction": 0.9458333333333333,
+        "conservative": 0.8922619047619048
+      },
+      "model_path": "models_probe_B\\cql_seed42.d3"
+    },
+    {
+      "seed": 123,
+      "alpha": 4.0,
+      "val_action_match": {
+        "overall": 0.7033333333333334,
+        "random": 0.2082089552238806,
+        "greedy_extraction": 0.9388888888888889,
+        "conservative": 0.8863636363636364
+      },
+      "test_action_match": {
+        "overall": 0.6933333333333334,
+        "random": 0.20652173913043478,
+        "greedy_extraction": 0.9305555555555556,
+        "conservative": 0.8898809523809523
+      },
+      "model_path": "models_probe_B\\cql_seed123.d3"
+    },
+    {
+      "seed": 2024,
+      "alpha": 4.0,
+      "val_action_match": {
+        "overall": 0.6971111111111111,
+        "random": 0.19328358208955224,
+        "greedy_extraction": 0.9444444444444444,
+        "conservative": 0.8753246753246753
+      },
+      "test_action_match": {
+        "overall": 0.6922222222222222,
+        "random": 0.1963768115942029,
+        "greedy_extraction": 0.9402777777777778,
+        "conservative": 0.8869047619047619
+      },
+      "model_path": "models_probe_B\\cql_seed2024.d3"
+    }
+  ],
+  "val_action_match_mean": 0.7031111111111111,
+  "val_action_match_std": 0.004810824557371709,
+  "test_action_match_mean": 0.6943703703703704,
+  "test_action_match_std": 0.0022974907287808895,
+  "n_train_episodes": 1050,
+  "n_train_episodes_after_oversampling": 1182,
+  "n_val_episodes": 225,
+  "n_test_episodes": 225,
+  "split_seed": 1,
+  "training_seeds": [
+    42,
+    123,
+    2024
+  ],
+  "policy_order_assumption": [
+    "random",
+    "greedy_extraction",
+    "conservative"
+  ],
+  "n_per_policy_assumption": 500
+}

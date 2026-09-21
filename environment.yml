@@ -1,0 +1,26 @@
+name: trishna-opal
+channels:
+  - conda-forge
+dependencies:
+  - python=3.10
+  - pip
+  - pip:
+      - earthengine-api
+      - geemap
+      - torch
+      - torchvision
+      - scikit-learn
+      - pykrige
+      - d3rlpy
+      - fastapi
+      - uvicorn[standard]
+      - sqlalchemy
+      - psycopg2-binary
+      - pandas
+      - numpy
+      - xarray
+      - rasterio
+      - geopandas
+      - matplotlib
+      - wandb
+      - pytest

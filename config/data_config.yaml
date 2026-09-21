@@ -1,0 +1,63 @@
+# config/data_config.yaml
+#
+# Single source of truth for region, date range, and reproducibility seed.
+# held_out_split.py and gee_fetch.py both read from this file -- do not
+# hardcode bbox/date values anywhere else in the codebase.
+
+region:
+  name: "Maharashtra"
+  # bbox format: [min_lon, min_lat, max_lon, max_lat]
+  # NOTE: this is a placeholder covering roughly the Maharashtra state
+  # extent. Refine against an actual state-boundary shapefile before
+  # Phase 1 is marked done, and justify the final choice in
+  # reports/validation_methodology.md.
+  bbox: [72.6, 15.6, 80.9, 22.0]
+
+date_range:
+  start: "2015-01-01"
+  end: "2022-12-31"
+
+random_seed: 42
+
+# Google Cloud project ID tied to your Earth Engine account. Required since
+# GEE now mandates every ee.Initialize() call specify a project (not just
+# an authenticated user). Find/create yours at https://code.earthengine.google.com/
+# -- the project dropdown near the top of the page shows the ID.
+gee_project_id: "api-check-proj-501006"
+
+# Fraction of wells per grid cell held out for independent validation.
+# Roadmap specifies 15-20%; 0.175 sits in the middle of that range.
+held_out_frac: 0.175
+
+# GEE export resolution in meters. 5000m is a coarse placeholder good for
+# initial testing/caching; tighten this once you've confirmed the pulls
+# work end-to-end and checked your GEE quota usage.
+export_scale_m: 5000
+
+gee_collections:
+  sentinel2: "COPERNICUS/S2_SR_HARMONIZED"
+  sentinel1: "COPERNICUS/S1_GRD"
+  chirps: "UCSB-CHG/CHIRPS/DAILY"
+  grace: "NASA/GRACE/MASS_GRIDS_V04/MASCON"
+  gldas: "NASA/GLDAS/V021/NOAH/G025/T3H"
+
+cgwb_source:
+  portal: "ckandev.indiadataportal.com"
+  dataset_name: "CGWB - Changes in Depth to Water Level"
+  package_id: "8ceb3cea-a8a9-4624-af75-fc92429d8fa5"
+  resource_id: "580a8f6e-3d86-4ca7-ac7d-cd5df12b443c"
+  csv_download_url: "https://ckandev.indiadataportal.com/dataset/8ceb3cea-a8a9-4624-af75-fc92429d8fa5/resource/580a8f6e-3d86-4ca7-ac7d-cd5df12b443c/download/cgwb-changes-in-depth-to-water-level.csv"
+  # Direct datastore dump endpoints (no login needed):
+  csv_dump_url: "https://ckandev.indiadataportal.com/datastore/dump/580a8f6e-3d86-4ca7-ac7d-cd5df12b443c?bom=True"
+  json_dump_url: "https://ckandev.indiadataportal.com/datastore/dump/580a8f6e-3d86-4ca7-ac7d-cd5df12b443c?format=json"
+  # Real source columns, per the portal's data dictionary (confirmed Aug 2026):
+  # index, date, state_name, state_code, district_name, district_code,
+  # station_name, latitude, longitude, basin, sub_basin, source,
+  # currentlevel (Depth to Water Level), level_diff
+  # Years covered: 2013-2022. ~22,965 observation wells, quarterly readings.
+  columns:
+    well_id_source: "station_name"  # no single unique ID column; station_name + lat/lon used to derive well_id
+    lat: "latitude"
+    lon: "longitude"
+    date: "date"
+    depth_m: "currentlevel"

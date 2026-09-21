@@ -1,0 +1,31 @@
+{
+  "observed": {
+    "n_wells": 710,
+    "n_readings": 16073,
+    "n_pairs": 7042,
+    "seasonal_amplitude_m": 5.294827586206895,
+    "rainfall_response_r": -0.3250966043606597,
+    "rainfall_response_slope": -0.3961596889219654,
+    "well_amplitude_mean_m": 10.187408450704226,
+    "well_amplitude_std_m": 9.778574491478857
+  },
+  "simulated": {
+    "n_episodes": 1500,
+    "n_steps_total": 30000,
+    "amplitude_mean": 12.546544075012207,
+    "amplitude_std": 7.8310546875,
+    "rainfall_response_r": -0.11682628032932119,
+    "rainfall_response_slope": -0.00178004396858637
+  },
+  "comparison": {
+    "response_sign_match": true,
+    "observed_response_sign": "negative",
+    "simulated_response_sign": "negative",
+    "amplitude_ratio_sim_over_obs": 1.2315736760456386
+  },
+  "notes": [
+    "Observed depth_m = CGWB convention (m below ground level; larger = deeper).",
+    "Simulated gw_level sign convention must be confirmed from Phase 4 environment code. If simulated gw_level also uses depth-below-ground, the two are directly comparable; if it uses 'height above datum', signs will be inverted.",
+    "Seasonal cycle alignment uses month recovery from month_sin/month_cos (atan2); binned to integer months for plotting."
+  ]
+}

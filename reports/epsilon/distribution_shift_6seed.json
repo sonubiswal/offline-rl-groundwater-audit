@@ -1,0 +1,329 @@
+{
+  "per_seed": {
+    "42": {
+      "action_support": {
+        "behavior_action_distribution": [
+          0.1547,
+          0.3433,
+          0.20153333333333334,
+          0.18973333333333334,
+          0.11073333333333334
+        ],
+        "bc_action_distribution": [
+          0.1353,
+          0.4511,
+          0.2039,
+          0.1745,
+          0.0352
+        ],
+        "cql_action_distribution": [
+          0.1275,
+          0.4623,
+          0.2018,
+          0.1764,
+          0.032
+        ],
+        "tv_distance_bc_vs_behavior": 0.11016666666666668,
+        "tv_distance_cql_vs_behavior": 0.11926666666666666,
+        "kl_bc_from_behavior": 0.052492842061472145,
+        "kl_cql_from_behavior": 0.06061886415108491,
+        "rare_action_rate_bc": 0.0,
+        "rare_action_rate_cql": 0.0
+      },
+      "state_shift": {
+        "mean_abs_zscore_behavior": 0.8482834774196933,
+        "mean_abs_zscore_bc_rollout": 0.886510743215915,
+        "mean_abs_zscore_cql_rollout": 0.8845027241786695,
+        "knn_distance_bc_to_behavior_support": 0.39216153082147065,
+        "knn_distance_cql_to_behavior_support": 0.39145124725759495,
+        "note": "Higher mean |z-score| or higher k-NN distance-to-behavior-support for a policy indicates it visits states farther from what the offline dataset covered -- a direct proxy for distribution shift."
+      },
+      "q_value_cql": {
+        "available": true,
+        "q_mean": 3.471572160720825,
+        "q_std": 0.559062659740448,
+        "q_min": 2.0268146991729736,
+        "q_max": 4.63516092300415,
+        "mean_bias_q_minus_realized_return": -5.24539346258993,
+        "rmse_q_vs_realized_return": 10.663926705902547,
+        "correlation_q_vs_realized_return": -0.7630551234481465,
+        "interpretation": "A large positive mean_bias indicates Q-value overestimation relative to what the simulator actually delivers. Low or negative correlation indicates the learned Q-function is not tracking real policy performance, which would undermine any conclusion drawn from FQE / offline value estimates alone."
+      },
+      "q_value_bc": {
+        "available": false,
+        "reason": "policy has no learned Q-function (BC does not support value estimation)"
+      }
+    },
+    "123": {
+      "action_support": {
+        "behavior_action_distribution": [
+          0.1547,
+          0.3433,
+          0.20153333333333334,
+          0.18973333333333334,
+          0.11073333333333334
+        ],
+        "bc_action_distribution": [
+          0.1342,
+          0.4525,
+          0.1976,
+          0.1726,
+          0.0431
+        ],
+        "cql_action_distribution": [
+          0.1343,
+          0.4512,
+          0.2053,
+          0.1717,
+          0.0375
+        ],
+        "tv_distance_bc_vs_behavior": 0.10920000000000002,
+        "tv_distance_cql_vs_behavior": 0.11166666666666668,
+        "kl_bc_from_behavior": 0.04499613586414167,
+        "kl_cql_from_behavior": 0.050373506528376494,
+        "rare_action_rate_bc": 0.0,
+        "rare_action_rate_cql": 0.0
+      },
+      "state_shift": {
+        "mean_abs_zscore_behavior": 0.8482834774196933,
+        "mean_abs_zscore_bc_rollout": 0.8887352589879725,
+        "mean_abs_zscore_cql_rollout": 0.8867947832367561,
+        "knn_distance_bc_to_behavior_support": 0.39454084785516924,
+        "knn_distance_cql_to_behavior_support": 0.39464970097839813,
+        "note": "Higher mean |z-score| or higher k-NN distance-to-behavior-support for a policy indicates it visits states farther from what the offline dataset covered -- a direct proxy for distribution shift."
+      },
+      "q_value_cql": {
+        "available": true,
+        "q_mean": 3.3488917350769043,
+        "q_std": 0.5767725110054016,
+        "q_min": 2.0995564460754395,
+        "q_max": 4.668618202209473,
+        "mean_bias_q_minus_realized_return": -5.2312162669744104,
+        "rmse_q_vs_realized_return": 10.822920150612816,
+        "correlation_q_vs_realized_return": -0.7453507547583151,
+        "interpretation": "A large positive mean_bias indicates Q-value overestimation relative to what the simulator actually delivers. Low or negative correlation indicates the learned Q-function is not tracking real policy performance, which would undermine any conclusion drawn from FQE / offline value estimates alone."
+      },
+      "q_value_bc": {
+        "available": false,
+        "reason": "policy has no learned Q-function (BC does not support value estimation)"
+      }
+    },
+    "2024": {
+      "action_support": {
+        "behavior_action_distribution": [
+          0.1547,
+          0.3433,
+          0.20153333333333334,
+          0.18973333333333334,
+          0.11073333333333334
+        ],
+        "bc_action_distribution": [
+          0.1334,
+          0.4519,
+          0.2053,
+          0.1649,
+          0.0445
+        ],
+        "cql_action_distribution": [
+          0.128,
+          0.4599,
+          0.2042,
+          0.1734,
+          0.0345
+        ],
+        "tv_distance_bc_vs_behavior": 0.1123666666666667,
+        "tv_distance_cql_vs_behavior": 0.11926666666666666,
+        "kl_bc_from_behavior": 0.04454785584493616,
+        "kl_cql_from_behavior": 0.05706851316795286,
+        "rare_action_rate_bc": 0.0,
+        "rare_action_rate_cql": 0.0
+      },
+      "state_shift": {
+        "mean_abs_zscore_behavior": 0.8482834774196933,
+        "mean_abs_zscore_bc_rollout": 0.8894453173018583,
+        "mean_abs_zscore_cql_rollout": 0.8863584992961556,
+        "knn_distance_bc_to_behavior_support": 0.3946577914751393,
+        "knn_distance_cql_to_behavior_support": 0.3930350803863552,
+        "note": "Higher mean |z-score| or higher k-NN distance-to-behavior-support for a policy indicates it visits states farther from what the offline dataset covered -- a direct proxy for distribution shift."
+      },
+      "q_value_cql": {
+        "available": true,
+        "q_mean": 3.5716745853424072,
+        "q_std": 0.5406680703163147,
+        "q_min": 2.149506092071533,
+        "q_max": 4.779869079589844,
+        "mean_bias_q_minus_realized_return": -5.09781700961546,
+        "rmse_q_vs_realized_return": 10.558590582674443,
+        "correlation_q_vs_realized_return": -0.7441206504589652,
+        "interpretation": "A large positive mean_bias indicates Q-value overestimation relative to what the simulator actually delivers. Low or negative correlation indicates the learned Q-function is not tracking real policy performance, which would undermine any conclusion drawn from FQE / offline value estimates alone."
+      },
+      "q_value_bc": {
+        "available": false,
+        "reason": "policy has no learned Q-function (BC does not support value estimation)"
+      }
+    }
+  },
+  "config": {
+    "dataset": "data/processed/offline_rl_dataset_epsilon.h5",
+    "bc_dir": "models_epsilon/bc",
+    "cql_dir": "models_epsilon/cql",
+    "seeds": null,
+    "rf_seed_table": "reports/rf_grid_predictions.csv",
+    "config": "config/rl_config.yaml",
+    "n_eval_episodes": 500,
+    "gamma": 0.99,
+    "obs_mean": [
+      15.075033,
+      36.681023,
+      0.391654,
+      -2.838e-12,
+      2.838e-12,
+      0.423686
+    ],
+    "obs_std": [
+      7.286923,
+      41.271557,
+      0.253303,
+      0.707107,
+      0.707107,
+      0.194976
+    ],
+    "out": "reports/epsilon/distribution_shift_6seed.json",
+    "seeds_used": [
+      42,
+      123,
+      2024
+    ],
+    "n_actions": 5,
+    "trajectory_length": 20,
+    "eval_seed": 9999
+  },
+  "aggregate": {
+    "action_support.kl_bc_from_behavior": {
+      "n": 3,
+      "mean": 0.047345611256849995,
+      "std": 0.0036442399720603056,
+      "min": 0.04454785584493616,
+      "max": 0.052492842061472145
+    },
+    "action_support.kl_cql_from_behavior": {
+      "n": 3,
+      "mean": 0.05602029461580476,
+      "std": 0.004247815894009372,
+      "min": 0.050373506528376494,
+      "max": 0.06061886415108491
+    },
+    "action_support.rare_action_rate_bc": {
+      "n": 3,
+      "mean": 0.0,
+      "std": 0.0,
+      "min": 0.0,
+      "max": 0.0
+    },
+    "action_support.rare_action_rate_cql": {
+      "n": 3,
+      "mean": 0.0,
+      "std": 0.0,
+      "min": 0.0,
+      "max": 0.0
+    },
+    "action_support.tv_distance_bc_vs_behavior": {
+      "n": 3,
+      "mean": 0.11057777777777782,
+      "std": 0.0013250669677928807,
+      "min": 0.10920000000000002,
+      "max": 0.1123666666666667
+    },
+    "action_support.tv_distance_cql_vs_behavior": {
+      "n": 3,
+      "mean": 0.11673333333333331,
+      "std": 0.003582674358011832,
+      "min": 0.11166666666666668,
+      "max": 0.11926666666666666
+    },
+    "q_value_cql.correlation_q_vs_realized_return": {
+      "n": 3,
+      "mean": -0.7508421762218088,
+      "std": 0.008650446967712106,
+      "min": -0.7630551234481465,
+      "max": -0.7441206504589652
+    },
+    "q_value_cql.mean_bias_q_minus_realized_return": {
+      "n": 3,
+      "mean": -5.191475579726601,
+      "std": 0.06647903948026389,
+      "min": -5.24539346258993,
+      "max": -5.09781700961546
+    },
+    "q_value_cql.q_max": {
+      "n": 3,
+      "mean": 4.694549401601155,
+      "std": 0.06185700160868777,
+      "min": 4.63516092300415,
+      "max": 4.779869079589844
+    },
+    "q_value_cql.q_mean": {
+      "n": 3,
+      "mean": 3.4640461603800454,
+      "std": 0.09110627531973282,
+      "min": 3.3488917350769043,
+      "max": 3.5716745853424072
+    },
+    "q_value_cql.q_min": {
+      "n": 3,
+      "mean": 2.091959079106649,
+      "std": 0.05037581735641969,
+      "min": 2.0268146991729736,
+      "max": 2.149506092071533
+    },
+    "q_value_cql.q_std": {
+      "n": 3,
+      "mean": 0.5588344136873881,
+      "std": 0.014740459774907561,
+      "min": 0.5406680703163147,
+      "max": 0.5767725110054016
+    },
+    "q_value_cql.rmse_q_vs_realized_return": {
+      "n": 3,
+      "mean": 10.681812479729935,
+      "std": 0.10865068123938969,
+      "min": 10.558590582674443,
+      "max": 10.822920150612816
+    },
+    "state_shift.knn_distance_bc_to_behavior_support": {
+      "n": 3,
+      "mean": 0.39378672338392634,
+      "std": 0.0011501759579470238,
+      "min": 0.39216153082147065,
+      "max": 0.3946577914751393
+    },
+    "state_shift.knn_distance_cql_to_behavior_support": {
+      "n": 3,
+      "mean": 0.3930453428741161,
+      "std": 0.0013057834276839879,
+      "min": 0.39145124725759495,
+      "max": 0.39464970097839813
+    },
+    "state_shift.mean_abs_zscore_bc_rollout": {
+      "n": 3,
+      "mean": 0.8882304398352486,
+      "std": 0.001250083476996636,
+      "min": 0.886510743215915,
+      "max": 0.8894453173018583
+    },
+    "state_shift.mean_abs_zscore_behavior": {
+      "n": 3,
+      "mean": 0.8482834774196933,
+      "std": 0.0,
+      "min": 0.8482834774196933,
+      "max": 0.8482834774196933
+    },
+    "state_shift.mean_abs_zscore_cql_rollout": {
+      "n": 3,
+      "mean": 0.8858853355705271,
+      "std": 0.0009937459819213473,
+      "min": 0.8845027241786695,
+      "max": 0.8867947832367561
+    }
+  }
+}

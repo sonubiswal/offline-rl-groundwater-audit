@@ -1,0 +1,34 @@
+{
+  "dataset": "C:\\trishna-opal\\reports\\paper_exp\\dataset_adapt_high_gw25.h5",
+  "dataset_sha1": "df1baf235887d0e9589b835dbd07918b3bfbd281",
+  "config": "config/rl_config.yaml",
+  "config_sha1": "cfe81f95d0d2a0742d0a4e5313aa50b56c2a8068",
+  "script_sha1": "e331ba002aec144fbab1e5e9a925abc25eb74dc7",
+  "split_seed": 1,
+  "eps": 0.1,
+  "cql_lr": 0.0003,
+  "alpha": 1.0,
+  "qfunc": "qr",
+  "n_quantiles": 32,
+  "oversample": 3,
+  "n_steps": 20000,
+  "n_features": 6,
+  "norm_fingerprint": "4bafb7665bcdd7e1b4956cb43e9350578636d0b0",
+  "mean": [
+    32.698516845703125,
+    36.84288787841797,
+    0.3953251838684082,
+    -2.8383163874767803e-12,
+    2.8383163874767803e-12,
+    0.41167396306991577
+  ],
+  "std": [
+    6.338571548461914,
+    40.92973709106445,
+    0.24560002982616425,
+    0.7071067690849304,
+    0.7071067690849304,
+    0.19999244809150696
+  ],
+  "created": "2026-09-12T02:07:18Z"
+}

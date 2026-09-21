@@ -1,0 +1,186 @@
+{
+  "cql_minus_bc_discounted_bootstrap": {
+    "bootstrap_seed": 2027,
+    "ci_contains_zero": false,
+    "ci_lower": -1.3844719793317632,
+    "ci_upper": -0.592512927854973,
+    "confidence_level": 0.95,
+    "n_bootstrap": 5000,
+    "observed_difference": -0.973405513591127,
+    "probability_bootstrap_difference_positive": 0.0
+  },
+  "cql_minus_bc_paired_bootstrap": {
+    "bootstrap_seed": 2026,
+    "ci_contains_zero": false,
+    "ci_lower": -1.6651058661779448,
+    "ci_upper": -0.7465402752887312,
+    "confidence_level": 0.95,
+    "n_bootstrap": 5000,
+    "observed_difference": -1.1959254220149023,
+    "probability_bootstrap_difference_positive": 0.0
+  },
+  "direct_rollout": {
+    "BC_seed123": {
+      "discounted_return_mean": 9.993926660666897,
+      "discounted_return_std": 6.658505406685558,
+      "gamma": 0.99,
+      "n_episodes": 500,
+      "policy": "BC_seed123",
+      "return_mean": 10.684851739020182,
+      "return_std": 7.90149567023921,
+      "seed": 9999
+    },
+    "BC_seed2024": {
+      "discounted_return_mean": 10.890926411164031,
+      "discounted_return_std": 5.290025704798965,
+      "gamma": 0.99,
+      "n_episodes": 500,
+      "policy": "BC_seed2024",
+      "return_mean": 11.758545659183111,
+      "return_std": 6.21543562315095,
+      "seed": 9999
+    },
+    "BC_seed42": {
+      "discounted_return_mean": 9.601675591515482,
+      "discounted_return_std": 7.220909049714089,
+      "gamma": 0.99,
+      "n_episodes": 500,
+      "policy": "BC_seed42",
+      "return_mean": 10.223098620761968,
+      "return_std": 8.565931809645233,
+      "seed": 9999
+    },
+    "CQL_seed123": {
+      "discounted_return_mean": 9.136834013022838,
+      "discounted_return_std": 8.29232479785815,
+      "gamma": 0.99,
+      "n_episodes": 500,
+      "policy": "CQL_seed123",
+      "return_mean": 9.633757602359266,
+      "return_std": 9.830578907968242,
+      "seed": 9999
+    },
+    "CQL_seed2024": {
+      "discounted_return_mean": 9.090833712970605,
+      "discounted_return_std": 8.253619393550055,
+      "gamma": 0.99,
+      "n_episodes": 500,
+      "policy": "CQL_seed2024",
+      "return_mean": 9.574959312636729,
+      "return_std": 9.790109468365845,
+      "seed": 9999
+    },
+    "CQL_seed42": {
+      "discounted_return_mean": 9.338644396579591,
+      "discounted_return_std": 7.92326472559379,
+      "gamma": 0.99,
+      "n_episodes": 500,
+      "policy": "CQL_seed42",
+      "return_mean": 9.870002837924556,
+      "return_std": 9.393118272399557,
+      "seed": 9999
+    },
+    "conservative": {
+      "discounted_return_mean": 11.61197581754111,
+      "discounted_return_std": 1.0494073020356378,
+      "gamma": 0.99,
+      "n_episodes": 500,
+      "policy": "conservative",
+      "return_mean": 12.666684304047688,
+      "return_std": 1.1408190631511756,
+      "seed": 9999
+    },
+    "greedy_extraction": {
+      "discounted_return_mean": 8.696308682108079,
+      "discounted_return_std": 9.084848985798413,
+      "gamma": 0.99,
+      "n_episodes": 500,
+      "policy": "greedy_extraction",
+      "return_mean": 9.094008968598095,
+      "return_std": 10.769225976192768,
+      "seed": 9999
+    },
+    "random": {
+      "discounted_return_mean": 8.533847531743463,
+      "discounted_return_std": 4.233733464598317,
+      "gamma": 0.99,
+      "n_episodes": 500,
+      "policy": "random",
+      "return_mean": 8.987487770352708,
+      "return_std": 4.908234834080836,
+      "seed": 9999
+    }
+  },
+  "experiment": "Phase 5 learned-policy and hand-coded-policy comparison",
+  "models": {
+    "BC": {
+      "123": "C:\\trishna-opal\\models\\bc\\bc_seed123.d3",
+      "2024": "C:\\trishna-opal\\models\\bc\\bc_seed2024.d3",
+      "42": "C:\\trishna-opal\\models\\bc\\bc_seed42.d3"
+    },
+    "CQL": {
+      "123": "C:\\trishna-opal\\models\\cql\\cql_seed123.d3",
+      "2024": "C:\\trishna-opal\\models\\cql\\cql_seed2024.d3",
+      "42": "C:\\trishna-opal\\models\\cql\\cql_seed42.d3"
+    },
+    "bc_dir": "C:\\trishna-opal\\models\\bc",
+    "cql_dir": "C:\\trishna-opal\\models\\cql"
+  },
+  "observation_standardization": {
+    "fitted_on": "training episodes only",
+    "mean": [
+      13.58569049835205,
+      37.29146957397461,
+      0.39369070529937744,
+      -2.8383163874767803e-12,
+      2.8383163874767803e-12,
+      0.3563271164894104
+    ],
+    "std": [
+      6.753443717956543,
+      41.474266052246094,
+      0.25919780135154724,
+      0.7071067690849304,
+      0.7071067690849304,
+      0.21446622908115387
+    ]
+  },
+  "per_seed_cql_minus_bc": {
+    "123": {
+      "bc_mean": 10.684851739020182,
+      "cql_mean": 9.633757602359266,
+      "cql_minus_bc": -1.051094136660916
+    },
+    "2024": {
+      "bc_mean": 11.758545659183111,
+      "cql_mean": 9.574959312636729,
+      "cql_minus_bc": -2.1835863465463827
+    },
+    "42": {
+      "bc_mean": 10.223098620761968,
+      "cql_mean": 9.870002837924556,
+      "cql_minus_bc": -0.3530957828374088
+    }
+  },
+  "protocol": {
+    "bootstrap_replicates": 5000,
+    "bootstrap_seed": 2026,
+    "evaluation_method": "exact direct rollout in controlled simulator",
+    "evaluation_seed": 9999,
+    "gamma": 0.99,
+    "n_evaluation_episodes": 500,
+    "split_seed": 1,
+    "training_seeds": [
+      42,
+      123,
+      2024
+    ]
+  },
+  "scientific_caveat": "Direct simulator rollout provides exact evaluation only for the controlled simulator used by this experiment. It is not evidence of real-world causal groundwater-management efficacy.",
+  "software": {
+    "d3rlpy": "2.8.1",
+    "platform": "Windows-10-10.0.26200-SP0",
+    "python": "3.10.20"
+  },
+  "statistical_caveat": "The bootstrap CI quantifies episode-level uncertainty for the evaluated policies. Three training seeds should not be treated as many independent training experiments."
+}

@@ -1,0 +1,91 @@
+{
+  "alpha_sweep_diagnostic": {
+    "skipped": true
+  },
+  "alpha_used": 4.0,
+  "alpha_source": "--alpha flag",
+  "target_update_interval_used": 500,
+  "target_update_interval_source": "--target-update-interval flag",
+  "n_steps_used": 8000,
+  "n_steps_per_epoch_used": 2000,
+  "is_short_probe": true,
+  "qfunc": "mean",
+  "q_func_factory": "MeanQFunctionFactory",
+  "n_quantiles": null,
+  "clip_grad_norm": 1.0,
+  "oversample_factor": 1,
+  "model_dir": "models_probe_D",
+  "per_seed": [
+    {
+      "seed": 42,
+      "alpha": 4.0,
+      "val_action_match": {
+        "overall": 0.7064444444444444,
+        "random": 0.20746268656716418,
+        "greedy_extraction": 0.9382716049382716,
+        "conservative": 0.8967532467532467
+      },
+      "test_action_match": {
+        "overall": 0.6955555555555556,
+        "random": 0.21304347826086956,
+        "greedy_extraction": 0.91875,
+        "conservative": 0.9005952380952381
+      },
+      "model_path": "models_probe_D\\cql_seed42.d3"
+    },
+    {
+      "seed": 123,
+      "alpha": 4.0,
+      "val_action_match": {
+        "overall": 0.7073333333333334,
+        "random": 0.20298507462686566,
+        "greedy_extraction": 0.9382716049382716,
+        "conservative": 0.9032467532467533
+      },
+      "test_action_match": {
+        "overall": 0.6982222222222222,
+        "random": 0.213768115942029,
+        "greedy_extraction": 0.9236111111111112,
+        "conservative": 0.9029761904761905
+      },
+      "model_path": "models_probe_D\\cql_seed123.d3"
+    },
+    {
+      "seed": 2024,
+      "alpha": 4.0,
+      "val_action_match": {
+        "overall": 0.706,
+        "random": 0.19701492537313434,
+        "greedy_extraction": 0.9351851851851852,
+        "conservative": 0.9077922077922078
+      },
+      "test_action_match": {
+        "overall": 0.7022222222222222,
+        "random": 0.21231884057971015,
+        "greedy_extraction": 0.9270833333333334,
+        "conservative": 0.9119047619047619
+      },
+      "model_path": "models_probe_D\\cql_seed2024.d3"
+    }
+  ],
+  "val_action_match_mean": 0.7065925925925925,
+  "val_action_match_std": 0.00055431961285543,
+  "test_action_match_mean": 0.6986666666666667,
+  "test_action_match_std": 0.002739739556875075,
+  "n_train_episodes": 1050,
+  "n_train_episodes_after_oversampling": 1050,
+  "n_val_episodes": 225,
+  "n_test_episodes": 225,
+  "split_seed": 1,
+  "training_seeds": [
+    42,
+    123,
+    2024
+  ],
+  "policy_order_assumption": [
+    "random",
+    "greedy_extraction",
+    "conservative"
+  ],
+  "n_per_policy_assumption": 500
+}

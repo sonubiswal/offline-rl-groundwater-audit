@@ -1,0 +1,281 @@
+{
+  "A::seasonal_median": {
+    "random": {
+      "n": 61913,
+      "rmse": 0.11414028298767621,
+      "mae": 0.08912767527345516,
+      "r2": 0.6362548613127712,
+      "bias": -0.006316874396071824,
+      "corr": 0.8081222015039833,
+      "ks_stat": 0.05384975691696414,
+      "ks_p": 1.8442685728503635e-78,
+      "hist_overlap": 0.896952174825965
+    },
+    "spatial_block": {
+      "n": 61913,
+      "rmse": 0.19000258996694075,
+      "mae": 0.14517371077343913,
+      "r2": -0.007948516161365715,
+      "bias": 0.011954991900827537,
+      "corr": -0.0877850126569417,
+      "ks_stat": 0.48992941708526483,
+      "ks_p": 0.0,
+      "hist_overlap": 0.10440456769983687
+    },
+    "temporal_holdout": {
+      "n": 20051,
+      "rmse": 0.13590132988961848,
+      "mae": 0.11000522666887018,
+      "r2": 0.47756385984392247,
+      "bias": -0.09412091441339004,
+      "corr": 0.8614403315848939,
+      "ks_stat": 0.2697621066280983,
+      "ks_p": 0.0,
+      "hist_overlap": 0.7233554436187714
+    }
+  },
+  "A::random_forest": {
+    "random": {
+      "n": 61913,
+      "rmse": 0.06129719031518895,
+      "mae": 0.04513509143475437,
+      "r2": 0.8950939719005371,
+      "bias": 1.8051794528150673e-05,
+      "corr": 0.9462061854644206,
+      "ks_stat": 0.03483920985899569,
+      "ks_p": 4.430514661827367e-33,
+      "hist_overlap": 0.909663560156994
+    },
+    "spatial_block": {
+      "n": 61913,
+      "rmse": 0.08188203639317236,
+      "mae": 0.06126518644672723,
+      "r2": 0.8128039942462159,
+      "bias": -0.0012952899506767834,
+      "corr": 0.9016296176819079,
+      "ks_stat": 0.043738794760389554,
+      "ks_p": 6.726790190723527e-52,
+      "hist_overlap": 0.8981150969909384
+    },
+    "temporal_holdout": {
+      "n": 20051,
+      "rmse": 0.09979563608971924,
+      "mae": 0.078347613691926,
+      "r2": 0.7182856950540323,
+      "bias": -0.005641957365227622,
+      "corr": 0.8482685274307828,
+      "ks_stat": 0.11804897511346069,
+      "ks_p": 3.414447381295394e-122,
+      "hist_overlap": 0.8034511994414241
+    }
+  },
+  "A::hist_gradient_boosting": {
+    "random": {
+      "n": 61913,
+      "rmse": 0.06875897383044478,
+      "mae": 0.05249940728400537,
+      "r2": 0.8679987386677634,
+      "bias": -8.983101292604304e-05,
+      "corr": 0.9318693626093989,
+      "ks_stat": 0.05099090659473777,
+      "ks_p": 2.1649704843953643e-70,
+      "hist_overlap": 0.8734353043787245
+    },
+    "spatial_block": {
+      "n": 61913,
+      "rmse": 0.0818112318961698,
+      "mae": 0.062166723113250326,
+      "r2": 0.8131275960768005,
+      "bias": -0.0006435191057788459,
+      "corr": 0.9017451304685186,
+      "ks_stat": 0.0577100124368065,
+      "ks_p": 4.670911138591057e-90,
+      "hist_overlap": 0.8594963900957793
+    },
+    "temporal_holdout": {
+      "n": 20051,
+      "rmse": 0.09376228815028641,
+      "mae": 0.07297251036827476,
+      "r2": 0.7513192357827598,
+      "bias": 0.0007766912187926577,
+      "corr": 0.866959783937855,
+      "ks_stat": 0.09695277043538975,
+      "ks_p": 1.7562937419556377e-82,
+      "hist_overlap": 0.8032018353199336
+    }
+  },
+  "B::seasonal_median": {
+    "random": {
+      "n": 61913,
+      "rmse": 0.11414028298767621,
+      "mae": 0.08912767527345516,
+      "r2": 0.6362548613127712,
+      "bias": -0.006316874396071824,
+      "corr": 0.8081222015039833,
+      "ks_stat": 0.05384975691696414,
+      "ks_p": 1.8442685728503635e-78,
+      "hist_overlap": 0.896952174825965
+    },
+    "spatial_block": {
+      "n": 61913,
+      "rmse": 0.19000258996694075,
+      "mae": 0.14517371077343913,
+      "r2": -0.007948516161365715,
+      "bias": 0.011954991900827537,
+      "corr": -0.0877850126569417,
+      "ks_stat": 0.48992941708526483,
+      "ks_p": 0.0,
+      "hist_overlap": 0.10440456769983687
+    },
+    "temporal_holdout": {
+      "n": 20051,
+      "rmse": 0.13590132988961848,
+      "mae": 0.11000522666887018,
+      "r2": 0.47756385984392247,
+      "bias": -0.09412091441339004,
+      "corr": 0.8614403315848939,
+      "ks_stat": 0.2697621066280983,
+      "ks_p": 0.0,
+      "hist_overlap": 0.7233554436187714
+    }
+  },
+  "B::random_forest": {
+    "random": {
+      "n": 61913,
+      "rmse": 0.05362518870575224,
+      "mae": 0.03782610424579501,
+      "r2": 0.9197108287965307,
+      "bias": 0.00018067982336393353,
+      "corr": 0.9591120239898278,
+      "ks_stat": 0.029541453329672285,
+      "ks_p": 6.652209782133855e-24,
+      "hist_overlap": 0.9347471451876014
+    },
+    "spatial_block": {
+      "n": 61913,
+      "rmse": 0.10432392989690589,
+      "mae": 0.08255439516491311,
+      "r2": 0.6961304482591475,
+      "bias": 0.007278213121702068,
+      "corr": 0.8373652714647956,
+      "ks_stat": 0.19293201750843925,
+      "ks_p": 0.0,
+      "hist_overlap": 0.7055545685074213
+    },
+    "temporal_holdout": {
+      "n": 20051,
+      "rmse": 0.1533689347929649,
+      "mae": 0.123628643327707,
+      "r2": 0.3346340052147675,
+      "bias": -0.09035025404023123,
+      "corr": 0.7811312745286741,
+      "ks_stat": 0.2585905939853374,
+      "ks_p": 0.0,
+      "hist_overlap": 0.72594883048227
+    }
+  },
+  "B::hist_gradient_boosting": {
+    "random": {
+      "n": 61913,
+      "rmse": 0.05902427414506604,
+      "mae": 0.04303935373809319,
+      "r2": 0.9027296187762135,
+      "bias": 0.0002591164402986464,
+      "corr": 0.9502282313849397,
+      "ks_stat": 0.03808570090287988,
+      "ks_p": 1.8881673612895806e-39,
+      "hist_overlap": 0.9174002228934144
+    },
+    "spatial_block": {
+      "n": 61913,
+      "rmse": 0.10043669682096572,
+      "mae": 0.08015620487916018,
+      "r2": 0.7183536351972446,
+      "bias": 0.019208122895690627,
+      "corr": 0.8565671073767493,
+      "ks_stat": 0.20977823720381827,
+      "ks_p": 0.0,
+      "hist_overlap": 0.7266325327475648
+    },
+    "temporal_holdout": {
+      "n": 20051,
+      "rmse": 0.14039810935503133,
+      "mae": 0.11529757141826587,
+      "r2": 0.4424185487828478,
+      "bias": -0.08013309064843029,
+      "corr": 0.7973108780372089,
+      "ks_stat": 0.24831679217994118,
+      "ks_p": 0.0,
+      "hist_overlap": 0.7268964141439325
+    }
+  },
+  "_winner": {
+    "experiment": "A",
+    "model": "hist_gradient_boosting",
+    "criterion": "spatial_block_r2",
+    "r2": 0.8131275960768005
+  },
+  "_recovery": {
+    "total_rows": 61913,
+    "observed_exact_source0": 61913,
+    "spatial_fallback_source1": 0,
+    "imputed_source2": 0,
+    "still_missing": 0,
+    "coverage_before": 1.0,
+    "coverage_after_exact": 1.0,
+    "coverage_after_spatial": 1.0,
+    "coverage_after_imputed": 1.0,
+    "winner_experiment": "A",
+    "winner_model": "hist_gradient_boosting",
+    "winner_criterion": "spatial_block_r2",
+    "spatial_fallback_radius_km": 20.0,
+    "spatial_time_window_days": 0
+  },
+  "_leakage": {
+    "n_checks": 66,
+    "n_failed": 0
+  },
+  "_caveats": {
+    "b_spatial_vs_a_spatial": "CAVEAT: Experiment B's spatial_block R2 (0.718) vs A's (0.813) does NOT show that temporal history (prev_ndvi/ndvi_age_days) improves spatial transfer. Held-out spatial blocks have no same-pixel history, so B's temporal features are NaN there BY CONSTRUCTION - B_spatial ~ A_spatial is expected, not a finding about temporal value. Whether temporal history helps at all is answered by the temporal_holdout numbers below, comparing A vs B there instead."
+  },
+  "_config": {
+    "input_csv": "C:\\trishna-opal\\data\\feature_table.csv",
+    "output_dir": "reports",
+    "random_seed": 42,
+    "n_splits_random": 5,
+    "n_splits_spatial": 5,
+    "spatial_block_deg": 1.0,
+    "spatial_fallback_radius_km": 20.0,
+    "radius_sweep_km": [
+      10.0,
+      15.0,
+      20.0,
+      30.0
+    ],
+    "run_radius_sweep": true,
+    "spatial_time_window_days": 0,
+    "temporal_holdout_frac": 0.2,
+    "models": [
+      "seasonal_median",
+      "random_forest",
+      "hist_gradient_boosting"
+    ],
+    "cov_predictors": [
+      "chirps",
+      "gldas_sm",
+      "grace",
+      "elevation",
+      "slope",
+      "month_sin",
+      "month_cos"
+    ],
+    "id_col": "pixel_id",
+    "lon_col": "lon",
+    "lat_col": "lat",
+    "date_col": "date",
+    "target_col": "sentinel2_ndvi",
+    "region_col": "region",
+    "winner_criterion": "spatial_block_r2",
+    "_winner_model_name": "hist_gradient_boosting"
+  }
+}

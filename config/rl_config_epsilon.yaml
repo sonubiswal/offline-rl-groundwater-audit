@@ -1,0 +1,78 @@
+# config/rl_config.yaml
+# Phase 4-5: synthetic RL dataset generation + CQL/BC training config.
+
+state_space:
+  # Order matters -- this is the exact feature vector order used by
+  # synthetic_reward.py and env_state_builder.py. Changing the order
+  # without updating both is a silent bug risk -- keep them in sync.
+  features:
+    - gw_level          # meters below ground; sourced from RF's predicted
+                         # grid (Phase 2), NOT the point-scale LSTM -- RF
+                         # provides coverage at any location, which a
+                         # region-wide state simulator needs. See
+                         # validation_methodology.md Section 16.2(a).
+    - recent_rainfall    # chirps_roll3 equivalent, mm, 3-month rolling
+    - crop_water_demand  # proxy, see synthetic_reward.py docstring for
+                         # the exact formula and its assumptions
+    - month_sin
+    - month_cos
+    - extraction_rate    # normalized historical pumping intensity, 0-1
+
+action_space:
+  n_actions: 5
+  labels:
+    - "no_pumping"
+    - "light_pumping"
+    - "moderate_pumping"
+    - "heavy_pumping"
+    - "maximum_extraction"
+
+reward:
+  # Reward = w1*crop_revenue_proxy - w2*depletion_penalty + w3*domestic_supply_score
+  # NOTE: sign convention -- w1 and w3 are additive benefits, w2 is a
+  # penalty subtracted. Keep this consistent with synthetic_reward.py.
+  w1_crop_revenue: 1.0
+  w2_depletion_penalty: 2.0   # weighted higher than revenue by default --
+                              # deliberately conservative; revisit in
+                              # Phase 6's reward-sensitivity sweep, not here
+  w3_domestic_supply: 0.5
+  sustainability_threshold_m: 15.0   # depth beyond which depletion penalty
+                                      # begins to grow quadratically -- chosen
+                                      # to match the ~15-20m reliability
+                                      # ceiling diagnosed in limitations.md
+                                      # Section 1, NOT an independent
+                                      # hydrogeological threshold. State this
+                                      # explicitly if questioned in viva.
+  depletion_penalty_exponent: 2.0
+
+simulation:
+  random_seed: 42
+  n_trajectories_per_policy: 500
+  trajectory_length: 20
+  behavior_policies:
+    - random
+    - greedy_extraction
+    - epsilon_greedy_extraction
+
+cql:
+  # Placeholder defaults for Phase 5 -- not used by Phase 4 scripts,
+  # kept here so Phase 5 reads from the same file per the roadmap's
+  # config-driven requirement.
+  conservative_weight: 5.0
+  learning_rate: 0.0003
+  n_epochs: 50
+  model_dir: models_epsilon/cql
+
+ 
+bc:
+  # Discrete BC hyperparameters -- see bc_baseline.py's module docstring
+  # for the verified DiscreteBCConfig signature this maps onto.
+  batch_size: 100
+  learning_rate: 0.001
+  beta: 0.5              # DiscreteBC's own regularization weight --
+                          # NOT the same as cql.conservative_weight below,
+                          # despite both being "how much to regularize"
+                          # knobs. Do not conflate the two when tuning.
+  n_steps: 20000
+  n_steps_per_epoch: 2000
+ 

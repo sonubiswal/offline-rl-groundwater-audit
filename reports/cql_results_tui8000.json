@@ -1,0 +1,105 @@
+{
+  "alpha_sweep_diagnostic": {
+    "grid_results": [
+      {
+        "alpha": 0.5,
+        "init_state_value": 0.8580150008201599
+      },
+      {
+        "alpha": 1.0,
+        "init_state_value": 0.8431705832481384
+      },
+      {
+        "alpha": 4.0,
+        "init_state_value": 0.9257336258888245
+      },
+      {
+        "alpha": 10.0,
+        "init_state_value": 1.0084984302520752
+      }
+    ],
+    "sweep_seed": 42,
+    "selection_disabled_reason": "InitialStateValueEstimationEvaluator is biased toward low alpha; auto-selection from this metric was removed. See module docstring BUGFIX 2. Alpha must be chosen via --alpha / cql.alpha in config, ideally validated by the full paired-bootstrap comparison in compare_policies.py."
+  },
+  "alpha_used": 4.0,
+  "alpha_source": "--alpha flag",
+  "target_update_interval_used": 8000,
+  "target_update_interval_source": "--target-update-interval flag",
+  "q_func_factory": "QRQFunctionFactory",
+  "n_quantiles": 32,
+  "oversample_factor": 3,
+  "model_dir": "models_tui8000",
+  "per_seed": [
+    {
+      "seed": 42,
+      "alpha": 4.0,
+      "val_action_match": {
+        "overall": 0.7017777777777777,
+        "random": 0.20149253731343283,
+        "greedy_extraction": 0.9592592592592593,
+        "conservative": 0.8662337662337662
+      },
+      "test_action_match": {
+        "overall": 0.6895555555555556,
+        "random": 0.19492753623188405,
+        "greedy_extraction": 0.9479166666666666,
+        "conservative": 0.8744047619047619
+      },
+      "model_path": "models_tui8000\\cql_seed42.d3"
+    },
+    {
+      "seed": 123,
+      "alpha": 4.0,
+      "val_action_match": {
+        "overall": 0.7024444444444444,
+        "random": 0.19776119402985073,
+        "greedy_extraction": 0.9481481481481482,
+        "conservative": 0.8831168831168831
+      },
+      "test_action_match": {
+        "overall": 0.6955555555555556,
+        "random": 0.21304347826086956,
+        "greedy_extraction": 0.9347222222222222,
+        "conservative": 0.8869047619047619
+      },
+      "model_path": "models_tui8000\\cql_seed123.d3"
+    },
+    {
+      "seed": 2024,
+      "alpha": 4.0,
+      "val_action_match": {
+        "overall": 0.6993333333333334,
+        "random": 0.2,
+        "greedy_extraction": 0.9555555555555556,
+        "conservative": 0.8642857142857143
+      },
+      "test_action_match": {
+        "overall": 0.6951111111111111,
+        "random": 0.20217391304347826,
+        "greedy_extraction": 0.9534722222222223,
+        "conservative": 0.8785714285714286
+      },
+      "model_path": "models_tui8000\\cql_seed2024.d3"
+    }
+  ],
+  "val_action_match_mean": 0.7011851851851851,
+  "val_action_match_std": 0.0013374422285383277,
+  "test_action_match_mean": 0.6934074074074075,
+  "test_action_match_std": 0.0027297075218797426,
+  "n_train_episodes": 1050,
+  "n_train_episodes_after_oversampling": 1182,
+  "n_val_episodes": 225,
+  "n_test_episodes": 225,
+  "split_seed": 1,
+  "training_seeds": [
+    42,
+    123,
+    2024
+  ],
+  "policy_order_assumption": [
+    "random",
+    "greedy_extraction",
+    "conservative"
+  ],
+  "n_per_policy_assumption": 500
+}

@@ -1,0 +1,34 @@
+{
+  "dataset": "C:\\trishna-opal\\reports\\paper_exp\\weights_ablation\\dataset_w0.0_2.0_0.5.h5",
+  "dataset_sha1": "80ec3b535468c65a21e7bbb00733d6be69181725",
+  "config": "config/rl_config.yaml",
+  "config_sha1": "cfe81f95d0d2a0742d0a4e5313aa50b56c2a8068",
+  "script_sha1": "e331ba002aec144fbab1e5e9a925abc25eb74dc7",
+  "split_seed": 1,
+  "eps": 0.1,
+  "cql_lr": 6.25e-05,
+  "alpha": 1.0,
+  "qfunc": "qr",
+  "n_quantiles": 32,
+  "oversample": 3,
+  "n_steps": 20000,
+  "n_features": 6,
+  "norm_fingerprint": "22ad25aa8d409999dc6545b899c8599d13b64494",
+  "mean": [
+    14.644857406616211,
+    36.84288787841797,
+    0.3953251838684082,
+    -2.8383163874767803e-12,
+    2.8383163874767803e-12,
+    0.41167396306991577
+  ],
+  "std": [
+    7.37384557723999,
+    40.92973709106445,
+    0.24560002982616425,
+    0.7071067690849304,
+    0.7071067690849304,
+    0.19999244809150696
+  ],
+  "created": "2026-09-13T16:10:36Z"
+}

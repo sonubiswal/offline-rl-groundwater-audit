@@ -1,0 +1,32 @@
+# config/model_config.yaml
+#
+# ConvLSTM hyperparameters for Phase 3 groundwater estimation.
+# Read by src/models/convlstm.py and src/models/train_convlstm.py -- do
+# not hardcode these values in the model/training code itself.
+
+convlstm:
+  seq_len: 12              # months of history per input sequence
+  hidden_dim: [32, 16]      # hidden channels per ConvLSTM layer (num_layers = len(this))
+  kernel_size: [3, 3]       # spatial kernel size for all ConvLSTM layers
+  num_layers: 2
+  grid_size: 64
+
+  # Input channels, in fixed order (must match build_sequences.py's stacking order):
+  #   chirps, gldas, sentinel2_ndvi, grace (coarse, resampled to grid),
+  #   srtm_elevation, srtm_slope, rf_downscaled_grace (Phase 2 model output)
+  input_channels: 7
+
+training:
+  batch_size: 8
+  learning_rate: 0.001
+  max_epochs: 100
+  early_stopping_patience: 10
+  val_fraction: 0.15        # fraction of sequences (by time) held out for validation
+  random_seed: 42
+  optimizer: adam
+  loss: mse
+
+  # Time-based split point: sequences ending before this date are
+  # train/val; sequences ending on or after this date are the internal
+  # time-based test set (separate from the spatial held-out wells).
+  time_split_date: "2021-01-01"

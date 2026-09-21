@@ -1,0 +1,19 @@
+{
+  "mode": "adapt",
+  "scenario": "normal",
+  "gw_level": 15.0,
+  "behavior": [
+    "random",
+    "greedy_extraction",
+    "epsilon_greedy_extraction"
+  ],
+  "eps": 0.1,
+  "alpha": 1.0,
+  "cql_lr": 0.0003,
+  "config": "config/rl_config.yaml",
+  "config_sha1": "cfe81f95d0d2a0742d0a4e5313aa50b56c2a8068",
+  "n_transitions": 30000,
+  "sha1": "212e8d6f1fd4c2f3a9830c5623175cd74432db43",
+  "script_sha1": "e331ba002aec144fbab1e5e9a925abc25eb74dc7",
+  "created": "2026-09-11T23:53:47Z"
+}

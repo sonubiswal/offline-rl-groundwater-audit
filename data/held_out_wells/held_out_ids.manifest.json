@@ -1,0 +1,6 @@
+{
+  "held_out_ids_sha1": "029865a1b0ad820cac76b9ecd8089354a9764b56",
+  "held_out_well_ids_sha256": "5c69b6226ca558fa8d69d70dd0085fb07fd816acfe749b9ffcb8b30847ccf25f",
+  "n_wells": 710,
+  "source_file": "data/held_out_wells/held_out_ids.csv"
+}

@@ -1,0 +1,230 @@
+{
+  "setup": {
+    "horizon": 20,
+    "n_states_per_band": 200,
+    "mahalanobis2_thresholds": {
+      "id_max": 7.009169946950603,
+      "mild_max": 12.591587243743977,
+      "moderate_max": 19.8046523588496
+    },
+    "reward_config": {
+      "w1_crop_revenue": 1.0,
+      "w2_depletion_penalty": 2.0,
+      "w3_domestic_supply": 0.5,
+      "sustainability_threshold_m": 15.0,
+      "depletion_penalty_exponent": 2.0
+    }
+  },
+  "per_policy_per_level": {
+    "bc_seed42": {
+      "id": {
+        "mean_return": -0.784774137650713,
+        "std_return": 20.57826757458267,
+        "mean_steps": 20.0,
+        "terminated_frac": 0.0,
+        "n": 200
+      },
+      "mild": {
+        "mean_return": -12.198967875137065,
+        "std_return": 33.07924521489604,
+        "mean_steps": 20.0,
+        "terminated_frac": 0.0,
+        "n": 200
+      },
+      "moderate": {
+        "mean_return": -24.37522523225971,
+        "std_return": 49.52817803387079,
+        "mean_steps": 20.0,
+        "terminated_frac": 0.0,
+        "n": 200
+      },
+      "severe": {
+        "mean_return": -42.15795108930155,
+        "std_return": 68.02323167297754,
+        "mean_steps": 20.0,
+        "terminated_frac": 0.0,
+        "n": 200
+      }
+    },
+    "bc_seed123": {
+      "id": {
+        "mean_return": 7.862403114666302,
+        "std_return": 5.4511693494813755,
+        "mean_steps": 20.0,
+        "terminated_frac": 0.0,
+        "n": 200
+      },
+      "mild": {
+        "mean_return": 0.8446648566359685,
+        "std_return": 12.417977632790109,
+        "mean_steps": 20.0,
+        "terminated_frac": 0.0,
+        "n": 200
+      },
+      "moderate": {
+        "mean_return": -10.83029821125262,
+        "std_return": 26.367881195933002,
+        "mean_steps": 20.0,
+        "terminated_frac": 0.0,
+        "n": 200
+      },
+      "severe": {
+        "mean_return": -28.054412027136582,
+        "std_return": 44.19707130253689,
+        "mean_steps": 20.0,
+        "terminated_frac": 0.0,
+        "n": 200
+      }
+    },
+    "bc_seed2024": {
+      "id": {
+        "mean_return": 5.170478573118296,
+        "std_return": 10.881499328163377,
+        "mean_steps": 20.0,
+        "terminated_frac": 0.0,
+        "n": 200
+      },
+      "mild": {
+        "mean_return": -3.62922390853078,
+        "std_return": 18.723342184806476,
+        "mean_steps": 20.0,
+        "terminated_frac": 0.0,
+        "n": 200
+      },
+      "moderate": {
+        "mean_return": -17.545629827269355,
+        "std_return": 37.04520125078541,
+        "mean_steps": 20.0,
+        "terminated_frac": 0.0,
+        "n": 200
+      },
+      "severe": {
+        "mean_return": -34.63026733022014,
+        "std_return": 56.93950446526131,
+        "mean_steps": 20.0,
+        "terminated_frac": 0.0,
+        "n": 200
+      }
+    },
+    "cql_seed42": {
+      "id": {
+        "mean_return": 3.4204713195841725,
+        "std_return": 12.145388936467883,
+        "mean_steps": 20.0,
+        "terminated_frac": 0.0,
+        "n": 200
+      },
+      "mild": {
+        "mean_return": -10.86372926570844,
+        "std_return": 23.972834133831306,
+        "mean_steps": 20.0,
+        "terminated_frac": 0.0,
+        "n": 200
+      },
+      "moderate": {
+        "mean_return": -30.06713147754017,
+        "std_return": 40.23594140849987,
+        "mean_steps": 20.0,
+        "terminated_frac": 0.0,
+        "n": 200
+      },
+      "severe": {
+        "mean_return": -58.72187323938357,
+        "std_return": 63.99419188980966,
+        "mean_steps": 20.0,
+        "terminated_frac": 0.0,
+        "n": 200
+      }
+    },
+    "cql_seed123": {
+      "id": {
+        "mean_return": -20.003829176561958,
+        "std_return": 29.641067244556773,
+        "mean_steps": 20.0,
+        "terminated_frac": 0.0,
+        "n": 200
+      },
+      "mild": {
+        "mean_return": -32.33254120609315,
+        "std_return": 42.84599240874138,
+        "mean_steps": 20.0,
+        "terminated_frac": 0.0,
+        "n": 200
+      },
+      "moderate": {
+        "mean_return": -44.25779212063293,
+        "std_return": 62.413553265700784,
+        "mean_steps": 20.0,
+        "terminated_frac": 0.0,
+        "n": 200
+      },
+      "severe": {
+        "mean_return": -56.507516631145144,
+        "std_return": 79.26835571176655,
+        "mean_steps": 20.0,
+        "terminated_frac": 0.0,
+        "n": 200
+      }
+    },
+    "cql_seed2024": {
+      "id": {
+        "mean_return": -19.18557609768572,
+        "std_return": 28.085481972879524,
+        "mean_steps": 20.0,
+        "terminated_frac": 0.0,
+        "n": 200
+      },
+      "mild": {
+        "mean_return": -42.653281326048074,
+        "std_return": 43.37608950702783,
+        "mean_steps": 20.0,
+        "terminated_frac": 0.0,
+        "n": 200
+      },
+      "moderate": {
+        "mean_return": -67.66370679571759,
+        "std_return": 64.23772645863956,
+        "mean_steps": 20.0,
+        "terminated_frac": 0.0,
+        "n": 200
+      },
+      "severe": {
+        "mean_return": -104.80677652827366,
+        "std_return": 90.48444909850598,
+        "mean_steps": 20.0,
+        "terminated_frac": 0.0,
+        "n": 200
+      }
+    }
+  },
+  "summary": {
+    "id": {
+      "bc_mean_return": 4.0827025167112945,
+      "cql_mean_return": -11.922977984887835,
+      "delta_cql_minus_bc": -16.00568050159913,
+      "bc_std_across_seeds": 3.613019159458055,
+      "cql_std_across_seeds": 10.854598470830982
+    },
+    "mild": {
+      "bc_mean_return": -4.994508975677292,
+      "cql_mean_return": -28.616517265949884,
+      "delta_cql_minus_bc": -23.622008290272593,
+      "bc_std_across_seeds": 5.411844491254046,
+      "cql_std_across_seeds": 13.241362731784804
+    },
+    "moderate": {
+      "bc_mean_return": -17.58371775692723,
+      "cql_mean_return": -47.32954346463023,
+      "delta_cql_minus_bc": -29.745825707703,
+      "bc_std_across_seeds": 5.52975888678046,
+      "cql_std_across_seeds": 15.501663591442023
+    },
+    "severe": {
+      "bc_mean_return": -34.94754348221942,
+      "cql_mean_return": -73.3453887996008,
+      "delta_cql_minus_bc": -38.397845317381375,
+      "bc_std_across_seeds": 5.762114868516817,
+      "cql_std_across_seeds": 22.264920572618685
+    }
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "seed": 2024,
+  "algo": "DiscreteBC",
+  "n_steps": 20000,
+  "n_steps_per_epoch": 2000,
+  "batch_size": 100,
+  "learning_rate": 0.001,
+  "beta": 0.5,
+  "val_accuracy_overall": 0.7055555555555556,
+  "test_accuracy_overall": 0.694,
+  "seeded_via": "d3rlpy.seed(seed), called before .create()"
+}

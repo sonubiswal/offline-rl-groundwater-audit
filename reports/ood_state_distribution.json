@@ -1,0 +1,651 @@
+{
+  "setup": {
+    "n_train_observations": 21000,
+    "train_mean": [
+      13.58569049835205,
+      37.29146957397461,
+      0.39369070529937744,
+      -2.8383163874767803e-12,
+      2.8383163874767803e-12,
+      0.3563271164894104
+    ],
+    "train_cov_diag": [
+      45.61131017076147,
+      1720.2267128726303,
+      0.0671869179487076,
+      0.5000238089779222,
+      0.5000238089779222,
+      0.04599798054622493
+    ],
+    "mahalanobis2_thresholds": {
+      "id_max": 7.009169946950603,
+      "mild_max": 12.591587243743977,
+      "moderate_max": 19.8046523588496
+    },
+    "sampling_draws": 155000,
+    "dim_names": [
+      "gw_level",
+      "recent_rainfall",
+      "crop_water_demand",
+      "month_sin",
+      "month_cos",
+      "extraction_rate"
+    ],
+    "bounds": {
+      "gw_level": [
+        1.0,
+        60.0
+      ],
+      "recent_rainfall": [
+        0.0,
+        400.0
+      ],
+      "crop_water_demand": [
+        0.0,
+        1.2
+      ],
+      "month_sin": [
+        -1.0,
+        1.0
+      ],
+      "month_cos": [
+        -1.0,
+        1.0
+      ],
+      "extraction_rate": [
+        0.0,
+        1.0
+      ]
+    }
+  },
+  "per_level": {
+    "id": {
+      "n_states": 500,
+      "bc_seed42": 0.81,
+      "bc_seed123": 0.124,
+      "bc_seed2024": 0.404,
+      "cql_seed42": 1.376,
+      "cql_seed123": 1.91,
+      "cql_seed2024": 2.57
+    },
+    "mild": {
+      "n_states": 500,
+      "bc_seed42": 0.616,
+      "bc_seed123": 0.042,
+      "bc_seed2024": 0.272,
+      "cql_seed42": 1.438,
+      "cql_seed123": 1.534,
+      "cql_seed2024": 2.624
+    },
+    "moderate": {
+      "n_states": 500,
+      "bc_seed42": 0.404,
+      "bc_seed123": 0.048,
+      "bc_seed2024": 0.268,
+      "cql_seed42": 1.494,
+      "cql_seed123": 1.214,
+      "cql_seed2024": 2.632
+    },
+    "severe": {
+      "n_states": 500,
+      "bc_seed42": 0.3,
+      "bc_seed123": 0.016,
+      "bc_seed2024": 0.19,
+      "cql_seed42": 1.636,
+      "cql_seed123": 0.722,
+      "cql_seed2024": 2.738
+    }
+  },
+  "policies": {
+    "bc_seed42": {
+      "id": {
+        "policy": "bc_seed42",
+        "n": 500,
+        "counts": [
+          364,
+          16,
+          1,
+          89,
+          30
+        ],
+        "distribution": [
+          0.728,
+          0.032,
+          0.002,
+          0.178,
+          0.06
+        ],
+        "mean_action": 0.81
+      },
+      "mild": {
+        "policy": "bc_seed42",
+        "n": 500,
+        "counts": [
+          400,
+          10,
+          1,
+          60,
+          29
+        ],
+        "distribution": [
+          0.8,
+          0.02,
+          0.002,
+          0.12,
+          0.058
+        ],
+        "mean_action": 0.616
+      },
+      "moderate": {
+        "policy": "bc_seed42",
+        "n": 500,
+        "counts": [
+          430,
+          14,
+          0,
+          36,
+          20
+        ],
+        "distribution": [
+          0.86,
+          0.028,
+          0.0,
+          0.072,
+          0.04
+        ],
+        "mean_action": 0.404
+      },
+      "severe": {
+        "policy": "bc_seed42",
+        "n": 500,
+        "counts": [
+          453,
+          5,
+          0,
+          23,
+          19
+        ],
+        "distribution": [
+          0.906,
+          0.01,
+          0.0,
+          0.046,
+          0.038
+        ],
+        "mean_action": 0.3
+      }
+    },
+    "bc_seed123": {
+      "id": {
+        "policy": "bc_seed123",
+        "n": 500,
+        "counts": [
+          478,
+          1,
+          2,
+          19,
+          0
+        ],
+        "distribution": [
+          0.956,
+          0.002,
+          0.004,
+          0.038,
+          0.0
+        ],
+        "mean_action": 0.124
+      },
+      "mild": {
+        "policy": "bc_seed123",
+        "n": 500,
+        "counts": [
+          493,
+          0,
+          0,
+          7,
+          0
+        ],
+        "distribution": [
+          0.986,
+          0.0,
+          0.0,
+          0.014,
+          0.0
+        ],
+        "mean_action": 0.042
+      },
+      "moderate": {
+        "policy": "bc_seed123",
+        "n": 500,
+        "counts": [
+          492,
+          0,
+          0,
+          8,
+          0
+        ],
+        "distribution": [
+          0.984,
+          0.0,
+          0.0,
+          0.016,
+          0.0
+        ],
+        "mean_action": 0.048
+      },
+      "severe": {
+        "policy": "bc_seed123",
+        "n": 500,
+        "counts": [
+          497,
+          0,
+          1,
+          2,
+          0
+        ],
+        "distribution": [
+          0.994,
+          0.0,
+          0.002,
+          0.004,
+          0.0
+        ],
+        "mean_action": 0.016
+      }
+    },
+    "bc_seed2024": {
+      "id": {
+        "policy": "bc_seed2024",
+        "n": 500,
+        "counts": [
+          399,
+          0,
+          101,
+          0,
+          0
+        ],
+        "distribution": [
+          0.798,
+          0.0,
+          0.202,
+          0.0,
+          0.0
+        ],
+        "mean_action": 0.404
+      },
+      "mild": {
+        "policy": "bc_seed2024",
+        "n": 500,
+        "counts": [
+          434,
+          0,
+          64,
+          0,
+          2
+        ],
+        "distribution": [
+          0.868,
+          0.0,
+          0.128,
+          0.0,
+          0.004
+        ],
+        "mean_action": 0.272
+      },
+      "moderate": {
+        "policy": "bc_seed2024",
+        "n": 500,
+        "counts": [
+          435,
+          0,
+          63,
+          0,
+          2
+        ],
+        "distribution": [
+          0.87,
+          0.0,
+          0.126,
+          0.0,
+          0.004
+        ],
+        "mean_action": 0.268
+      },
+      "severe": {
+        "policy": "bc_seed2024",
+        "n": 500,
+        "counts": [
+          454,
+          0,
+          44,
+          1,
+          1
+        ],
+        "distribution": [
+          0.908,
+          0.0,
+          0.088,
+          0.002,
+          0.002
+        ],
+        "mean_action": 0.19
+      }
+    },
+    "cql_seed42": {
+      "id": {
+        "policy": "cql_seed42",
+        "n": 500,
+        "counts": [
+          156,
+          0,
+          344,
+          0,
+          0
+        ],
+        "distribution": [
+          0.312,
+          0.0,
+          0.688,
+          0.0,
+          0.0
+        ],
+        "mean_action": 1.376
+      },
+      "mild": {
+        "policy": "cql_seed42",
+        "n": 500,
+        "counts": [
+          141,
+          0,
+          358,
+          1,
+          0
+        ],
+        "distribution": [
+          0.282,
+          0.0,
+          0.716,
+          0.002,
+          0.0
+        ],
+        "mean_action": 1.438
+      },
+      "moderate": {
+        "policy": "cql_seed42",
+        "n": 500,
+        "counts": [
+          128,
+          0,
+          369,
+          3,
+          0
+        ],
+        "distribution": [
+          0.256,
+          0.0,
+          0.738,
+          0.006,
+          0.0
+        ],
+        "mean_action": 1.494
+      },
+      "severe": {
+        "policy": "cql_seed42",
+        "n": 500,
+        "counts": [
+          92,
+          0,
+          406,
+          2,
+          0
+        ],
+        "distribution": [
+          0.184,
+          0.0,
+          0.812,
+          0.004,
+          0.0
+        ],
+        "mean_action": 1.636
+      }
+    },
+    "cql_seed123": {
+      "id": {
+        "policy": "cql_seed123",
+        "n": 500,
+        "counts": [
+          136,
+          0,
+          137,
+          227,
+          0
+        ],
+        "distribution": [
+          0.272,
+          0.0,
+          0.274,
+          0.454,
+          0.0
+        ],
+        "mean_action": 1.91
+      },
+      "mild": {
+        "policy": "cql_seed123",
+        "n": 500,
+        "counts": [
+          201,
+          0,
+          130,
+          169,
+          0
+        ],
+        "distribution": [
+          0.402,
+          0.0,
+          0.26,
+          0.338,
+          0.0
+        ],
+        "mean_action": 1.534
+      },
+      "moderate": {
+        "policy": "cql_seed123",
+        "n": 500,
+        "counts": [
+          266,
+          0,
+          95,
+          139,
+          0
+        ],
+        "distribution": [
+          0.532,
+          0.0,
+          0.19,
+          0.278,
+          0.0
+        ],
+        "mean_action": 1.214
+      },
+      "severe": {
+        "policy": "cql_seed123",
+        "n": 500,
+        "counts": [
+          360,
+          0,
+          59,
+          81,
+          0
+        ],
+        "distribution": [
+          0.72,
+          0.0,
+          0.118,
+          0.162,
+          0.0
+        ],
+        "mean_action": 0.722
+      }
+    },
+    "cql_seed2024": {
+      "id": {
+        "policy": "cql_seed2024",
+        "n": 500,
+        "counts": [
+          70,
+          0,
+          5,
+          425,
+          0
+        ],
+        "distribution": [
+          0.14,
+          0.0,
+          0.01,
+          0.85,
+          0.0
+        ],
+        "mean_action": 2.57
+      },
+      "mild": {
+        "policy": "cql_seed2024",
+        "n": 500,
+        "counts": [
+          59,
+          0,
+          11,
+          430,
+          0
+        ],
+        "distribution": [
+          0.118,
+          0.0,
+          0.022,
+          0.86,
+          0.0
+        ],
+        "mean_action": 2.624
+      },
+      "moderate": {
+        "policy": "cql_seed2024",
+        "n": 500,
+        "counts": [
+          60,
+          0,
+          4,
+          436,
+          0
+        ],
+        "distribution": [
+          0.12,
+          0.0,
+          0.008,
+          0.872,
+          0.0
+        ],
+        "mean_action": 2.632
+      },
+      "severe": {
+        "policy": "cql_seed2024",
+        "n": 500,
+        "counts": [
+          42,
+          0,
+          5,
+          453,
+          0
+        ],
+        "distribution": [
+          0.084,
+          0.0,
+          0.01,
+          0.906,
+          0.0
+        ],
+        "mean_action": 2.738
+      }
+    }
+  },
+  "comparisons": {
+    "id": {
+      "bc_mean_action": 0.446,
+      "cql_mean_action": 1.952,
+      "delta_cql_minus_bc": 1.506,
+      "bc_distribution": [
+        0.8273333333333334,
+        0.011333333333333334,
+        0.06933333333333334,
+        0.072,
+        0.02
+      ],
+      "cql_distribution": [
+        0.24133333333333337,
+        0.0,
+        0.324,
+        0.4346666666666667,
+        0.0
+      ],
+      "total_variation_bc_vs_cql": 0.6173333333333333
+    },
+    "mild": {
+      "bc_mean_action": 0.31,
+      "cql_mean_action": 1.8653333333333333,
+      "delta_cql_minus_bc": 1.5553333333333332,
+      "bc_distribution": [
+        0.8846666666666666,
+        0.006666666666666667,
+        0.043333333333333335,
+        0.04466666666666667,
+        0.020666666666666667
+      ],
+      "cql_distribution": [
+        0.2673333333333333,
+        0.0,
+        0.33266666666666667,
+        0.39999999999999997,
+        0.0
+      ],
+      "total_variation_bc_vs_cql": 0.6446666666666666
+    },
+    "moderate": {
+      "bc_mean_action": 0.24000000000000002,
+      "cql_mean_action": 1.7800000000000002,
+      "delta_cql_minus_bc": 1.5400000000000003,
+      "bc_distribution": [
+        0.9046666666666666,
+        0.009333333333333334,
+        0.042,
+        0.029333333333333333,
+        0.014666666666666666
+      ],
+      "cql_distribution": [
+        0.3026666666666667,
+        0.0,
+        0.312,
+        0.38533333333333336,
+        0.0
+      ],
+      "total_variation_bc_vs_cql": 0.6259999999999999
+    },
+    "severe": {
+      "bc_mean_action": 0.16866666666666666,
+      "cql_mean_action": 1.6986666666666668,
+      "delta_cql_minus_bc": 1.53,
+      "bc_distribution": [
+        0.9359999999999999,
+        0.0033333333333333335,
+        0.03,
+        0.017333333333333336,
+        0.013333333333333334
+      ],
+      "cql_distribution": [
+        0.3293333333333333,
+        0.0,
+        0.31333333333333335,
+        0.35733333333333334,
+        0.0
+      ],
+      "total_variation_bc_vs_cql": 0.6233333333333334
+    }
+  }
+}

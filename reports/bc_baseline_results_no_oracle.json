@@ -1,0 +1,73 @@
+{
+  "per_seed": [
+    {
+      "seed": 42,
+      "val_accuracy": {
+        "overall": 0.557,
+        "random": 0.196,
+        "greedy_extraction": 0.918,
+        "conservative": NaN
+      },
+      "test_accuracy": {
+        "overall": 0.5866666666666667,
+        "random": 0.22905405405405405,
+        "greedy_extraction": 0.9348684210526316,
+        "conservative": NaN
+      },
+      "model_path": "models_no_oracle\\bc\\bc_seed42.d3"
+    },
+    {
+      "seed": 123,
+      "val_accuracy": {
+        "overall": 0.5566666666666666,
+        "random": 0.19133333333333333,
+        "greedy_extraction": 0.922,
+        "conservative": NaN
+      },
+      "test_accuracy": {
+        "overall": 0.5756666666666667,
+        "random": 0.2087837837837838,
+        "greedy_extraction": 0.9328947368421052,
+        "conservative": NaN
+      },
+      "model_path": "models_no_oracle\\bc\\bc_seed123.d3"
+    },
+    {
+      "seed": 2024,
+      "val_accuracy": {
+        "overall": 0.5426666666666666,
+        "random": 0.17533333333333334,
+        "greedy_extraction": 0.91,
+        "conservative": NaN
+      },
+      "test_accuracy": {
+        "overall": 0.5736666666666667,
+        "random": 0.2141891891891892,
+        "greedy_extraction": 0.9236842105263158,
+        "conservative": NaN
+      },
+      "model_path": "models_no_oracle\\bc\\bc_seed2024.d3"
+    }
+  ],
+  "val_accuracy_mean": 0.5521111111111111,
+  "val_accuracy_std": 0.006679617051195196,
+  "test_accuracy_mean": 0.5786666666666666,
+  "test_accuracy_std": 0.005715476066494088,
+  "n_train_episodes": 700,
+  "n_val_episodes": 150,
+  "n_test_episodes": 150,
+  "split_seed": 1,
+  "training_seeds": [
+    42,
+    123,
+    2024
+  ],
+  "policy_order_assumption": [
+    "random",
+    "greedy_extraction",
+    "conservative"
+  ],
+  "n_per_policy_assumption": 500,
+  "model_dir": "models_no_oracle/bc",
+  "seeding_note": "Each training seed is applied via d3rlpy.seed(seed) before model construction, so the 3 runs are genuinely independently seeded (fixed in this revision -- previously `seed` was a label only)."
+}

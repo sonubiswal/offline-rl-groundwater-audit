@@ -1,0 +1,88 @@
+{
+  "experiment": "Phase 5b FQE-based offline validation of compare_policies.py",
+  "config": {
+    "dataset": "C:\\trishna-opal\\data\\processed\\offline_rl_dataset_epsilon.h5",
+    "bc_dir": "C:\\trishna-opal\\models_epsilon\\bc",
+    "cql_dir": "C:\\trishna-opal\\models_epsilon\\cql",
+    "training_seeds": [
+      42,
+      123,
+      2024
+    ],
+    "split_seed": 1,
+    "n_train_episodes": 1050,
+    "n_val_episodes": 225,
+    "n_test_episodes": 225,
+    "fqe_n_steps": 20000,
+    "fqe_n_steps_per_epoch": 2000,
+    "gamma": 0.99
+  },
+  "per_seed_bc_fqe": {
+    "42": {
+      "label": "BC_seed42",
+      "fqe_init_state_value": 2.451716661453247,
+      "n_steps": 20000,
+      "n_steps_per_epoch": 2000,
+      "gamma": 0.99
+    },
+    "123": {
+      "label": "BC_seed123",
+      "fqe_init_state_value": 2.567594289779663,
+      "n_steps": 20000,
+      "n_steps_per_epoch": 2000,
+      "gamma": 0.99
+    },
+    "2024": {
+      "label": "BC_seed2024",
+      "fqe_init_state_value": 2.5071771144866943,
+      "n_steps": 20000,
+      "n_steps_per_epoch": 2000,
+      "gamma": 0.99
+    }
+  },
+  "per_seed_cql_fqe": {
+    "42": {
+      "label": "CQL_seed42",
+      "fqe_init_state_value": 2.4494965076446533,
+      "n_steps": 20000,
+      "n_steps_per_epoch": 2000,
+      "gamma": 0.99
+    },
+    "123": {
+      "label": "CQL_seed123",
+      "fqe_init_state_value": 2.5259993076324463,
+      "n_steps": 20000,
+      "n_steps_per_epoch": 2000,
+      "gamma": 0.99
+    },
+    "2024": {
+      "label": "CQL_seed2024",
+      "fqe_init_state_value": 2.5457160472869873,
+      "n_steps": 20000,
+      "n_steps_per_epoch": 2000,
+      "gamma": 0.99
+    }
+  },
+  "bc_fqe_values": [
+    2.451716661453247,
+    2.567594289779663,
+    2.5071771144866943
+  ],
+  "cql_fqe_values": [
+    2.4494965076446533,
+    2.5259993076324463,
+    2.5457160472869873
+  ],
+  "cql_minus_bc_fqe_bootstrap": {
+    "observed_difference": -0.0017587343851725261,
+    "ci_lower": -0.0415949821472168,
+    "ci_upper": 0.03853893280029297,
+    "ci_contains_zero": true,
+    "n_bootstrap": 5000,
+    "bootstrap_seed": 2026,
+    "n_paired_values": 3,
+    "caveat": "This bootstrap resamples across only len(values) paired points (typically 3 training seeds) -- treat the resulting CI as illustrative of seed variability, not a substitute for the much larger per-episode bootstrap in compare_policies.py."
+  },
+  "how_to_cross_check": "Load the corresponding compare_policies.py output (reports/<run>/policy_comparison.json) and compare cql_minus_bc_paired_bootstrap.observed_difference / ci_lower / ci_upper there against cql_minus_bc_fqe_bootstrap above. FQE and direct rollout measure value via completely different mechanisms (offline critic fit vs exact simulator rollout) so exact numeric agreement is not expected -- sign agreement and non-overlapping conclusions (both exclude zero in the same direction, or both contain zero) is the meaningful check.",
+  "api_verification_caveat": "This script's d3rlpy.ope.DiscreteFQEConfig usage was NOT verified against a live d3rlpy install when written -- see module docstring 'API VERIFICATION STATUS'. If numbers here look implausible (e.g. far outside the range of compare_policies.py's return_mean values), suspect the FQE call shape before suspecting the underlying policies."
+}

@@ -1,0 +1,99 @@
+{
+  "alpha_sweep_diagnostic": {
+    "grid_results": [
+      {
+        "alpha": 0.5,
+        "init_state_value": 1.121298909187317
+      },
+      {
+        "alpha": 1.0,
+        "init_state_value": 1.2547849416732788
+      },
+      {
+        "alpha": 4.0,
+        "init_state_value": 1.314268946647644
+      },
+      {
+        "alpha": 10.0,
+        "init_state_value": 1.295692801475525
+      }
+    ],
+    "sweep_seed": 42,
+    "selection_disabled_reason": "InitialStateValueEstimationEvaluator is biased toward low alpha; auto-selection from this metric was removed. See module docstring BUGFIX 2. Alpha must be chosen via --alpha / cql.alpha in config, ideally validated by the full paired-bootstrap comparison in compare_policies.py."
+  },
+  "alpha_used": 1.0,
+  "alpha_source": "--alpha flag",
+  "model_dir": "models_epsilon/cql",
+  "per_seed": [
+    {
+      "seed": 42,
+      "alpha": 1.0,
+      "val_action_match": {
+        "overall": 0.6562222222222223,
+        "random": 0.21417910447761193,
+        "greedy_extraction": 0.9722222222222222,
+        "conservative": 0.7084415584415584
+      },
+      "test_action_match": {
+        "overall": 0.6328888888888888,
+        "random": 0.21231884057971015,
+        "greedy_extraction": 0.9743055555555555,
+        "conservative": 0.6857142857142857
+      },
+      "model_path": "models_epsilon\\cql\\cql_seed42.d3"
+    },
+    {
+      "seed": 123,
+      "alpha": 1.0,
+      "val_action_match": {
+        "overall": 0.6544444444444445,
+        "random": 0.20671641791044776,
+        "greedy_extraction": 0.9722222222222222,
+        "conservative": 0.7097402597402598
+      },
+      "test_action_match": {
+        "overall": 0.626,
+        "random": 0.20072463768115942,
+        "greedy_extraction": 0.9680555555555556,
+        "conservative": 0.6821428571428572
+      },
+      "model_path": "models_epsilon\\cql\\cql_seed123.d3"
+    },
+    {
+      "seed": 2024,
+      "alpha": 1.0,
+      "val_action_match": {
+        "overall": 0.658,
+        "random": 0.2126865671641791,
+        "greedy_extraction": 0.9740740740740741,
+        "conservative": 0.712987012987013
+      },
+      "test_action_match": {
+        "overall": 0.6317777777777778,
+        "random": 0.2072463768115942,
+        "greedy_extraction": 0.9798611111111111,
+        "conservative": 0.6821428571428572
+      },
+      "model_path": "models_epsilon\\cql\\cql_seed2024.d3"
+    }
+  ],
+  "val_action_match_mean": 0.6562222222222222,
+  "val_action_match_std": 0.0014515494772048374,
+  "test_action_match_mean": 0.6302222222222222,
+  "test_action_match_std": 0.0030198247571317613,
+  "n_train_episodes": 1050,
+  "n_val_episodes": 225,
+  "n_test_episodes": 225,
+  "split_seed": 1,
+  "training_seeds": [
+    42,
+    123,
+    2024
+  ],
+  "policy_order_assumption": [
+    "random",
+    "greedy_extraction",
+    "conservative"
+  ],
+  "n_per_policy_assumption": 500
+}

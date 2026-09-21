@@ -1,0 +1,84 @@
+{
+  "alpha_sweep_diagnostic": {
+    "skipped": true
+  },
+  "alpha_used": 1.0,
+  "alpha_source": "--alpha flag",
+  "q_func_factory": "QRQFunctionFactory",
+  "n_quantiles": 32,
+  "oversample_factor": 1,
+  "model_dir": "models_epsilon_qr32_verify",
+  "per_seed": [
+    {
+      "seed": 42,
+      "alpha": 1.0,
+      "val_action_match": {
+        "overall": 0.6555555555555556,
+        "random": 0.21194029850746268,
+        "greedy_extraction": 0.9679012345679012,
+        "conservative": 0.712987012987013
+      },
+      "test_action_match": {
+        "overall": 0.6275555555555555,
+        "random": 0.21811594202898552,
+        "greedy_extraction": 0.9631944444444445,
+        "conservative": 0.6761904761904762
+      },
+      "model_path": "models_epsilon_qr32_verify\\cql_seed42.d3"
+    },
+    {
+      "seed": 123,
+      "alpha": 1.0,
+      "val_action_match": {
+        "overall": 0.6597777777777778,
+        "random": 0.21865671641791046,
+        "greedy_extraction": 0.9697530864197531,
+        "conservative": 0.7175324675324676
+      },
+      "test_action_match": {
+        "overall": 0.6282222222222222,
+        "random": 0.20797101449275363,
+        "greedy_extraction": 0.9666666666666667,
+        "conservative": 0.6833333333333333
+      },
+      "model_path": "models_epsilon_qr32_verify\\cql_seed123.d3"
+    },
+    {
+      "seed": 2024,
+      "alpha": 1.0,
+      "val_action_match": {
+        "overall": 0.6537777777777778,
+        "random": 0.2126865671641791,
+        "greedy_extraction": 0.967283950617284,
+        "conservative": 0.7077922077922078
+      },
+      "test_action_match": {
+        "overall": 0.6222222222222222,
+        "random": 0.20072463768115942,
+        "greedy_extraction": 0.9625,
+        "conservative": 0.6767857142857143
+      },
+      "model_path": "models_epsilon_qr32_verify\\cql_seed2024.d3"
+    }
+  ],
+  "val_action_match_mean": 0.6563703703703704,
+  "val_action_match_std": 0.0025163389261426746,
+  "test_action_match_mean": 0.626,
+  "test_action_match_std": 0.0026851213274654557,
+  "n_train_episodes": 1050,
+  "n_train_episodes_after_oversampling": 1050,
+  "n_val_episodes": 225,
+  "n_test_episodes": 225,
+  "split_seed": 1,
+  "training_seeds": [
+    42,
+    123,
+    2024
+  ],
+  "policy_order_assumption": [
+    "random",
+    "greedy_extraction",
+    "conservative"
+  ],
+  "n_per_policy_assumption": 500
+}

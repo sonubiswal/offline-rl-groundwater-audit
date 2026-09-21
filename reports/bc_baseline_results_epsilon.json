@@ -1,0 +1,73 @@
+{
+  "per_seed": [
+    {
+      "seed": 42,
+      "val_accuracy": {
+        "overall": 0.6557777777777778,
+        "random": 0.21044776119402986,
+        "greedy_extraction": 0.9728395061728395,
+        "conservative": 0.7097402597402598
+      },
+      "test_accuracy": {
+        "overall": 0.6268888888888889,
+        "random": 0.20072463768115942,
+        "greedy_extraction": 0.9833333333333333,
+        "conservative": 0.6714285714285714
+      },
+      "model_path": "models_epsilon\\bc\\bc_seed42.d3"
+    },
+    {
+      "seed": 123,
+      "val_accuracy": {
+        "overall": 0.6511111111111111,
+        "random": 0.2,
+        "greedy_extraction": 0.9734567901234568,
+        "conservative": 0.7045454545454546
+      },
+      "test_accuracy": {
+        "overall": 0.6173333333333333,
+        "random": 0.1963768115942029,
+        "greedy_extraction": 0.9722222222222222,
+        "conservative": 0.6589285714285714
+      },
+      "model_path": "models_epsilon\\bc\\bc_seed123.d3"
+    },
+    {
+      "seed": 2024,
+      "val_accuracy": {
+        "overall": 0.658,
+        "random": 0.21194029850746268,
+        "greedy_extraction": 0.9796296296296296,
+        "conservative": 0.7077922077922078
+      },
+      "test_accuracy": {
+        "overall": 0.6282222222222222,
+        "random": 0.19492753623188405,
+        "greedy_extraction": 0.9819444444444444,
+        "conservative": 0.680952380952381
+      },
+      "model_path": "models_epsilon\\bc\\bc_seed2024.d3"
+    }
+  ],
+  "val_accuracy_mean": 0.654962962962963,
+  "val_accuracy_std": 0.0028707885000112975,
+  "test_accuracy_mean": 0.6241481481481481,
+  "test_accuracy_std": 0.004849448089876453,
+  "n_train_episodes": 1050,
+  "n_val_episodes": 225,
+  "n_test_episodes": 225,
+  "split_seed": 1,
+  "training_seeds": [
+    42,
+    123,
+    2024
+  ],
+  "policy_order_assumption": [
+    "random",
+    "greedy_extraction",
+    "conservative"
+  ],
+  "n_per_policy_assumption": 500,
+  "model_dir": "models_epsilon/bc",
+  "seeding_note": "Each training seed is applied via d3rlpy.seed(seed) before model construction, so the 3 runs are genuinely independently seeded (fixed in this revision -- previously `seed` was a label only)."
+}

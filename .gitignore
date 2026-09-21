@@ -1,0 +1,69 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+
+# Data (too large for git; back up separately)
+data/*.h5
+data/*.hdf5
+data/processed/*.csv
+data/processed/*.h5
+data/interim/*.npy
+data/interim/*.tif
+data/interim/*.tiff
+
+# Training logs
+d3rlpy_logs/
+
+# Editor / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Backups
+*.bak
+*.bak[0-9]*
+*.bak[0-9][0-9]*
+
+# Temporary
+*.tmp
+*.log
+
+# Model checkpoints � regenerable from seed + config (see reports/paper_exp/*.json)
+models/
+models_*/
+*.d3
+
+# Experiment rollout outputs (large, regenerable)
+reports/**/returns/
+reports/**/*.d3
+reports/**/*.h5
+
+# Figures and PDFs (usually regenerated from CSVs + scripts)
+reports/**/*.png
+reports/**/*.pdf
+
+data/raw/*/
+data/raw/*.csv
+!data/raw/fetch_log.csv
+!data/raw/*.manifest.csv
+# Quarantine — excluded on purpose
+_quarantine/
+
+# Intermediate and processed data — too large, regenerable
+data/interim/
+data/processed/
+
+_quarantine/
+data/interim/
+data/processed/
+
+# Old git backup — not part of the repo
+.git_old_backup/
+
+# Large intermediate NDVI predictions — not part of the RL audit
+reports/ndvi_imputation_predictions.csv
