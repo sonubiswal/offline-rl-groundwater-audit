@@ -4,7 +4,7 @@
 
 ### An Audit of Estimator, Baseline, and Distribution Sensitivity on a Groundwater Pumping Task
 
-**Sumit Kumar Biswal** · **Dr.Bhramara Bar Biswal**
+**Sumit Kumar Biswal** · **Dr. Bhramara Bar Biswal**
 
 *Manuscript submitted to IEEE Transactions on Neural Networks and Learning Systems (TNNLS)*
 
