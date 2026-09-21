@@ -203,7 +203,9 @@ Large files are archived separately on **Zenodo** to keep the repository small:
 - `.d3` model checkpoints
 - per-episode return arrays
 
-**DOI:** *to be added*
+**Code and audit artifacts:** [10.5281/zenodo.22881193](https://doi.org/10.5281/zenodo.22881193)
+
+**Datasets and model checkpoints:** *second Zenodo record, DOI to be added*
 
 ---
 
@@ -421,7 +423,9 @@ Large files are archived separately on **Zenodo** to keep the repository small:
 - `.d3` model checkpoints
 - per-episode return arrays
 
-**DOI:** *to be added*
+**Code and audit artifacts:** [10.5281/zenodo.22881193](https://doi.org/10.5281/zenodo.22881193)
+
+**Datasets and model checkpoints:** *second Zenodo record, DOI to be added*
 
 ---
 
