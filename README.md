@@ -449,5 +449,3 @@ See [`LICENSE`](LICENSE).
 
 Questions about the code or the manuscript: open an issue on this repository.},
   note   = {Submitted to IEEE Transactions on Neural Networks and Learning Systems}
-}
-```
