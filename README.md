@@ -42,4 +42,12 @@ are archived separately on Zenodo. DOI to be added.
 ```bash
 conda env create -f environment.yml
 conda activate trishna-opal
+
+
+This repository contains the full `trishna-opal` project, which produced two
+papers. The offline-RL audit described in this manuscript uses the files
+listed below. Other folders (`src/downscaling/`, `src/models/`, `src/data/`)
+belong to the companion downscaling paper and are included for context —
+the RL experiments do not require running them, since the RF seed table and
+held-out wells are already archived under `data/`.
 pip install -r requirements.txt
