@@ -1,0 +1,218 @@
+[
+  {
+    "bc": "base",
+    "cql": "base",
+    "protocol": "rf_grid",
+    "mean": 0.4089064870444465,
+    "lo": 0.2337082229817572,
+    "hi": 0.59818865856646,
+    "excludes": true
+  },
+  {
+    "bc": "base",
+    "cql": "base",
+    "protocol": "common_eps",
+    "mean": -2.231215534260072,
+    "lo": -3.163216959431222,
+    "hi": -1.3859339053648383,
+    "excludes": true
+  },
+  {
+    "bc": "base",
+    "cql": "base",
+    "protocol": "own_family",
+    "mean": -2.2219775326677995,
+    "lo": -3.1361303554254665,
+    "hi": -1.4033036071206393,
+    "excludes": true
+  },
+  {
+    "bc": "base",
+    "cql": "epsilon",
+    "protocol": "rf_grid",
+    "mean": 0.47159379627399567,
+    "lo": 0.2959424813098857,
+    "hi": 0.6635934036714194,
+    "excludes": true
+  },
+  {
+    "bc": "base",
+    "cql": "epsilon",
+    "protocol": "common_eps",
+    "mean": -2.5911692174689454,
+    "lo": -3.5163518523466935,
+    "hi": -1.726001681012015,
+    "excludes": true
+  },
+  {
+    "bc": "base",
+    "cql": "epsilon",
+    "protocol": "own_family",
+    "mean": -2.531698329878058,
+    "lo": -3.4533444115331116,
+    "hi": -1.7041830334970396,
+    "excludes": true
+  },
+  {
+    "bc": "base",
+    "cql": "no_oracle",
+    "protocol": "rf_grid",
+    "mean": 0.4243607937957462,
+    "lo": 0.2753441811215648,
+    "hi": 0.5902004146694954,
+    "excludes": true
+  },
+  {
+    "bc": "base",
+    "cql": "no_oracle",
+    "protocol": "common_eps",
+    "mean": -2.4180710670679626,
+    "lo": -3.337631954250782,
+    "hi": -1.5658980061004086,
+    "excludes": true
+  },
+  {
+    "bc": "base",
+    "cql": "no_oracle",
+    "protocol": "own_family",
+    "mean": -2.455932636397318,
+    "lo": -3.4265776252792826,
+    "hi": -1.5835584116446004,
+    "excludes": true
+  },
+  {
+    "bc": "epsilon",
+    "cql": "base",
+    "protocol": "rf_grid",
+    "mean": -0.0984520629113606,
+    "lo": -0.19631396162986542,
+    "hi": -0.0015043170738101275,
+    "excludes": true
+  },
+  {
+    "bc": "epsilon",
+    "cql": "base",
+    "protocol": "common_eps",
+    "mean": 0.37402934208719407,
+    "lo": 0.14703383231200184,
+    "hi": 0.6733529313471032,
+    "excludes": true
+  },
+  {
+    "bc": "epsilon",
+    "cql": "epsilon",
+    "protocol": "rf_grid",
+    "mean": -0.03576475368181135,
+    "lo": -0.12658170343241634,
+    "hi": 0.04655539927671116,
+    "excludes": false
+  },
+  {
+    "bc": "epsilon",
+    "cql": "epsilon",
+    "protocol": "common_eps",
+    "mean": 0.014075658878321086,
+    "lo": -0.10748239790882143,
+    "hi": 0.13822348340049273,
+    "excludes": false
+  },
+  {
+    "bc": "epsilon",
+    "cql": "no_oracle",
+    "protocol": "rf_grid",
+    "mean": -0.08299775616006076,
+    "lo": -0.18132633202504855,
+    "hi": 0.013914366767770742,
+    "excludes": false
+  },
+  {
+    "bc": "epsilon",
+    "cql": "no_oracle",
+    "protocol": "common_eps",
+    "mean": 0.18717380927930383,
+    "lo": -0.09950160189428972,
+    "hi": 0.5971397937555841,
+    "excludes": false
+  },
+  {
+    "bc": "no_oracle",
+    "cql": "base",
+    "protocol": "rf_grid",
+    "mean": 0.34972798959161744,
+    "lo": 0.08066693487358356,
+    "hi": 0.6270453466283973,
+    "excludes": true
+  },
+  {
+    "bc": "no_oracle",
+    "cql": "base",
+    "protocol": "common_eps",
+    "mean": -0.1683367880536332,
+    "lo": -0.7738406722555188,
+    "hi": 0.3706064030154704,
+    "excludes": false
+  },
+  {
+    "bc": "no_oracle",
+    "cql": "base",
+    "protocol": "own_family",
+    "mean": -0.480450014816533,
+    "lo": -1.2827550964660113,
+    "hi": 0.17575861039223548,
+    "excludes": false
+  },
+  {
+    "bc": "no_oracle",
+    "cql": "epsilon",
+    "protocol": "rf_grid",
+    "mean": 0.41241529882116684,
+    "lo": 0.14751343317600887,
+    "hi": 0.7115748914709663,
+    "excludes": true
+  },
+  {
+    "bc": "no_oracle",
+    "cql": "epsilon",
+    "protocol": "common_eps",
+    "mean": -0.5282904712625063,
+    "lo": -1.204310262941654,
+    "hi": 0.0578061783818522,
+    "excludes": false
+  },
+  {
+    "bc": "no_oracle",
+    "cql": "epsilon",
+    "protocol": "own_family",
+    "mean": -0.7643956678734034,
+    "lo": -1.5894203120926242,
+    "hi": -0.10839717587563044,
+    "excludes": true
+  },
+  {
+    "bc": "no_oracle",
+    "cql": "no_oracle",
+    "protocol": "rf_grid",
+    "mean": 0.3651822963429174,
+    "lo": 0.1511171335420642,
+    "hi": 0.6118324784272595,
+    "excludes": true
+  },
+  {
+    "bc": "no_oracle",
+    "cql": "no_oracle",
+    "protocol": "common_eps",
+    "mean": -0.3551923208615235,
+    "lo": -0.9657467589791451,
+    "hi": 0.2103647812321157,
+    "excludes": false
+  },
+  {
+    "bc": "no_oracle",
+    "cql": "no_oracle",
+    "protocol": "own_family",
+    "mean": -0.6133940165286378,
+    "lo": -1.313475298523554,
+    "hi": -0.05546958183784368,
+    "excludes": true
+  }
+]
