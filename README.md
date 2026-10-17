@@ -1,23 +1,27 @@
 <div align="center">
 
-# Protocol-Dependent Verdicts in Offline Reinforcement Learning
+<img src="assets/header-real-animated.svg" width="100%" alt="Protocol-Dependent Verdicts in Offline Reinforcement Learning: an audit of estimator, baseline, and distribution sensitivity on a groundwater pumping task" />
 
-### An Audit of Estimator, Baseline, and Distribution Sensitivity on a Groundwater Pumping Task
+<br/>
 
 **Sumit Kumar Biswal** · **Dr. Bhramara Bar Biswal**
 
-*Manuscript submitted to IEEE Transactions on Neural Networks and Learning Systems (TNNLS)*
+> **TL;DR:** We audited how offline RL policies (CQL vs BC) are evaluated on a groundwater pumping task. A policy's apparent advantage depends on the protocol: it changes with the estimator (FQE vs direct rollout), the baseline and critic pairing, and the state distribution, and CQL's advantage over BC reverses sign under genuine state-distribution shift.
 
-![Status](https://img.shields.io/badge/status-under%20review-orange)
-![Venue](https://img.shields.io/badge/venue-IEEE%20TNNLS-blue)
-![Environment](https://img.shields.io/badge/env-conda-44A833)
+<br/>
+
+![Environment](https://img.shields.io/badge/env-conda-44A833?style=flat-square&logo=anaconda&logoColor=white)
+![Python](https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=python&logoColor=white)
+![PyTorch](https://img.shields.io/badge/PyTorch-EE4C2C?style=flat-square&logo=pytorch&logoColor=white)
+![d3rlpy](https://img.shields.io/badge/Library-d3rlpy-FF6F00?style=flat-square)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.22881193.svg)](https://doi.org/10.5281/zenodo.22881193)
 
 [Overview](#overview) ·
+[Key findings](#key-findings) ·
 [Pipeline](#pipeline) ·
-[Repository layout](#repository-layout) ·
+[Layout](#repository-layout) ·
 [Setup](#setup) ·
-[Reproducing the results](#reproducing-the-results) ·
+[Reproduce](#reproducing-the-results) ·
 [Artifacts](#large-artifacts) ·
 [Citation](#citation)
 
@@ -27,19 +31,36 @@
 
 ## Overview
 
-This repository holds the code behind the manuscript above. It asks a narrow question about offline reinforcement learning (RL): **does the verdict on a policy change depending on how it is evaluated?**
+This repository holds the code behind the manuscript above. It asks one narrow question about offline reinforcement learning (RL): **does the verdict on a policy change depending on how it is evaluated?**
 
 The testbed is a synthetic **groundwater pumping** task. An agent chooses a discrete extraction level each quarter, and the simulator returns groundwater dynamics and a reward. Policies are trained offline from logged data (**BC** and **CQL**) and then judged under several evaluation protocols.
 
-The audit varies three things:
+| | |
+|---|---|
+| **Task** | Synthetic groundwater pumping, discrete extraction level per quarter |
+| **Policies** | Behavioural cloning (**BC**) and conservative Q-learning (**CQL**, with **QR** or **Mean-Q** critic) |
+| **Protocols** | Off-policy estimate (**FQE**), direct simulator rollout, banded out-of-distribution (OOD) returns |
+| **Trust checks** | Parameter sensitivity sweeps (A4/A5), leakage, provenance, and confidence-interval audits |
+
+### What the audit varies
 
 | Axis | What changes | Where to look |
 |---|---|---|
 | **Estimator** | Off-policy estimate (**FQE**) vs. direct simulator rollout | `src/rl/fqe_eval.py`, `src/rl/rollout_eval.py` |
 | **Baseline / critic** | **BC** baseline; **QR** critic vs. **Mean-Q** critic in **CQL** | `src/rl/bc_baseline.py`, `src/rl/train_cql.py`, `ood_return_test*.py` |
-| **Distribution** | Banded out-of-distribution (OOD) returns and state-distance partitioning | `ood_return_test*.py`, `ood_state_distribution_test.py` |
+| **Distribution** | Banded OOD returns and Mahalanobis state-distance partitioning | `ood_return_test*.py`, `ood_state_distribution_test.py` |
 
-Two further groups of scripts check that the results are trustworthy: parameter **sensitivity** sweeps (A4/A5) and **audits** for leakage, provenance, and confidence intervals.
+---
+
+## Key findings
+
+| Finding | Evidence in this repository |
+|---|---|
+| CQL's return advantage over BC **reverses sign** under genuine state-distribution shift, for both the QR and Mean-Q critics. The magnitude depends on the critic. | `ood_return_test.py`, `ood_return_test_meanq.py`, `ood_state_distribution_test.py` |
+| A "scenario shift" with an OOD fraction of 0 is **not** out-of-distribution and must not be conflated with the state-distance diagnostic. | `ood_state_distribution_test.py` |
+| The scenario-gap sign is robust to the two uncalibrated simulator constants (all 27 cells of the A4/A5 grid agree), but its **size varies by more than two orders of magnitude**. | `a4a5_sensitivity.py` |
+| The simulator's rainfall–recharge assumption has the right **sign** against held-out CGWB wells; amplitude is not calibrated. | `cgwb_behavioral_validation.py` |
+| All 114 archived checkpoints match their stated configuration (zero mismatches). This confirms provenance, not that the hyperparameters are optimal. | `verify_provenance.py` |
 
 ---
 
@@ -60,6 +81,17 @@ flowchart LR
     H --> I
     J["Sensitivity<br/>a4a5_sensitivity.py"] --> I
     K["Audits<br/>check_leakage · verify_*"] -.-> I
+
+    classDef sim fill:#0ea5e9,stroke:none,color:#fff
+    classDef train fill:#6366f1,stroke:none,color:#fff
+    classDef evalc fill:#8b5cf6,stroke:none,color:#fff
+    classDef out fill:#22c55e,stroke:none,color:#fff
+    classDef audit fill:#1e293b,stroke:#64748b,color:#e2e8f0,stroke-dasharray: 4 3
+    class A,B sim
+    class C,D train
+    class E,F,G,H evalc
+    class I out
+    class J,K audit
 ```
 
 ---
@@ -69,7 +101,7 @@ flowchart LR
 ```text
 trishna-opal/
 ├── src/
-│   ├── rl/                 # RL environment, dataset, training, evaluation  ← this paper
+│   ├── rl/                 # RL environment, dataset, training, evaluation  <- this paper
 │   ├── downscaling/        # companion paper (context only)
 │   ├── models/             # companion paper (context only)
 │   └── data/               # companion paper (context only)
@@ -94,11 +126,12 @@ trishna-opal/
 > [!NOTE]
 > This repository is the full **`trishna-opal`** project, which produced **two papers**. The offline-RL audit uses only the files listed in this README. `src/downscaling/`, `src/models/`, and `src/data/` belong to the companion downscaling paper and are included for context. **The RL experiments do not require running them**, because the RF seed table and held-out wells are already archived under `data/`.
 
----
+<details>
+<summary><b>Component reference</b></summary>
 
-## Components
+<br/>
 
-### RL environment and training
+**RL environment and training**
 
 | File | Purpose |
 |---|---|
@@ -107,7 +140,7 @@ trishna-opal/
 | `src/rl/bc_baseline.py` | Behavioural cloning (**BC**) training |
 | `src/rl/train_cql.py` | Conservative Q-learning (**CQL**) training |
 
-### Evaluation
+**Evaluation**
 
 | File | Purpose |
 |---|---|
@@ -115,29 +148,31 @@ trishna-opal/
 | `src/rl/rollout_eval.py` | Direct simulator rollout |
 | `ood_return_test.py` | Banded OOD diagnostic, **QR** critic |
 | `ood_return_test_meanq.py` | Banded OOD diagnostic, **Mean-Q** critic |
-| `ood_state_distribution_test.py` | State-distance partitioning |
+| `ood_state_distribution_test.py` | Mahalanobis state-distance partitioning |
 
-### Sensitivity and validation
+**Sensitivity and validation**
 
 | File | Purpose |
 |---|---|
 | `a4a5_sensitivity.py` | A4/A5 parameter sweep |
-| `cgwb_behavioral_validation.py` | Rainfall–groundwater sign check |
+| `cgwb_behavioral_validation.py` | Rainfall–groundwater sign check on held-out wells |
 
-### Audits and reproducibility
+**Audits and reproducibility**
 
 | File | Purpose |
 |---|---|
 | `check_leakage.py` | Leakage check |
-| `verify_provenance.py` | Provenance check |
+| `verify_provenance.py` | Checkpoint provenance check |
 | `verify_ci.py` | Confidence-interval verification |
 | `freeze_project.py` | Project freeze for the submitted state |
 
-### Figures
+**Figures**
 
 | File | Purpose |
 |---|---|
 | `generate_figures.py` | Generates the manuscript figures |
+
+</details>
 
 ---
 
@@ -153,6 +188,17 @@ pip install -r requirements.txt
 ```
 
 For a description of the datasets and how the initial states were sourced, see [`DATA.md`](DATA.md).
+
+### Fast path: view figures only
+
+To see the generated plots without re-training any models, download the per-episode return arrays from the datasets Zenodo record (see [Large artifacts](#large-artifacts)), then run:
+
+```bash
+conda env create -f environment.yml
+conda activate trishna-opal
+pip install -r requirements.txt
+python generate_figures.py
+```
 
 ---
 
@@ -193,6 +239,9 @@ python generate_figures.py
 
 The `.h5` datasets, `.d3` checkpoints, and per-episode return arrays are **not** in this repository. Download them first (see below), or regenerate them with steps 1–2.
 
+> [!WARNING]
+> Regenerating from steps 1–2 trains new BC and CQL models. Results can differ from the archived checkpoints, and BC-versus-CQL contrasts are sensitive to which BC checkpoint is paired with which CQL checkpoint. For the reported numbers, evaluate the archived checkpoints.
+
 ---
 
 ## Large artifacts
@@ -203,9 +252,10 @@ Large files are archived separately on **Zenodo** to keep the repository small:
 - `.d3` model checkpoints
 - per-episode return arrays
 
-**Code and audit artifacts:** [10.5281/zenodo.22881193](https://doi.org/10.5281/zenodo.22881193)
-
-**Datasets and model checkpoints:** *second Zenodo record, DOI to be added*
+| Record | Contents | DOI |
+|---|---|---|
+| **Code and audit artifacts** | This repository's code and audit outputs | [10.5281/zenodo.22881193](https://doi.org/10.5281/zenodo.22881193) |
+| **Datasets and model checkpoints** | `.h5`, `.d3`, per-episode returns | *second Zenodo record, DOI to be added* |
 
 ---
 
@@ -219,7 +269,7 @@ If you use this code, please cite the manuscript:
             An Audit of Estimator, Baseline, and Distribution Sensitivity
             on a Groundwater Pumping Task},
   author = {Biswal, Sumit Kumar and Biswal, Bhramara Bar},
-  note   = {Submitted to IEEE Transactions on Neural Networks and Learning Systems}
+  note   = {Manuscript}
 }
 ```
 
