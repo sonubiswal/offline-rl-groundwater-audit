@@ -4,7 +4,10 @@
 
 <br/>
 
-**Sumit Kumar Biswal** · **Dr. Bhramara Bar Biswal**
+<sub><b>AUTHORS</b></sub>
+
+![Sumit Kumar Biswal](https://img.shields.io/badge/Sumit_Kumar_Biswal-6366f1?style=for-the-badge)
+![Dr. Bhramara Bar Biswal](https://img.shields.io/badge/Dr._Bhramara_Bar_Biswal-8b5cf6?style=for-the-badge)
 
 > **TL;DR:** We audited how offline RL policies (CQL vs BC) are evaluated on a groundwater pumping task. A policy's apparent advantage depends on the protocol: it changes with the estimator (FQE vs direct rollout), the baseline and critic pairing, and the state distribution, and CQL's advantage over BC reverses sign under genuine state-distribution shift.
 
