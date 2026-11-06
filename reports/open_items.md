@@ -27,3 +27,16 @@
 
 ## Cleanup
 - [ ] After freeze, verify reports_2/ is a duplicate of reports/bc_sweep/ then delete (~95 MB)
+
+## Documented side effects (not defects)
+
+- Commit 80c0a18 committed 230 `.npy` return arrays under `reports_10seed/*/returns/`
+  (~1 MB total). Reproducible from seed + config. The `reports/**/returns/` rule does
+  not match the `reports_10seed/` root. Not worth amending. `.gitignore` now includes
+  `reports_*/**/returns/` for future runs.
+
+## Cleanup items (post-freeze, non-blocking)
+
+- [ ] Confirm reports_2/ is a duplicate of reports/bc_sweep/ and delete to reclaim ~95 MB
+- [ ] Confirm _archive/ contents are all reproduced elsewhere and delete on disk
+- [ ] Confirm figs/ contents are superseded by figures/ and figures_final/
