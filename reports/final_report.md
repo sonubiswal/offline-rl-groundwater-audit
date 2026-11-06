@@ -601,13 +601,194 @@ TODO (~1200 words). Cite assumptions A1-A6 in reports/open_items.md and final_re
 
 ## 7. Policy Evaluation (Phase 5)
 
-TODO (~1500 words). Cite final_report_claims.md Claim 3.
-- The five-family 10-seed comparison table
-- The historical 3-seed +0.1096 and why it does not replicate
-- The base family's -2.47 gap and why it is dataset-specific
-- The e1 diagnostic: start-set sensitivity, not BC recipe
-- FQE vs direct rollout disagreement (e8: +0.437, CI [0.113, 0.762])
+This section reports what happened when two learned policies (Behavioral
+Cloning and Conservative Q-Learning) were trained on the same offline
+dataset and compared under a fixed evaluation protocol. It is the
+section where the project's original claim — "CQL outperforms BC" — was
+found not to replicate at 10 seeds.
 
+The honest summary is short. At 10 training seeds, CQL does not
+outperform BC by a statistically significant margin on four of the five
+dataset families tested. On the fifth, BC is decisively better, for a
+dataset-specific reason that does not generalise. The historical
+3-seed result that motivated the project did not survive replication.
+
+The rest of this section substantiates that summary.
+
+### 7.1 The 10-seed comparison
+
+Five dataset families were evaluated. Each is a distinct combination of
+training data (the .h5 offline dataset) and the CQL conservatism
+parameter alpha. For each family, ten independent training seeds were
+used (42, 123, 2024, 7, 99, 777, 1234, 5678, 12345, 99999). Each policy
+was evaluated on 500 episodes from a fixed evaluation seed (9999), and
+the mean return was recorded.
+
+  Family          Dataset                     Alpha   BC      CQL     CQL-BC
+  ---------------------------------------------------------------------------
+  base            offline_rl_dataset.h5       1.0     11.924  9.451   -2.473
+  epsilon         ..._epsilon.h5              1.0      9.088  9.135   +0.047
+  no_oracle       ..._no_oracle.h5            4.0      9.094  9.167   +0.073
+  no_oracle_a1    ..._no_oracle.h5            1.0      9.094  9.244   +0.150
+  no_oracle_a10   ..._no_oracle.h5            10.0     9.094  9.134   +0.040
+
+Three things stand out.
+
+First, the four no_oracle and epsilon families cluster tightly: CQL's
+mean return exceeds BC's by between +0.040 and +0.150 return units in
+every case. These are small gaps. No bootstrap confidence interval on
+any of them excludes zero.
+
+Second, the base family is on a different scale. BC's mean return is
+11.92, versus 9.09 on the other four families. CQL's mean return is
+essentially stable across all five families (9.13 to 9.24 on the non-base
+families, 9.45 on base). BC improves dramatically on base; CQL does not.
+This produces the -2.47 gap. It is a real result for the base dataset,
+but it is not evidence that CQL is worse in general. It is evidence that
+BC and CQL respond differently to the structure of this particular
+dataset.
+
+Third, the historical 3-seed result is absent. That result — the
+epsilon-family comparison at seeds 42, 123, 2024 — produced a CQL-BC gap
+of +0.1096 with 95% confidence interval [+0.050, +0.174]. That interval
+excluded zero, which is why the project originally claimed that CQL
+outperformed BC. At 10 seeds on the same family, the gap is +0.047 and
+the confidence interval includes zero. The historical result does not
+survive replication.
+
+### 7.2 Why the historical 3-seed result does not replicate
+
+Three diagnostic experiments examined why.
+
+**Experiment 1: start-set sensitivity.** The evaluation uses a set of
+initial states from which each policy is rolled out for 20 quarters. If
+different evaluations use different initial-state sets, the returns are
+not directly comparable. The historical 3-seed summary used a start set
+that is unrecorded in the paper.
+
+A diagnostic (revision_experiments/e1_sweep_vs_canonical.py) re-evaluated
+the same models on a fixed, documented start set (`rf_grid`) and compared
+results against the historical numbers. Under the fixed start set:
+
+  Configuration        CQL - BC   95% CI                 Excludes zero
+  ----------------------------------------------------------------------
+  canonical (rf_grid)  -0.0129    [-0.1011, +0.0686]     no
+  sweep_default        -0.0574    [-0.1282, +0.0044]     no
+
+Both are null. The sign of the small residual gap depends on the start
+set: on rf_grid it is slightly negative; on the unrecorded historical
+start set it was slightly positive. Neither is significant.
+
+**Experiment 2: BC training recipe.** A separate concern was that the
+canonical BC models used different hyperparameters from a "sweep-default"
+BC family, and that the historical result might have depended on which BC
+recipe was used as the baseline. The diagnostic trained both BC variants
+and compared them on identical starts:
+
+  BC canonical - BC sweep_default:   -0.0445 [-0.104, 0.000]   null
+
+The BC training recipe does not meaningfully affect the comparison. BC
+models trained with canonical vs sweep-default hyperparameters differ by
+less than the noise floor.
+
+**Experiment 3: 10-seed replication.** The most direct test is simply to
+run the same comparison at 10 seeds instead of 3. That is the table in
+Section 7.1. The gap is +0.047 on epsilon at 10 seeds, versus +0.1096 at
+3 seeds. The historical result was a seed artefact: three seeds is not
+enough to distinguish a real effect from training noise on this problem,
+and at 10 seeds the effect disappears.
+
+### 7.3 The base family: what it does and does not say
+
+The -2.47 gap on the base family is the largest effect in the entire
+project. It deserves its own treatment.
+
+What is true: on the base dataset, BC's learned policy achieves higher
+mean return than CQL's learned policy, at every one of the ten training
+seeds. The gap is not a seed artefact; it is consistent and large.
+
+What is also true: BC's mean return on base (11.924) is much higher than
+BC's mean return on any other family (9.088 to 9.094). BC learned something
+from the base dataset's structure that it did not learn from the other
+four. CQL did not: CQL's mean return on base (9.451) is within normal
+variation of its mean return on the other four families (9.134 to 9.244).
+
+The base dataset (`offline_rl_dataset.h5`) differs from the other four in
+a way that is favourable to Behavior Cloning specifically. Whether this
+is because base contains more of one kind of state-action pair, or has
+different reward distribution, or something else, was not determined.
+The base result is real, but it is dataset-specific, and it must not be
+generalised.
+
+The honest phrasing of the base result is: "on this particular dataset,
+BC substantially outperforms CQL, and we do not know why beyond the fact
+that the dataset structure favours BC." This is recorded in the report so
+that no reader mistakes the small positive gaps on the other four families
+for a general CQL advantage.
+
+### 7.4 FQE and direct rollout disagree
+
+Policies were evaluated by two methods. Direct rollout runs the policy in
+the simulator for 500 episodes and measures the realised return. Fitted
+Q Evaluation (FQE) estimates the policy's value from the offline dataset
+without touching the simulator. These two methods share no machinery.
+
+They disagree systematically. On the paired seed comparison
+(revision_experiments/e8_estimator_contrast.json):
+
+  FQE_gap - rollout_gap:   +0.437 [0.113, 0.762]   (95% CI, 10 seeds)
+
+FQE over-estimates the CQL-BC gap relative to rollout by about 0.44
+return units, and the confidence interval excludes zero. That is a
+substantial disagreement on a metric where the underlying gap is in the
+range of 0.05 to 0.15.
+
+This disagreement is itself a finding. It says that offline policy
+evaluation is unstable in this regime. FQE's value function approximations
+are biased, and the bias is in the same direction (favouring the
+conservative policy) that the CQL algorithm itself optimises for. This
+is not an accident of implementation; it is a known property of FQE when
+combined with CQL-trained critics.
+
+The report treats the disagreement as a data point about offline policy
+evaluation, not as a tiebreaker between the two policies. When two
+evaluation methods disagree by 0.44 units on a metric whose point estimate
+is 0.05 to 0.15, the correct conclusion is not "one method is right"; it
+is "neither method is precise enough to settle the question."
+
+### 7.5 What this section concludes
+
+The evidence at 10 seeds does not support the claim that CQL outperforms
+BC. On four of five dataset families, the CQL advantage is between +0.04
+and +0.15 return units, with no confidence interval excluding zero. On
+the fifth family, BC substantially outperforms CQL, for a dataset-specific
+reason. The historical 3-seed positive result is best described as a seed
+artefact — a plausible under three seeds, not reproducible at ten.
+
+The FQE-versus-rollout disagreement of +0.44 on a metric whose point
+estimate is 0.05 to 0.15 makes the whole comparison more uncertain, not
+less. Neither estimator is precise enough to establish CQL superiority at
+the scale of effect observed.
+
+The honest claim, recorded in Section 11.2 and restated here, is: at 10
+seeds, in-distribution, CQL does not outperform BC by a statistically
+significant margin on any of the four comparable dataset families. Any
+report sentence that begins "CQL beats BC" must qualify which dataset,
+which number of seeds, and which start set.
+
+### 7.6 What this section does not conclude
+
+It does not conclude that CQL is a worse algorithm than BC. The
+comparison is dataset-specific and small. In a different regime — a
+different simulator, a different reward function, a different offline
+dataset — the picture could reverse again. What this section establishes
+is that in this particular setup, the CQL advantage that motivated the
+project does not exist at 10 seeds.
+
+Section 8 examines out-of-distribution behaviour and finds a different
+picture: both policies fail catastrophically, and CQL fails slightly less
+than BC. That is also not evidence that CQL is better. It is evidence
+that both are broken outside the training distribution.
 ## 8. Out-of-Distribution Behaviour
 
 TODO (~1000 words). Cite final_report_claims.md Claim 4.
@@ -1025,6 +1206,7 @@ TODO. Include:
 
 TODO. Paste reports/open_items.md as-is. This is a statement of what remains open,
 not an apology.
+
 
 
 
