@@ -40,3 +40,4 @@
 - [ ] Confirm reports_2/ is a duplicate of reports/bc_sweep/ and delete to reclaim ~95 MB
 - [ ] Confirm _archive/ contents are all reproduced elsewhere and delete on disk
 - [ ] Confirm figs/ contents are superseded by figures/ and figures_final/
+
