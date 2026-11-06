@@ -2,18 +2,18 @@
   "cql_minus_bc_discounted_bootstrap": {
     "bootstrap_seed": 2027,
     "ci_contains_zero": false,
-    "ci_lower": -1.3844719793317632,
+    "ci_lower": -1.3844719793317635,
     "ci_upper": -0.592512927854973,
     "confidence_level": 0.95,
     "n_bootstrap": 5000,
-    "observed_difference": -0.973405513591127,
+    "observed_difference": -0.9734055135911271,
     "probability_bootstrap_difference_positive": 0.0
   },
   "cql_minus_bc_paired_bootstrap": {
     "bootstrap_seed": 2026,
     "ci_contains_zero": false,
-    "ci_lower": -1.6651058661779448,
-    "ci_upper": -0.7465402752887312,
+    "ci_lower": -1.6651058661779445,
+    "ci_upper": -0.746540275288731,
     "confidence_level": 0.95,
     "n_bootstrap": 5000,
     "observed_difference": -1.1959254220149023,
@@ -21,17 +21,17 @@
   },
   "direct_rollout": {
     "BC_seed123": {
-      "discounted_return_mean": 9.993926660666897,
-      "discounted_return_std": 6.658505406685558,
+      "discounted_return_mean": 9.993926660666899,
+      "discounted_return_std": 6.658505406685556,
       "gamma": 0.99,
       "n_episodes": 500,
       "policy": "BC_seed123",
       "return_mean": 10.684851739020182,
-      "return_std": 7.90149567023921,
+      "return_std": 7.901495670239209,
       "seed": 9999
     },
     "BC_seed2024": {
-      "discounted_return_mean": 10.890926411164031,
+      "discounted_return_mean": 10.890926411164033,
       "discounted_return_std": 5.290025704798965,
       "gamma": 0.99,
       "n_episodes": 500,
@@ -42,7 +42,7 @@
     },
     "BC_seed42": {
       "discounted_return_mean": 9.601675591515482,
-      "discounted_return_std": 7.220909049714089,
+      "discounted_return_std": 7.220909049714088,
       "gamma": 0.99,
       "n_episodes": 500,
       "policy": "BC_seed42",
@@ -97,7 +97,7 @@
       "n_episodes": 500,
       "policy": "greedy_extraction",
       "return_mean": 9.094008968598095,
-      "return_std": 10.769225976192768,
+      "return_std": 10.769225976192766,
       "seed": 9999
     },
     "random": {
@@ -159,7 +159,7 @@
     "42": {
       "bc_mean": 10.223098620761968,
       "cql_mean": 9.870002837924556,
-      "cql_minus_bc": -0.3530957828374088
+      "cql_minus_bc": -0.3530957828374086
     }
   },
   "protocol": {
