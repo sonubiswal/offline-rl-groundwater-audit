@@ -775,13 +775,242 @@ history, not at unmonitored locations. The per-well result complements
 Phase 2, it does not replace it.
 ## 6. Synthetic RL Environment (Phase 4)
 
-TODO (~1200 words). Cite assumptions A1-A6 in reports/open_items.md and final_report_claims.md cross-cutting caveats.
-- Why a synthetic environment is necessary
-- The water-balance equation
-- Each of the six assumptions, what it costs
-- The directional validation against real CGWB wells (sign correct, 2.8x too weak)
-- The nine pre-training sanity checks
+This section describes the simulator that the offline reinforcement
+learning policies were trained in. It exists because there is no real
+dataset of farmer pumping decisions paired with aquifer responses at the
+required resolution in the study region, and because experimenting on a
+real aquifer to learn what "too much" looks like is not an option. The
+simulator is a stylised bucket model, not a calibrated hydrological
+model, and Section 10.4 records the consequences of that.
 
+### 6.1 Why a synthetic environment is necessary
+
+Learning a pumping policy from historical data alone is not possible.
+Farmers pump, the water responds, but the response is tangled with
+rainfall, other farmers, and everything else in the watershed. No
+controlled experiment exists in which one block pumps this much and a
+neighbouring block pumps that much, and the water table is observed for
+the next several years. Without such an experiment, there is no way to
+learn a policy that has seen the consequences of over-extraction.
+
+The offline reinforcement learning approach is the methodologically
+correct one for this setting: learn from a fixed dataset of experiences
+without requiring interactive exploration of the real environment. But
+the experiences still have to come from somewhere, and the somewhere in
+this project is a simulator that encodes the water balance explicitly.
+
+The simulator is documented completely so that a reviewer can challenge
+any assumption, not because it is believed to be accurate.
+
+### 6.2 The water balance
+
+Each step simulates one quarter. The state consists of six numbers:
+
+  gw_level          current groundwater depth, in meters (bigger is worse)
+  recent_rainfall   recent rainfall, in millimeters
+  crop_water_demand crop water demand proxy, normalized 0 to 1
+  month_sin         sine of the month, seasonal encoding
+  month_cos         cosine of the month, seasonal encoding
+  extraction_rate   recent pumping intensity, normalized 0 to 1
+
+The action is a discrete pumping intensity with five levels: 0, 0.25,
+0.50, 0.75, or 1.00 of maximum extraction per block per quarter. The
+action-to-fraction mapping is fixed by line 148 of
+src/rl/synthetic_reward.py (Section 9.3).
+
+The state transition is a water-balance equation:
+
+  next_gw_level = max(0, gw_level + drawdown - recharge + noise)
+
+  drawdown = pumping_fraction * 2.0
+  recharge = 0.15 * recent_rainfall / 100.0
+  noise    = Normal(0, 0.1)
+
+The 2.0 and the 0.15 are the two arithmetic constants that the entire
+simulator rests on. Section 10.4 shows that a 3x3 sweep of these two
+constants produces a 226-fold spread in the magnitude of the reported
+CQL-versus-BC advantage. The simulator is honest about this: it is a
+stylised model with two tunable numbers, not a calibrated aquifer
+response function.
+
+### 6.3 The reward function
+
+The reward at each step combines three components:
+
+  reward = w1 * crop_revenue_proxy(action, crop_water_demand)
+         + w2 * domestic_supply_score(next_gw_level)
+         - w3 * depletion_penalty(next_gw_level, threshold)
+
+where crop_revenue_proxy is a normalized 0-1 proxy for how much of the
+crop's water demand was met, domestic_supply_score is a normalized 0-1
+measure of how adequate the water level is for domestic use, and
+depletion_penalty grows quadratically below a configurable sustainability
+threshold.
+
+The default weights are w1 = 1.0, w2 = 2.0, w3 = 0.5. Section 7.4 uses
+a weights [1.0, 2.0, 0.0] variant to test how sensitive the comparison
+is to the depletion-penalty term.
+
+Crop revenue rises with pumping until the crop's water demand is met,
+then flattens. No real price or yield data backs the magnitude of the
+formula. The domestic supply score has a single fixed critical depth for
+the whole study region, not calibrated to well depth or local
+infrastructure. The depletion penalty uses a single sustainability
+threshold of 15 meters by default, not calibrated to aquifer type or
+geology.
+
+### 6.4 The six assumptions
+
+Six numbered assumptions govern the simulator. They are reproduced here
+so the report does not rely on Section 10.4 alone to state them.
+
+**A1. Crop water demand is a simple seasonal proxy.** Higher in pre-
+monsoon and summer. Not derived from crop-type maps, irrigation records,
+or FAO crop-coefficient tables. Additionally, the demand decouples from
+the calendar after the first step of each episode, a known defect
+documented in Section 10.10.
+
+**A2. Crop revenue rises with pumping until demand is met, then flattens.**
+No real price or yield data backs the magnitude of the formula.
+
+**A3. There is one fixed, location-independent critical depth for
+domestic supply.** Real adequacy depends on well depth, pump capacity,
+and local infrastructure, none of which is modeled.
+
+**A4. One sustainability threshold applies to the whole study region.**
+Real sustainable yield varies by aquifer type and geology. Configurable,
+canonical value 15 m, not a validated threshold.
+
+**A5. Pumping lowers the water table linearly at up to 2 m per quarter
+at full pumping.** Not a calibrated aquifer response function. This
+single number drives the largest reported effect in the project.
+
+**A6. Recharge is a fixed 15% fraction of recent rainfall.** Not a
+physically calibrated infiltration model.
+
+The simulator's own source file states all six in its header comments.
+Any claim downstream of Phase 4 inherits all six.
+
+### 6.5 Directional validation against real wells
+
+The simulator is not calibrated, but is it qualitatively wrong? That is
+a fair question and it was actually tested, which is more than most
+synthetic environments get.
+
+The comparison is the correlation between rainfall and the next-quarter
+change in water depth, computed on real CGWB wells and inside the
+simulator:
+
+  Quantity                          Correlation
+  Real wells: rainfall vs. next change     -0.325
+  Simulator: rainfall vs. next change      -0.117
+  Ratio of magnitudes                       ~2.78x
+
+Both correlations are negative, which is the expected sign: more rain,
+shallower next reading. The simulator's effect is weaker than reality
+by roughly a factor of 2.78. This establishes that the simulator's
+rainfall-recharge relationship is not qualitatively wrong in direction.
+
+It does not establish that the fixed-fraction form of A6 or its 0.15
+coefficient is calibrated. Only the sign and the rough magnitude of the
+correlation are safely comparable, not the underlying slopes, because
+the two quantities are constructed differently — real physical units
+over irregular elapsed time, versus a smoothed, seeded, randomly drifting
+proxy on a uniform quarterly clock.
+
+The observed side was computed from held-out wells only. That is
+deliberate: this is a descriptive check, not a model-training step, so
+it does not "use up" the held-out set.
+
+### 6.6 Dataset generation and coverage
+
+The offline RL dataset was generated by running the simulator with three
+hand-written behaviour policies, 500 episodes each, 20 quarters per
+episode:
+
+  Random:         picks any of the five actions uniformly. Reference
+                  floor. Guarantees every action appears.
+  Greedy:         pumps exactly what the crop needs, ignoring depletion.
+                  Deliberately unsustainable. Provides real examples of
+                  what heavy extraction does to the water table.
+  Conservative:   cuts to zero once the water level approaches 80% of
+                  the sustainability threshold, and otherwise caps
+                  pumping at half of demand. Provides examples of the
+                  sustainable end.
+
+Total: 1,500 episodes, 30,000 transitions. Initial states are seeded from
+real predicted water depths (from the Phase 2 downscaler) and real
+rainfall values, sampled with spatial-block stratification so every part
+of the study region is represented.
+
+The three behaviour policies were chosen deliberately, not accidentally.
+A dataset where everyone always pumps moderately teaches a policy nothing
+about what happens when you pump hard. Without greedy extraction, the
+learned agents would never see the consequence of over-pumping. Without
+conservative, they would never see the sustainable end.
+
+### 6.7 The nine sanity checks
+
+Nine automated checks were run on the generated dataset before anything
+was trained on it:
+
+  1. No NaN or infinite values in any state or reward.
+  2. State values within plausible ranges.
+  3. A workable spread of actions across the five levels.
+  4. Rewards that actually vary (not a constant).
+  5. No duplicate transitions.
+  6. Next states genuinely respond to the action.
+  7. More pumping produces more drawdown (monotonicity).
+  8. More rain produces more recharge (monotonicity).
+  9. Reward varies across actions within a fixed state.
+
+All nine passed. The action distribution is 0%: 28.1%, 25%: 32.7%, 50%:
+18.3%, 75%: 12.7%, 100%: 8.3%. The 100% action (the most consequential
+one) is the least represented, which is documented as a limitation in
+Section 10.7 and drives some of the ambiguity in the policy comparison.
+
+The one bug found during sanity checking was in the checker, not the
+data: two checks assumed that a bigger water-level number meant "better",
+when in this project it means "deeper, therefore worse". Correcting the
+sign convention flipped the interpretation of two checks and changed
+none of the underlying numbers. An independent correlation computed
+straight from the raw arrays confirmed the corrected direction at
+r = -0.13, which is right sign, weak, and consistent with how crude A6
+is.
+
+### 6.8 The simulator's inherited limitation
+
+Every result in Phase 5 was generated by a simulator whose initial water
+depths come from the v1 downscaler, not the v2 downscaler that Section 4
+describes. This is confirmed by direct inspection of the saved model
+file: it takes 11 inputs, which is v1's signature; v2 takes 16.
+
+The simulator was built and validated before v2 existed. Re-seeding from
+v2 would produce a different pipeline than the one built and validated,
+so it is classified as out of scope rather than as unfinished work.
+Whether re-seeding from v2 would change any of the Phase 5 conclusions
+is untested, and is recorded in Section 12 as future work.
+
+### 6.9 What this section establishes
+
+Three things, for the rest of the report:
+
+First, the simulator is fully documented. Its water balance, its reward
+function, its six assumptions, and its nine sanity checks are all in the
+report. A reviewer can challenge any of them, and the report does not
+rely on the simulator being hidden behind a black box.
+
+Second, the simulator is qualitatively correct in the direction it needs
+to be. The rainfall-recharge correlation matches reality in sign and is
+within a factor of 2.78 in magnitude. That is a real piece of external
+validation, and it is modest in scope.
+
+Third, the simulator is a stylised bucket model with two arithmetic
+constants at its core. No amount of reinforcement-learning rigour makes
+the reward function true. Every Phase 5 result in Section 7 is a
+statement about this simulator, not a statement about real aquifer
+behaviour. Section 10.4 records this as the deepest limitation in the
+project.
 ## 7. Policy Evaluation (Phase 5)
 
 This section reports what happened when two learned policies (Behavioral
@@ -1690,6 +1919,7 @@ TODO. Include:
 
 TODO. Paste reports/open_items.md as-is. This is a statement of what remains open,
 not an apology.
+
 
 
 
