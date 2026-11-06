@@ -1,0 +1,3 @@
+method,nominal_coverage,observation_coverage,mean_width,median_width,calibration_n,test_n
+C0_global,0.9,0.8935731132075472,13.478610521532453,13.47861052153245,3368,3392
+C1_distance_stratified,0.9,0.8918042452830188,13.468147627321814,13.70513298926257,3368,3392
