@@ -13,7 +13,7 @@
 ## Still open (P0)
 - [x] ROI written justification: reports/roi_justification.md (bbox contains 9 states; Maharashtra-led 3-state core; Vidarbha-heavy district density)
 - [x] Final report citations grounded: see reports/final_report_claims.md
-- [ ] Q-value -> plain-language advice module (if explainability claimed)
+- [x] Q-value -> plain-language advice module: src/explainability/qvalue_translation.py, tests/test_qvalue_translation.py (8 tests), reports/explainability_methodology.md
 
 ## Still open (P1)
 - [ ] Strict region-level holdout with re-kriging
@@ -118,5 +118,6 @@ All four claims verified against committed artefacts:
 
 Remaining P0 items:
 
-- [ ] Q-value -> plain-language advice module (if explainability claimed)
+- [x] Q-value -> plain-language advice module: src/explainability/qvalue_translation.py, tests/test_qvalue_translation.py (8 tests), reports/explainability_methodology.md
+
 
