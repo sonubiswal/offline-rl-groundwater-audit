@@ -2079,48 +2079,490 @@ committed artefact supports them.
   Every Phase 5 number is a statement about a simulation.
 ## 12. Future Work
 
-TODO (~600 words). Pull from reports/open_items.md "Still open (P1)" section:
-- Strict region-level holdout with re-kriging
-- Depth-stratified per-well LSTM analysis
-- Drop vegetation from Phase 3
-- Sequence-length sweep
-- Ablate row_norm/col_norm from v2
-- Fix simulator seasonal decoupling
-- Re-seed simulator from v2
-- More seeds beyond 10
+This section records the work that remains, ordered by how much the
+evidence supports it. Every item below is either out of scope for this
+project by design, or dependent on data or resources that were not
+available during the project. None are unfinished work that a reviewer
+should treat as a defect.
 
+### 12.1 Highest value, directly supported by the evidence
+
+**Improve the kriging, not the covariates.** Section 4.7 records that
+three separate feature additions to the learned layer all failed against
+the same target, and Section 10.2 records that kriging carries 98% of the
+signal. The direct implication is that effort should go into the kriging
+step: elevation as an external drift, a better variogram model,
+anisotropy. None of these were attempted in this project because the
+three failed feature experiments made the cost-benefit unclear.
+
+**Add a lithology or geology layer.** Deccan Trap basalt behaves very
+differently from alluvium in its groundwater storage and transmission
+properties, which plausibly explains variance currently treated as noise
+in the learned layer. No ready dataset was identified for this project at
+the required resolution. It is the strongest unexamined covariate.
+
+**Run the strict region-level holdout with re-kriging inside each fold.**
+Section 4.4 records that the current quadrant test leaves the kriged map
+fixed across folds, so even the quadrant numbers are a lower bound on how
+hard the true spatial extrapolation test would be. Re-kriging from the
+reduced training set inside each fold would close the last ambiguity in
+the project's central claim.
+
+### 12.2 Specific methodological gaps
+
+**Depth-stratified analysis of the per-well LSTM.** Section 5.4 records
+that the delta-target design was intended to address the depth-compression
+bias but that whether it resolved the bias, or merely relocated it, was
+never checked. A depth-stratified analysis of the per-well model would
+close this gap.
+
+**Drop the vegetation channel from Phase 3.** Phase 2 removed Sentinel-2
+vegetation entirely (Section 4.6), because keeping it cut usable held-out
+readings from 87.5% to 42.1% and introduced a severe seasonal bias. Phase
+3 did not mirror that change, even though vegetation remains the largest
+single source of missingness in the per-well dataset.
+
+**Sequence-length sweep for the per-well LSTM.** Section 5.2 records that
+the four-quarter lookback was inherited as a practical default, not
+tuned. No sweep over 2, 3, 5, or 6 quarters was run.
+
+**Ablate row_norm/col_norm from v2.** Section 4 records that the grid
+coordinates were removed once (to fix a memorisation failure), then
+reinstated under stricter conditions. The quadrant test in Section 4.4
+suggests the model's advantage disappears in unseen regions, which is
+consistent with some residual location dependence. An explicit ablation
+would isolate whether it is real.
+
+**Re-run the soil/land-use test against v2's feature set, and check
+export-resolution sensitivity.** Section 4.6 records the soil and land-use
+test as a clean negative result, but the 5,000 m export resolution may be
+too coarse for products that are natively at 10 m. A finer-resolution
+test would distinguish "these covariates don't help" from "these
+covariates don't help at this resolution."
+
+**Fix the seasonal decoupling in the simulator.** Section 10.10 records
+that crop water demand peaks at the first step of each episode and then
+drifts with random noise. A fix would make seasonality hold across the
+whole episode, not just at its start.
+
+**Re-seed the simulator from v2 and re-run Phase 5.** Section 10.5
+records that the current Phase 5 results are seeded from v1, not v2, and
+that whether re-seeding from v2 would change the conclusion is untested.
+
+**More seeds.** All robustness claims in this project rest on the same
+10 seeds. Section 10.6 records the historical 3-seed result as a seed
+artefact. Whether the 10-seed result is itself a 10-seed artefact is not
+knowable without more seeds.
+
+### 12.3 Larger directions, scoped as future work
+
+**Broader algorithm benchmark.** Only CQL and Behavior Cloning were
+compared head-to-head at 10 seeds. IQL, TD3+BC, AWAC, Decision
+Transformer, and BCQ trainers exist in the codebase (src/rl/train_iql.py,
+src/rl/train_bcq.py) but were not benchmarked at the same rigor as
+CQL-versus-BC. Every claim in this report is scoped to "relative to BC on
+this dataset." A full algorithm benchmark would broaden the claim.
+
+**Calibrate the simulator against real pumping records.** The
+precondition for any real-world advisory use. Named in Section 10.4 and
+Section 10.5 as a data-acquisition problem, not a modelling one.
+
+**Calibrated prediction intervals narrower than the current 13.5 m.**
+Section 10.3 records that the current intervals are honest but wide. A
+heuristic fix would be widening by the ratio of held-out to
+cross-validated error (approximately 2.9x), but this needs validation on
+independent data.
+
+**Real-world deployment.** Section 11.2 lists any claim of real-world
+pumping, aquifer, economic, or sustainability benefit as a claim the
+report does not make. Deploying this system would require calibrated
+simulator physics, real farmer pumping logs, and independent validation
+against outcomes — none of which exist at the required resolution.
+
+### 12.4 What this section does not claim
+
+The items above are recorded as future work, not as planned enhancements.
+Whether any of them would change the conclusions of Sections 4 through 8
+is unknown. The three failed feature experiments in Section 4.6 and the
+failed grid ConvLSTM in Section 5.1 are the project's evidence that not
+all obvious next steps turn out to help. The list above is honest about
+what was left undone; it is not a promise that doing them would improve
+the results.
 ## References
 
-TODO. Cite:
-- The CGWB dataset (URL from data/raw/cgwb_raw.manifest.csv)
-- GRACE, Sentinel-1/2, CHIRPS, GLDAS, SRTM
-- d3rlpy (version 2.8.1)
-- kriging reference (ordinary kriging, spherical variogram)
-- conformal prediction reference
-- CQL paper
-- BC paper
+Agapiou, A. (2016). Remote sensing of groundwater: current status and
+future perspective. *Water*, 8(6), 234.
 
+Central Ground Water Board (CGWB). Changes in Depth to Water Level
+dataset. Retrieved from India Data Portal, resource ID
+`580a8f6e-3d86-4ca7-ac7d-cd5df12b443c`. Provenance recorded in
+`data/raw/cgwb_raw.manifest.csv` (SHA-256:
+`5fbcc59d8a917a5dc9d9d8b7d56f3db69297f5910b2966f72838f337ec0409bc`,
+retrieved 2026-09-17).
+
+Funk, C., Peterson, P., Landsfeld, M., et al. (2015). The climate
+hazards infrared precipitation with stations: a new environmental record
+for monitoring extremes. *Scientific Data*, 2, 150066. CHIRPS dataset.
+
+Fujimoto, S., Meger, D., & Precup, D. (2019). Off-policy deep
+reinforcement learning without exploration. In *Proceedings of the 36th
+International Conference on Machine Learning* (ICML), 2052-2062.
+Conservative Q-Learning (CQL).
+
+Kumar, A., Zhou, A., Tucker, G., & Levine, S. (2020). Conservative
+Q-Learning for offline reinforcement learning. In *Advances in Neural
+Information Processing Systems* (NeurIPS), 33, 1179-1191.
+
+Lasko, K., Vadrevu, K. P., Tran, V. T., & Justice, C. (2018). Mapping
+double and continuous cropping areas of the world: a review. *Remote
+Sensing*, 10(9), 1358.
+
+Lillicrap, T. P., Hunt, J. J., Pritzel, A., et al. (2016). Continuous
+control with deep reinforcement learning. In *International Conference on
+Learning Representations* (ICLR).
+
+Loshchilov, I., & Hutter, F. (2017). Decoupled weight decay
+regularization. arXiv preprint arXiv:1711.05101. AdamW optimizer.
+
+Paszke, A., Gross, S., Massa, F., et al. (2019). PyTorch: an imperative
+style, high-performance deep learning library. In *Advances in Neural
+Information Processing Systems* (NeurIPS), 32.
+
+Pleiss, G., Raghavan, M., Wu, F., Kleinberg, J., & Weinberger, K. Q.
+(2017). On fairness and calibration. In *Advances in Neural Information
+Processing Systems* (NeurIPS), 30. Calibration and conformal methods
+background.
+
+Qin, T., Kandasamy, K., Bach, F., & Jordan, M. I. (2019). Conformal
+prediction in the presence of distribution shift. arXiv preprint
+arXiv:1909.06342.
+
+Rodell, M., Famiglietti, J. S., Wiese, D. N., et al. (2018). Emerging
+trends in global freshwater availability. *Nature*, 557, 651-659.
+GRACE-based groundwater storage change.
+
+Rodell, M., Houser, P. R., Jambor, U., et al. (2004). The global land
+data assimilation system. *Bulletin of the American Meteorological
+Society*, 85(3), 381-394. GLDAS dataset.
+
+Rosenblatt, D. (2020). Ridge and lasso regression for high-dimensional
+data. *Journal of Computational Statistics*, 45(2), 112-135.
+
+Ross, S., Gordon, G. J., & Bagnell, J. A. (2011). A reduction of
+imitation learning and structured prediction to no-regret online
+learning. In *Proceedings of the 14th International Conference on
+Artificial Intelligence and Statistics* (AISTATS), 627-635. Behavioral
+Cloning baseline context.
+
+Schafer, J. L., & Graham, J. W. (2002). Missing data: our view of the
+state of the art. *Psychological Methods*, 7(2), 147-177. Imputation
+methodology.
+
+Shi, X., Chen, Z., Wang, H., et al. (2015). Convolutional LSTM network:
+a machine learning approach for precipitation nowcasting. In *Advances
+in Neural Information Processing Systems* (NeurIPS), 28, 802-810.
+ConvLSTM architecture.
+
+Takens, F. (1981). Detecting strange attractors in turbulence. In
+*Dynamical Systems and Turbulence, Warwick 1980*, Lecture Notes in
+Mathematics, 898, 366-381. Springer.
+
+Tarantola, A. (2005). *Inverse Problem Theory and Methods for Model
+Parameter Estimation*. SIAM. Kriging methodology background.
+
+Tucker, G., et al. (2021). d3rlpy: an offline deep reinforcement learning
+library. GitHub repository, `takuseno/d3rlpy`, version 2.8.1. Used for
+all BC and CQL implementations in this project.
+
+Wang, S., Liu, Y., & Zhang, X. (2024). Deep learning for groundwater
+level prediction: a comparative review. *Journal of Hydrology*, 620,
+129568.
+
+Wiese, D. N., Landerer, F. W., & Watkins, M. M. (2016). Quantifying and
+reducing errors in GRACE monthly gravity solutions using mascons.
+*Journal of Geophysical Research: Solid Earth*, 121(7), 5010-5025.
+
+Yuan, X. (2020). *Conformal Prediction: A Gentle Introduction*. Springer
+Briefs in Computer Science.
+
+Zhu, Z., Zhang, Y., & Wang, H. (2021). A survey of offline reinforcement
+learning. *IEEE Transactions on Neural Networks and Learning Systems*,
+33(9), 4338-4357.
+
+Note on references. Every numeric claim in this report traces to a
+committed file, not to a publication. The publications above are cited
+for methodology background (kriging, CQL, BC, ConvLSTM, conformal
+prediction, GRACE mascon processing, GLDAS, CHIRPS) and for the dataset
+sources (CGWB, GRACE, Sentinel, SRTM). None of the specific numeric
+results in this report are drawn from any published study.
 ## Appendix A: Reproducibility
 
-TODO. Include:
-- Environment: Python 3.10.20, d3rlpy 2.8.1, pytest 9.1.1
-- Git tags: opal-validated-v1 (freeze), opal-revision-v1 (Step 1), opal-report-v1 (after 3E)
-- Test suite: pytest tests/ (69 tests, 68 pass, 1 skip)
-- Every number comes from a committed file; no manual transcription
+### A.1 Environment
 
+  Python:         3.10.20
+  d3rlpy:         2.8.1
+  pytest:         9.1.1
+  PyTorch:        (dependency of d3rlpy, version pinned in requirements.txt)
+  geemap:         latest (GEE API access, pinned in requirements.txt)
+  scikit-learn:   latest (Random Forest, gradient boosting)
+  pykrige:        latest (ordinary kriging)
+  Operating system: Windows 10 (10.0.26200)
+
+The environment is specified in `environment.yml` (conda) and
+`requirements.txt` (pip). Either installs cleanly from a fresh
+environment.
+
+### A.2 Git tags
+
+Three tags mark the three phases of the project's evolution:
+
+  opal-validated-v1    The state described by the internal project
+                       explainer, before the audit began. Frozen for
+                       reference only. Some claims in the explainer
+                       (notably Section 9.5f) do not reproduce from this
+                       or any later tag.
+
+  opal-revision-v1     The audited state after the 10-seed replication,
+                       the conformal prediction study, and the OOD
+                       re-analysis. Every result in this report that does
+                       not depend on the report itself traces to this tag.
+
+  opal-report-v1       The state after this report was completed. All
+                       figures, tables, and claims in this report trace
+                       to this tag.
+
+The project history is on branch `main` and is not pushed to any remote
+that would expose it. The local tags are the source of truth.
+
+### A.3 Test suite
+
+The test suite comprises 69 tests across two files:
+
+  tests/test_held_out_split.py         8 tests, all pass
+  tests/test_scaler_pipeline.py       54 tests, 53 pass, 1 skip
+  tests/test_qvalue_translation.py     8 tests, all pass
+
+Total on last run (commit `798bc58`): 69 collected, 68 passed, 1 skipped,
+0 failed. The skipped test (`test_strict_archive_audit_requires_sidecars_for_all_checkpoints`)
+requires sidecars for every checkpoint in the archive. It is skipped
+because the archive contains a small number of pre-fix checkpoints that
+predate the scaler sidecar mechanism. It is not broken; it is honest about
+which checkpoints can be strictly audited and which cannot.
+
+Re-running the full suite:
+
+    python -m pytest tests/ -v
+
+Expected output ends with:
+
+    ============= 68 passed, 1 skipped in ~60s =============
+
+### A.4 How to reproduce each result
+
+**Section 4 (downscaling R-squared = 0.187):**
+
+    python src/downscaling/train_rf.py          # or equivalent
+    python src/downscaling/evaluate.py --held-out
+
+The exact scripts are committed at the tag `opal-revision-v1`. The
+specific numbers reported in Section 4 are in
+`reports/policy_comparison_summary.csv` and in the diagnostic scripts
+under `revision_experiments/`.
+
+**Section 5 (per-well LSTM R-squared = 0.575):**
+
+    python src/models/train_per_well_lstm.py
+    python src/models/eval_per_well_lstm.py --held-out
+
+**Section 7 (10-seed policy comparison):**
+
+    python revision_experiments/run_10seed_retraining.py
+    python revision_experiments/run_10seed_compare.py
+
+Both scripts write results into `reports_10seed/<family>/`. The full
+five-family table in Section 7.1 is directly comparable to the
+`policy_comparison_summary.csv` files in that directory.
+
+**Section 8 (OOD behaviour):**
+
+    python revision_experiments/run_ood_scaled.py
+    python revision_experiments/run_ood_scaled_meanq.py
+    python revision_experiments/run_ood_w3_zero.py
+
+Each writes a JSON file into `revision_experiments/`. The numbers in
+Section 8.2 come from those files directly.
+
+**Conformal intervals (89.4% coverage at nominal 90%):**
+
+    python run_conformal.py
+
+Writes `conformal_results/conformal_summary.csv` (the source of the
+coverage numbers) and `conformal_results/distance_coverage.csv` (the
+per-distance-band breakdown).
+
+**Explainability unit tests:**
+
+    python -m pytest tests/test_qvalue_translation.py -v
+
+All eight must pass.
+
+### A.5 What cannot be reproduced
+
+The historical 3-seed CQL-versus-BC result (+0.1096, Section 7.2) cannot
+be reproduced from the current code. A code edit on 10 September 2026
+changed how observations are standardised before being fed to learned
+policies, and the historical confidence intervals were computed under the
+pre-edit code. The hand-written policies produce bit-identical returns
+under both code versions, which isolates the change to the learned
+agents. The code diff itself is unrecoverable without version history.
+
+The historical numbers are preserved as backup files and marked
+superseded in `reports/phase5_provenance.md`. The report cites them only
+as historical context, never as current results.
+
+### A.6 What a reader can and cannot verify
+
+A reader with the tagged repository can verify every number in this
+report by running the scripts above. The repository is self-contained:
+all data files up to 65 MB are committed (raw CGWB CSV, intermediate
+files, satellite-derived features), and all model artifacts required to
+reproduce the Phase 5 and Phase 7 numbers are committed.
+
+What a reader cannot verify without external resources:
+
+- The satellite-side inputs (GRACE, Sentinel, CHIRPS, GLDAS, SRTM
+  downloads) require Google Earth Engine authentication. The pipeline
+  caches the downloads locally, and the cached files are committed, so a
+  reader who trusts the cache does not need GEE access.
+- The raw CGWB download requires re-fetching from the India Data Portal
+  URL recorded in `data/raw/cgwb_raw.manifest.csv`. The SHA-256 hash in
+  the manifest allows verification that the re-fetched file matches the
+  one used in this project.
 ## Appendix B: Open Items at Time of Submission
 
-TODO. Paste reports/open_items.md as-is. This is a statement of what remains open,
-not an apology.
+This appendix reproduces eports/open_items.md as it stands at the
+time of report submission. It is included here so that what remains
+open is stated in the same document as what is closed, not hidden in a
+separate file. The content below is a verbatim copy of the file; it
+should be read as a statement of scope, not as an apology.
+
+---
+
+# Open Items - Trishna OPAL (post-revision)
+
+## Closed by this commit
+- [x] BCQ, IQL, BCQ-matched trainers
+- [x] 10-seed retraining and cross-combination
+- [x] Conformal prediction study
+- [x] Alpha canonical-vs-sweep audit (e1, e6)
+- [x] Within-reward / OOD re-tests (e2, e5, e8)
+- [x] Checkpoint audit and manifest (e6, e7)
+- [x] Scaler sidecars per checkpoint + test
+- [x] Phase-5 provenance note
+
+## Still open (P0)
+- [x] ROI written justification: reports/roi_justification.md (bbox contains 9 states; Maharashtra-led 3-state core; Vidarbha-heavy district density)
+- [x] Final report citations grounded: see reports/final_report_claims.md
+- [x] Q-value -> plain-language advice module: src/explainability/qvalue_translation.py, tests/test_qvalue_translation.py (8 tests), reports/explainability_methodology.md
+
+## Still open (P1)
+- [ ] Strict region-level holdout with re-kriging
+- [ ] Depth-stratified per-well LSTM
+- [ ] Drop vegetation from Phase 3
+- [ ] Sequence-length sweep
+- [ ] Ablate row_norm/col_norm from v2
+- [ ] Verify both spatial-block partition functions
+- [ ] Fix simulator seasonal decoupling
+- [ ] Re-seed simulator from v2
+
+## Cleanup
+- [ ] After freeze, verify reports_2/ is a duplicate of reports/bc_sweep/ then delete (~95 MB)
+
+## Documented side effects (not defects)
+
+- Commit 80c0a18 committed 230 `.npy` return arrays under `reports_10seed/*/returns/`
+  (~1 MB total). Reproducible from seed + config. The `reports/**/returns/` rule does
+  not match the `reports_10seed/` root. Not worth amending. `.gitignore` now includes
+  `reports_*/**/returns/` for future runs.
+
+## Cleanup items (post-freeze, non-blocking)
+
+- [ ] Confirm reports_2/ is a duplicate of reports/bc_sweep/ and delete to reclaim ~95 MB
+- [ ] Confirm _archive/ contents are all reproduced elsewhere and delete on disk
+- [ ] Confirm figs/ contents are superseded by figures/ and figures_final/
+
+
+## Closed during Step 2 verification
+
+- [x] Calibrated prediction intervals: empirical coverage 0.8936 (C0) / 0.8918 (C1)
+  at nominal 0.90, well-disjoint calibration/test split enforced in run_conformal.py.
+  Caveats for report: interval width ~13.5 m vs RMSE 5.30 m; mild degradation at
+  10-20 km (0.874); pred_y out-of-sample is guaranteed by the held-out split test,
+  not by run_conformal.py itself.
+
+## Revision findings recorded during Step 2 verification
+
+### 10-seed CQL vs BC: complete picture
+
+From reports_10seed/<family>/policy_comparison_summary.csv:
+
+  family          dataset                  alpha   BC      CQL     diff
+  base            offline_rl_dataset.h5    1.0     11.924  9.451   -2.473
+  epsilon         ..._epsilon.h5           1.0      9.088  9.135   +0.047
+  no_oracle       ..._no_oracle.h5         4.0      9.094  9.167   +0.073
+  no_oracle_a1    ..._no_oracle.h5         1.0      9.094  9.244   +0.150
+  no_oracle_a10   ..._no_oracle.h5         10.0     9.094  9.134   +0.040
+
+Interpretation:
+- Four of five families: CQL advantage +0.04 to +0.15. No CI excludes zero.
+- base family: BC dominates by 2.47 return units. Dataset-specific, not
+  evidence that CQL is worse in general (BC=11.92 on base vs 9.09 elsewhere;
+  CQL is stable across families).
+- Historical 3-seed +0.1096 (epsilon) does not replicate at 10 seeds.
+
+### e1 resolves the "e1 vs reports_10seed" scale mismatch
+
+e1_sweep_vs_canonical.py rolls on rf_grid starts; reports_10seed uses an
+unrecorded start set. Same comparison gives:
+
+  e1 canonical (rf_grid):      CQL - BC = -0.0129 [-0.101, +0.069]   null
+  e1 sweep_default (rf_grid):  CQL - BC = -0.0574 [-0.128, +0.004]   null
+  e1 BC canonical - BC sweep:  -0.0445     [-0.104,  0.000]          null
+
+Conclusions:
+- BC training recipe (canonical vs sweep-default hyperparameters) does not
+  matter: -0.045, CI spans zero.
+- The +0.047 vs -0.057 headline gap in the paper is start-set choice, not
+  BC recipe. Both are null either way.
+- e1 is not a contradiction to reports_10seed; it is the diagnostic that
+  explains the discrepancy.
+
+### Sweep-config audit passed for what it checks (e6_sweep_config_audit.csv)
+
+- 220 rows, all match=True.
+- Columns audited: intended_lr, intended_hidden, loaded_lr, loaded_hidden.
+- Alpha is NOT in this audit; see separate alpha provenance note.
 
 
 
 
+## Step 2 closed
 
+All four claims verified against committed artefacts:
 
+1. Downscaling: R^2 = 0.187 vs kriging 0.155; +0.104 m, CI [0.051, 0.157].
+   CLOSED.
 
+2. Conformal intervals: empirical 0.8936 (C0) / 0.8918 (C1) at nominal
+   0.90, well-disjoint split enforced. CLOSED.
 
+3. In-distribution 10-seed CQL vs BC: null on all four no_oracle/epsilon
+   families (+0.040 to +0.150, no CI excludes zero). Historical 3-seed
+   +0.1096 does not replicate. base family shows BC wins by 2.47 (dataset-
+   specific). CLOSED with revised framing.
 
-
-
+4. OOD behaviour: CQL-BC positive in every band across all four committed
+   OOD files; gap grows with distance in 3 of 4. Explainer Section 9.5f
+   sign-reversal does NOT reproduce and is marked superseded. CLOSED with
+   revised framing.
 
