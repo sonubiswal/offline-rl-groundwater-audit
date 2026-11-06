@@ -16,13 +16,173 @@ TODO (~250 words). Structure:
 
 ## 1. Introduction
 
-TODO (~1000 words). Structure:
-- 1.1 The problem: groundwater depletion in central India
-- 1.2 Why satellite data alone is not enough
-- 1.3 Why offline RL rather than online
-- 1.4 What this report claims (cite final_report_claims.md)
-- 1.5 What this report does not claim (the "do not say" list from final_report_claims.md)
+### 1.1 The problem
 
+Groundwater is a critical water source across Indian agricultural
+regions. In many districts it is being depleted faster than it recharges.
+The Central Ground Water Board (CGWB) measures this directly: field teams
+visit monitoring wells and record how far below the surface the water
+sits, in meters. A bigger number means the water is deeper, which is
+worse.
+
+CGWB monitoring wells are sparse. Across the whole country, about 23,000
+observation wells are read roughly four times a year. Inside this
+project's study region — a nine-state bounding box covering a
+Maharashtra-led three-state core — the CGWB dataset contains 4,063 usable
+wells and 92,227 individual readings from 2013 to mid-2022. Spread over
+approximately 700,000 square kilometers, that is about one well per 200
+square kilometers. Coverage is uneven: some districts are dense (Amravati
+has 116 wells), others are sparse (Pune has 63).
+
+A farmer, a district officer, or an irrigation planner who needs to know
+the water situation at a specific field cannot rely on the nearest
+monitoring well being nearby. The nearest well might be many kilometers
+away. The result is that the resource is managed reactively: the problem
+is noticed when wells run dry, and by then the damage — aquifer
+compaction, land subsidence — is often irreversible.
+
+A proactive, data-driven system is needed to estimate underground water
+levels between wells and to recommend safe pumping. That is what this
+project set out to build.
+
+### 1.2 Why satellite data alone is not enough
+
+Satellites see the whole area at once, every month, for free. But they do
+not directly see groundwater. They see rainfall (CHIRPS), soil moisture
+(GLDAS), vegetation (Sentinel-2), terrain (SRTM), radar backscatter
+(Sentinel-1), and — most usefully — small changes in Earth's gravity
+caused by the movement of water.
+
+That last signal comes from GRACE, a pair of satellites. It is the closest
+thing to a direct measurement of total water storage from space. But its
+native resolution is approximately 300 km. One "pixel" covers a large
+fraction of a state. That is far too coarse to say anything about a
+single farm, a single block, or even a single district.
+
+The central difficulty of the project follows directly: can we use the
+fine-grained surface signals to sharpen the coarse gravity signal down to
+something useful, and prove that the sharpening is real rather than
+invented?
+
+### 1.3 Why offline reinforcement learning rather than online
+
+Most agricultural reinforcement learning work uses online simulators.
+The agent takes actions in a live environment, observes the consequences,
+and adjusts. That is appropriate when the environment can absorb
+experimentation. An aquifer cannot.
+
+An aquifer is irreversible on human timescales. If you recommend heavy
+pumping to see what happens, and the water table falls, the damage is
+done. You cannot undo it, and you cannot try a different policy on the
+same aquifer. This makes online reinforcement learning the wrong
+paradigm here.
+
+Offline reinforcement learning learns from a fixed dataset of recorded
+experiences without interactive exploration. It is the methodologically
+correct paradigm for a setting where you cannot experiment on the real
+system. It remains comparatively unexplored for groundwater
+specifically, which is part of why this project is interesting.
+
+The catch is that the offline dataset has to come from somewhere. No real
+farmer pumping logs paired with aquifer responses exist at the required
+resolution. The project therefore builds a synthetic offline dataset
+using a water-balance simulator, fully documented, and trains the offline
+RL agents inside it. Section 6 describes the simulator; Section 10.4
+records its limitations.
+
+### 1.4 What this report claims
+
+This report makes four claims. Each one is bounded by the numbers on
+file, and each one is qualified by the limitations in Section 10.
+
+**Downscaling.** A learned downscaler improves on well-level kriging by
+0.104 m RMSE on a 14,062-reading held-out well set within the study
+region. The improvement is real but small: kriging carries approximately
+98% of the useful signal, and the learned layer polishes the remaining
+2%. The improvement does not extend to region-level spatial
+extrapolation.
+
+**Time-series modelling.** A per-well sequence model (2-layer LSTM,
+hidden size 64) reaches R-squared of 0.575 on held-out wells, against a
+persistence baseline of 0.439. The defensible contribution is the +0.136
+above persistence, and it applies only at wells that already have a
+reading history. It does not replace the downscaler.
+
+**In-distribution policy comparison.** At 10 training seeds, CQL does
+not outperform Behavior Cloning by a statistically significant margin on
+any of the four comparable dataset families. The historical 3-seed result
+of +0.1096 does not replicate. One family shows BC decisively ahead by
+2.47 return units; that gap is dataset-specific and does not generalise.
+
+**Out-of-distribution behaviour.** Under all four committed OOD evaluation
+files, CQL's return exceeds BC's, but both policies collapse to
+catastrophic returns in the severe band (BC approximately -90, CQL
+approximately -86). A gap of four to nineteen return units between two
+failing policies is not a working policy.
+
+The full text of each claim, with its supporting files and its "do not
+say" boundary, is in reports/final_report_claims.md and is reproduced in
+Section 11.
+
+### 1.5 What this report does not claim
+
+The report does not claim strong spatial generalisation, state-of-the-art
+groundwater prediction, calibrated prediction intervals narrow enough to
+serve as point predictions, or any real-world pumping, aquifer,
+economic, or sustainability benefit. It does not claim that CQL beats BC
+or that BC beats CQL without qualifying which dataset, how many seeds,
+and which start set. It does not claim that CQL reverses
+out-of-distribution. It does not claim that the simulator is physically
+calibrated. It does not claim that the ConvLSTM approach was shown not to
+work as a technique — the limit is data volume, not the method.
+
+Section 11.2 lists the full set of claims that this report does not make,
+and the reason for each.
+
+### 1.6 What the report contributes
+
+The contribution of this project is not a record-breaking accuracy
+number. It is three things that a rigorous audit produces:
+
+**An end-to-end pipeline from raw satellite data to policy evaluation,
+fully audited.** Every data source has a committed provenance record.
+Every model has a committed evaluation record. Every claim traces to a
+specific file, and the validation methodology (Section 3) is designed
+specifically to prevent circular ground truth.
+
+**Evidence that a claimed CQL advantage does not replicate at 10 seeds,
+with the honest analysis of why.** The historical 3-seed result was
+plausible under 3 seeds and disappears at 10. The diagnostic that
+explains this — start-set sensitivity, not BC training recipe — is
+recorded in Section 7.2. The report's conclusion is a null result, not a
+positive one, and the null result is the more honest contribution.
+
+**A well-disjoint calibration procedure for prediction intervals that
+hits nominal coverage on real CGWB data.** Split-conformal intervals
+achieve 89.4% empirical coverage at nominal 90%, against a prior attempt
+that achieved only 50.4%. The improvement comes from enforcing well-level
+disjointness between calibration and test sets. The intervals are wide
+(13.5 m against 5.30 m RMSE), and the report states that they are useful
+as bounds, not as precise estimates.
+
+Together these three contributions make the project's honest claim: a
+reproducible, audited, bounded pipeline and evaluation methodology. It
+does not contribute a deployable advisory system. Section 12 records what
+would be needed to turn it into one.
+
+### 1.7 Structure of the report
+
+Section 2 describes the data and region of interest. Section 3 describes
+the validation methodology, which is the project's strongest
+methodological contribution. Sections 4 and 5 describe the estimation
+pipeline (downscaling and time-series model). Section 6 describes the
+synthetic RL environment. Sections 7 and 8 describe the policy
+evaluation results, including the OOD behaviour. Section 9 describes the
+explainability layer. Section 10 is the limitations section and is the
+honesty backbone of the report. Section 11 states, in one place, what the
+report claims and what it does not. Section 12 records future work.
+
+The report is not written to persuade. It is written to be checked.
 ## 2. Data and Region of Interest
 
 This section describes the input data: the satellite layers, the CGWB
@@ -1919,6 +2079,7 @@ TODO. Include:
 
 TODO. Paste reports/open_items.md as-is. This is a statement of what remains open,
 not an apology.
+
 
 
 
