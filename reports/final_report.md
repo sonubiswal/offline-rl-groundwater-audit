@@ -502,8 +502,8 @@ The eight tests are:
   test_split_handles_repeated_readings_per_well
   test_assert_no_overlap_raises_on_bad_input
 
-The test suite passed on the last commit before this report (62 passed,
-1 skipped, 0 failed in 56.68 seconds). The one skipped test is a
+The test suite passed on the last commit before this report (70 passed,
+ 1 skipped, 0 failed in under 70 seconds). The one skipped test is a
 strict-archive audit that requires sidecars for every checkpoint; it is
 skipped because the archive contains a small number of pre-fix
 checkpoints, not because the test is broken.
@@ -2342,7 +2342,7 @@ The test suite comprises 69 tests across two files:
   tests/test_scaler_pipeline.py       54 tests, 53 pass, 1 skip
   tests/test_qvalue_translation.py     8 tests, all pass
 
-Total on last run (commit `798bc58`): 69 collected, 68 passed, 1 skipped,
+Total on last run (tag `opal-report-v1`): 71 collected, 70 passed, 1 skipped,
 0 failed. The skipped test (`test_strict_archive_audit_requires_sidecars_for_all_checkpoints`)
 requires sidecars for every checkpoint in the archive. It is skipped
 because the archive contains a small number of pre-fix checkpoints that
@@ -2355,7 +2355,7 @@ Re-running the full suite:
 
 Expected output ends with:
 
-    ============= 68 passed, 1 skipped in ~60s =============
+    ============= 70 passed, 1 skipped in under 70s =============
 
 ### A.4 How to reproduce each result
 
@@ -2565,4 +2565,6 @@ All four claims verified against committed artefacts:
    OOD files; gap grows with distance in 3 of 4. Explainer Section 9.5f
    sign-reversal does NOT reproduce and is marked superseded. CLOSED with
    revised framing.
+
+
 
