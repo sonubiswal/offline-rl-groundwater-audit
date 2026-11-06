@@ -231,14 +231,206 @@ prove. Every subsequent result in this report inherits the strength of
 this design and is bounded by its limits.
 ## 4. Downscaling (Phase 2)
 
-TODO (~1000 words). Cite final_report_claims.md Claim 1.
-- The kriging baseline and its role
-- The gradient-boosting layer
-- The R^2 = 0.187 vs kriging R^2 = 0.155 result
-- The 2% of error framing
-- The quadrant holdout and why it matters
-- The three rejected feature experiments (Phase 2.5 / 2.6)
+Phase 2 is the technical core of the estimation side of the project. It
+takes coarse satellite signals plus sparse CGWB well readings and produces
+a fine-resolution estimate of water depth on a 64x64 grid. This section
+describes what was built, reports the result honestly, and documents the
+three alternative approaches that were tried and rejected.
 
+### 4.1 The approach
+
+The GRACE satellites measure changes in total water storage from space,
+but at approximately 300 km native resolution. A "pixel" covers a large
+fraction of a state. That is far too coarse to say anything about a single
+farm or even a single district.
+
+The pipeline is a two-layer stack:
+
+  Layer 1 (kriging baseline):  A classical statistical interpolation
+    produces a smooth water-depth surface from the training wells alone.
+    Ordinary kriging with a spherical variogram. Held-out wells are never
+    used to build this surface.
+
+  Layer 2 (learned correction):  A gradient-boosting regressor learns to
+    reproduce the kriged surface from satellite covariates. It sees
+    rainfall, soil moisture, the coarse GRACE anomaly, elevation, slope,
+    seasonal encoding, three-month rolling averages of rainfall and soil
+    moisture, the previous month's kriged value, age-days features for
+    stale satellite matches, and grid position. Sixteen features in the
+    adopted v2 configuration.
+
+The output is a prediction at every 64x64 grid cell, including cells with
+no well nearby. That is the project's actual objective; a per-well model
+cannot do this.
+
+### 4.2 The result
+
+On 14,062 held-out readings from 683 wells:
+
+  Method                     Readings   RMSE (m)   Median (m)   R-squared
+  ----------------------------------------------------------------
+  Our model (v2)               14,062      5.300        3.395      0.187
+  Kriging alone                14,062      5.404        3.436      0.155
+  Assume nothing changed       14,062      5.869        3.885      0.003
+
+The improvement over kriging is 0.104 m with a 95% confidence interval of
+[0.051, 0.157]. The interval does not include zero, so the improvement is
+real.
+
+It is also small. About 98% of the useful signal is already in the kriged
+surface. The learned layer polishes the last 2% of error. That is not the
+story people expect, and it is the story the numbers tell.
+
+### 4.3 What the numbers mean, and what they do not
+
+The R-squared of 0.187 sits in the middle of published well-level
+groundwater results once holdout design is accounted for. It is not a
+state-of-the-art figure, and the report does not present it as one.
+
+Three contextual facts matter for interpreting it:
+
+  First, the target is a smoothed interpolation, not raw observations.
+  The kriged surface is itself a 5.404 m error surface. A smooth target
+  limits achievable R-squared regardless of model, because no model can
+  outperform the noise floor of its own target.
+
+  Second, the honest comparison is kriging at 0.155. The 0.104 m
+  improvement is real but is 2% of total error. A reviewer who reads only
+  "R-squared 0.187" without this comparison will overestimate the
+  contribution.
+
+  Third, cross-validated R-squared on the same models was 0.50 to 0.64,
+  which is about three times too optimistic relative to the honest
+  held-out result. CV is a tool for ranking models, never a number to
+  quote as performance. Section 3.5 explains why.
+
+Consequence for the report: any sentence describing the downscaler as
+"the model that predicts groundwater" overstates it. The correct phrasing
+is "a small learned correction on top of kriging." Section 10.2 states
+this as a limitation. Section 11.2 lists it as a claim the report does
+not make.
+
+### 4.4 The quadrant holdout: what the model does not do
+
+The held-out well result proves one thing: interpolation between known
+points. It does not prove spatial extrapolation. To test that, the study
+region was divided into four quadrants. For each quadrant, all training
+wells in that quadrant were removed, the model was refitted, and the
+held-out wells inside the excluded quadrant were predicted.
+
+  Quadrant      Readings   Our model R-squared   Kriging R-squared   Winner
+  North-west       3,167                 0.116               0.055   Our model
+  North-east       3,540                 0.104               0.188   Kriging
+  South-west       3,106                 0.056               0.192   Kriging
+  South-east       4,249                 0.090               0.174   Kriging
+  All pooled      14,062                 0.101               0.155   Kriging
+
+Once the model is asked to work in a region with no training wells at
+all, plain kriging beats it in three quadrants out of four. The machine-
+learning layer's advantage is interpolation between known points, not
+extrapolation into unknown ones.
+
+One caveat on the quadrant test itself: the kriged map was held fixed
+across the four folds rather than re-kriged from the reduced training set
+inside each fold. Even the quadrant result is a lower bound on how hard
+the true spatial extrapolation test would be. Section 10.3 records this.
+
+Consequence: the phrase "the model generalises spatially" must not appear
+in this report. The model generalises to held-out wells within a region
+that also contains training wells. That is all.
+
+### 4.5 Depth compression
+
+The learned layer systematically over-predicts shallow depths and
+under-predicts deep depths. On the well-level holdout, binned by actual
+depth:
+
+  0-10 m      bias +1.55 m  (over-predicts)
+  10-20 m     bias -5.21 m  (under-predicts)
+  20-30 m     bias -13.83 m
+  30-50 m     bias -25.58 m
+  50 m+       bias -50.64 m  (too few readings to trust)
+
+The opposite signs partly cancel in the mean bias, which is why the mean
+looks almost perfect (-0.05 m). It is not. Section 10.1 diagnoses the
+cause: tree-based regression predicts averages in each leaf, which pulls
+output toward the centre of the training distribution, and deep examples
+are a thin tail.
+
+The practical consequence is that the downscaler should be treated as
+reliable mainly shallower than about 15 to 20 m. Beyond that, its output
+is qualitative. Because Phase 4 seeds the simulator from the Phase 2
+downscaler, every Phase 5 result inherits this bias.
+
+### 4.6 Three ideas we tested and rejected
+
+Three separate feature additions were tried against the same target. All
+three failed the pre-registered improvement threshold of +0.02 on spatial
+cross-validation. They are kept in the record because a project that only
+reports its wins has no way of showing it looked.
+
+**Idea one: a 12-month rainfall deficit feature.** Groundwater responds
+to how much rain has fallen over a year or more, not just this month. A
+feature capturing the twelve-month rainfall total relative to the
+long-term normal was added. The model used it (importance score 0.052),
+but held-out R-squared came back at 0.190, slightly below the 0.198
+baseline it was meant to beat. Rejected: a feature that is used but does
+not improve held-out accuracy adds complexity for nothing.
+
+**Idea two: residual kriging.** Fit the model as usual, krige the
+residuals near training wells, and add the smoothed error surface back as
+a correction. This looked good under date-grouped cross-validation
+(+0.041) but collapsed to +0.006 under the correct spatial folding.
+Under the held-out check it came back at 0.182, below the 0.189 it was
+compared against. Rejected: a gain that evaporates under the correct test
+is not a gain.
+
+The residual-kriging failure directly motivated the pre-registered rule:
+any new feature must improve spatial cross-validation by more than +0.02
+before the held-out set may be opened for that model. The threshold was
+set at roughly three times the failed +0.006 signal, to filter CV noise at
+this sample size. It was written down before the next experiment ran.
+
+**Idea three: soil texture and land-use classes.** Two datasets were added
+as 23 yes/no columns: 12 soil texture classes and 11 land-use classes.
+This was the most physically motivated idea — the geology genuinely does
+control how water moves. Cross-validated R-squared came back at 0.639,
+identical to the baseline 0.639. Delta +0.000. Under the pre-registered
+rule the held-out set was not opened. Before accepting the result, the
+team confirmed the 23 new columns had actually been wired in (feature
+count was confirmed programmatically at 35 rather than the baseline 11),
+so "no improvement" could not be a silent import bug masquerading as a
+scientific finding. It was not a bug. The result is genuine.
+
+Possible explanations for why soil and land use did not help, none
+confirmed: the 5,000 m export resolution may be too coarse for products
+that are native at 10 m; the soil layer is used at a single depth slice;
+the truly load-bearing variable may be lithology (the actual rock type),
+which no ready dataset was identified for.
+
+### 4.7 The pattern across all three failures
+
+Three separate attempts to improve the map — a rainfall-memory feature, a
+kriging correction, and soil/land-use covariates — all failed against the
+same target. Combined with the finding that kriging carries 98% of the
+signal, the conclusion is fairly firm: adding more inputs to the
+machine-learning layer is not where improvement will come from. Better
+kriging is.
+
+Section 12 names that as future work: elevation as external drift in the
+kriging step, a better variogram, anisotropy. Section 10.2 records that
+this is the direct recommendation of the three failed experiments, not a
+hypothesis invented after the fact.
+
+### 4.8 Summary
+
+The downscaler works, but the honest way to describe the work is that
+kriging does almost all of it and the learned layer adds a small, real,
+and honestly-bounded 0.104 m improvement. The result does not extend to
+spatial extrapolation, does not extend to deep wells, and does not
+survive three attempts to improve it with additional covariates. The
+contribution is not the numerical skill of the downscaler; it is the
+audit trail that shows what the number is and what it is not.
 ## 5. Time-Series Model (Phase 3)
 
 TODO (~800 words). Cite final_report_claims.md Claim 5 (per-well LSTM).
@@ -682,6 +874,7 @@ TODO. Include:
 
 TODO. Paste reports/open_items.md as-is. This is a statement of what remains open,
 not an apology.
+
 
 
 
