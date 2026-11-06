@@ -140,7 +140,12 @@ DEFAULT_OUTPUT_DIR = PROJECT_ROOT / "reports"
 DEFAULT_DATASET = PROJECT_ROOT / "data" / "processed" / "offline_rl_dataset.h5"
 
 EVAL_SEED = 9999
-TRAINING_SEEDS = [42, 123, 2024]
+import os as _os
+_ENV_SEEDS = _os.environ.get("TRAINING_SEEDS_OVERRIDE", "").strip()
+if _ENV_SEEDS:
+    TRAINING_SEEDS = [int(s.strip()) for s in _ENV_SEEDS.split(",")]
+else:
+    TRAINING_SEEDS = [42, 123, 2024]
 POLICY_ORDER = ["random", "greedy_extraction", "conservative"]
 HANDCODED_POLICY_FN = {
     "random": policy_random,

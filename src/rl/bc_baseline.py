@@ -1,369 +1,372 @@
+"""Discrete BC with validation-only tuning and best-validation checkpoints.
+
+Requires d3rlpy==2.8.1 and the repository's existing src.rl.policy_io.
+The episode-order labels remain a declared assumption, NOT inferred truth.
+Default: all training policies. --exclude-random is a separately labelled
+filtered-data baseline, not a fair drop-in replacement for full-data BC.
+No test metric is evaluated during tuning or checkpoint selection.
 """
-src/rl/bc_baseline.py
-
-Phase 5: Behavior Cloning baseline, trained on the Phase 4 offline
-dataset, for comparison against CQL (train_cql.py).
-
-VERIFIED API (not assumed) against d3rlpy 2.8.1, this session:
-  - Actions are int64, shape (T, 1); d3rlpy auto-detected
-    ActionSpace.DISCRETE, action_size=5 on load.
-  - The correct class for discrete actions is DiscreteBCConfig, NOT
-    plain BCConfig (which trains a continuous/regression policy and
-    would silently be wrong for categorical pumping-level actions).
-  - DiscreteBCConfig(batch_size, gamma, learning_rate, beta, ...).create()
-    -> DiscreteBC. beta (default 0.5) is DiscreteBC's own regularization
-    weight, distinct from CQL's conservative_weight -- do not confuse
-    the two when reading rl_config.yaml.
-  - .fit(dataset, n_steps, n_steps_per_epoch=10000, evaluators=None, ...)
-    controls training duration via n_steps/n_steps_per_epoch, not a
-    separate n_epochs argument.
-  - Loading the saved dataset requires the ReplayBuffer.load() classmethod
-    (NOT MDPDataset.load(), which shares the inherited method but has an
-    incompatible __init__ signature and raises TypeError) -- confirmed by
-    hitting that exact error and correcting it, not assumed.
-  - ds.episodes is a plain list of Episode objects, each exposing
-    .observations (T,6), .actions (T,1), .rewards (T,1), .terminated
-    (bool, confirmed False for every episode -- see INVESTIGATION NOTE
-    below for why that is CORRECT, not a bug).
-  - d3rlpy.seed(seed) is the library's documented reproducibility entry
-    point: it seeds Python's `random`, NumPy's global RNG, and PyTorch
-    (CPU + CUDA) in one call. This is called at the top of
-    run_one_seed(), before the algo is constructed.
-
-NOT independently verified in this session (flagged, not assumed away):
-  - algo.predict(observations) is assumed to follow d3rlpy's standard
-    AlgoBase interface (returns predicted discrete action per row). This
-    matches every other d3rlpy algo class's documented interface but was
-    not spot-checked against DiscreteBC specifically before this script
-    was written. If action-accuracy numbers come back nonsensical (e.g.
-    constant predictions when the loss is clearly decreasing), check this
-    first.
-
-BUGFIX 1: the previous version of this file accepted a `seed` argument
-into run_one_seed() and used it ONLY as a print/logging label -- it was
-never passed to d3rlpy.seed(), np.random.seed(), torch.manual_seed(), or
-anything else that actually controls RNG state. As a result, the three
-"TRAINING_SEEDS = [42, 123, 2024]" runs were NOT actually independently
-seeded. Fixed by calling d3rlpy.seed(seed) at the start of
-run_one_seed(), before the algo is constructed.
-
-BUGFIX 2: the previous version of run_one_seed() never called
-algo.save() at all -- no BC model was ever written to disk.
-compare_policies.py expects to load models/bc/bc_seed{seed}.d3 via
-DiscreteBC.load(), so that path was silently broken. Fixed by saving
-each seed's model to models/bc/bc_seed{seed}.d3, plus a
-bc_seed{seed}.meta.json sidecar recording the seed and key
-hyperparameters.
-
-INVESTIGATION NOTE -- terminal vs. timeout (raised, then RULED OUT, this
-session):
-  While debugging an FQE divergence (loss growing, getting WORSE with
-  shorter target_update_interval), it was hypothesized that marking
-  every episode's last transition as a TIMEOUT rather than a TERMINAL
-  was the cause -- reasoning that quarter 20 might be a true fixed
-  planning horizon with zero continuation value past it, so bootstrapping
-  V(obs[19]) as if the process continued would produce exactly this kind
-  of runaway inflation.
-
-  This was checked directly against synthetic_reward.py's step()
-  function and docstring, which is the actual ground truth (a citation
-  to validation_methodology.md Section 27 turned out to be WRONG --
-  Section 27 is about the dataset validator's duplicate/monotonicity/
-  sign-convention checks, unrelated to terminal-vs-timeout, and should
-  not have been trusted without checking). step()'s own docstring is
-  explicit: "done is always False here; episode length is controlled
-  externally by the trajectory generator... not by any terminal
-  condition in the simulator itself." The state dynamics (gw_level,
-  rainfall, demand, extraction_rate) are all ongoing AR(1)-ish processes
-  with no absorbing state -- calling step() an imagined 21st time would
-  produce a well-formed next_state with real consequences. Quarter 20 is
-  therefore a DATA-COLLECTION cutoff on a continuing process, not a true
-  fixed horizon.
-
-  CONCLUSION: the ORIGINAL code (this revision) -- terminals all-zero,
-  timeouts[-1]=1 at the end of every episode -- is correct. Marking the
-  last transition as a true terminal instead (briefly tried, then
-  reverted) would have been a NEW, opposite-direction bug: it tells the
-  critic there is zero continuation value past quarter 20, which is
-  false, and would introduce systematic value UNDERESTIMATION near every
-  episode boundary. Left this note in so nobody re-derives the terminal
-  "fix" later without re-checking synthetic_reward.py first.
-
-  This means the FQE divergence that prompted the investigation is NOT
-  explained by terminal/timeout handling -- it needs a different root
-  cause. Worth checking directly in fqe_eval.py and train_cql.py: this
-  is standard territory for off-policy value-based bootstrapping
-  instability (the "deadly triad" -- function approximation +
-  bootstrapping + off-policy data), which FQE is known to be prone to
-  even with correct terminal/timeout handling. Also worth checking
-  concretely whether d3rlpy's timeout handling actually does what
-  Pardo et al.'s time-limit bootstrapping fix intends (bootstrap through
-  timeouts, not through true terminals) in this d3rlpy version, rather
-  than assuming it from the API docs alone.
-
-ANTI-LEAKAGE DESIGN:
-  - Train/val/test split is by EPISODE, not by transition -- an episode's
-    20 quarterly transitions are highly autocorrelated (each state is
-    largely a deterministic function of the prior one), so splitting at
-    the transition level would leak information across the boundary the
-    same way un-grouped CV leaked spatial information in
-    validation_methodology.md Section 11.
-  - The split is computed ONCE (fixed seed, separate from the 3 training
-    seeds below) and reused identically across all 3 seeds, so seed-to-
-    seed variance reflects only training stochasticity, not which
-    episodes each run happened to see.
-  - Observation standardization (mean/std) is fit on the TRAIN split
-    only and applied unchanged to val/test -- mirrors the point-scale
-    LSTM's StandardScaler discipline (validation_methodology.md,
-    Section 15.5), implemented manually here rather than via an
-    unverified d3rlpy preprocessing class name.
-
-Usage:
-    python src/rl/bc_baseline.py --config config/rl_config.yaml
-"""
-
 from __future__ import annotations
-
 import argparse
+import hashlib
+import itertools
 import json
+import sys
+import tempfile
 from pathlib import Path
-
 import numpy as np
 import yaml
 import d3rlpy
 from d3rlpy.algos import DiscreteBCConfig
 from d3rlpy.dataset import MDPDataset, ReplayBuffer, InfiniteBuffer
 
-TRAIN_FRAC = 0.70
-VAL_FRAC = 0.15
-# TEST_FRAC is the remainder (0.15)
-
-SPLIT_SEED = 1  # fixed, independent of the 3 training seeds below
-TRAINING_SEEDS = [42, 123, 2024]
-
-N_STEPS = 20_000
-N_STEPS_PER_EPOCH = 2_000  # -> 10 "epochs" worth of logging granularity
-
+_REPO_ROOT = Path(__file__).resolve().parents[2]
+if str(_REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(_REPO_ROOT))
+TRAIN_FRAC, VAL_FRAC = 0.70, 0.15
+SPLIT_SEED = 1
+import os as _os
+_ENV_SEEDS = _os.environ.get("TRAINING_SEEDS_OVERRIDE", "").strip()
+if _ENV_SEEDS:
+    TRAINING_SEEDS = [int(s.strip()) for s in _ENV_SEEDS.split(",")]
+else:
+    TRAINING_SEEDS = [42, 123, 2024]
+N_STEPS, N_STEPS_PER_EPOCH = 20_000, 2_000
 N_PER_POLICY = 500
 POLICY_ORDER = ["random", "greedy_extraction", "conservative"]
+N_ACTIONS = 5
+
+
+def refuse_existing_outputs(model_dir, prefix, report_path, overwrite=False):
+    if overwrite:
+        return
+    paths = [Path(report_path)]
+    for seed in TRAINING_SEEDS:
+        model = Path(model_dir)/f'{prefix}_seed{seed}.d3'
+        paths.extend([model, model.with_suffix('.meta.json'),
+                      Path(str(model)+'.scaler.json'), model.with_suffix('.scaler.json')])
+    existing = [str(p) for p in paths if p.exists()]
+    if existing:
+        raise FileExistsError('Refusing to overwrite prior results: '+', '.join(existing)+
+                              '. Choose new output paths or explicitly pass --overwrite.')
+
+
+def write_json(path, value):
+    path = Path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open('w', encoding='utf-8') as f:
+        json.dump(value, f, indent=2, allow_nan=False)
 
 
 def policy_for_episode_index(idx: int) -> str:
+    idx = int(idx)
+    if idx < 0 or idx >= N_PER_POLICY * len(POLICY_ORDER):
+        raise ValueError('Episode index outside declared policy-order blocks.')
     return POLICY_ORDER[idx // N_PER_POLICY]
 
 
+def configure_policy_layout(order, count, n_episodes):
+    global N_PER_POLICY
+    if count <= 0 or len(order) != len(set(order)) or not order:
+        raise ValueError('Policy order must be nonempty/unique; block size positive.')
+    if len(order) * count != n_episodes:
+        raise ValueError(f'{n_episodes} episodes do not match policy-order assumption: '
+                         f'{len(order)} blocks x {count}. Supply the correct '
+                         '--policy-order and --n-per-policy; never guess labels.')
+    POLICY_ORDER[:] = order
+    N_PER_POLICY = count
+
+
 def split_episode_indices(n_episodes: int, seed: int = SPLIT_SEED):
-    rng = np.random.RandomState(seed)
-    idx = rng.permutation(n_episodes)
-    n_train = int(n_episodes * TRAIN_FRAC)
-    n_val = int(n_episodes * VAL_FRAC)
-    train_idx = idx[:n_train]
-    val_idx = idx[n_train:n_train + n_val]
-    test_idx = idx[n_train + n_val:]
-    return train_idx, val_idx, test_idx
+    idx = np.random.RandomState(seed).permutation(n_episodes)
+    n_train, n_val = int(n_episodes * TRAIN_FRAC), int(n_episodes * VAL_FRAC)
+    if min(n_train, n_val, n_episodes - n_train - n_val) <= 0:
+        raise ValueError('Dataset too small for nonempty episode splits.')
+    return idx[:n_train], idx[n_train:n_train+n_val], idx[n_train+n_val:]
 
 
 def episodes_to_arrays(episodes, obs_mean=None, obs_std=None):
+    if not episodes:
+        raise ValueError('No episodes supplied.')
+    if (obs_mean is None) != (obs_std is None):
+        raise ValueError('Supply both scaler mean and std, or neither.')
+    if obs_std is not None and (not np.isfinite(obs_std).all() or (np.asarray(obs_std) <= 0).any()):
+        raise ValueError('Scaler standard deviations must be finite and positive.')
     obs_list, act_list, rew_list, term_list, timeout_list = [], [], [], [], []
     for ep in episodes:
-        obs = ep.observations.astype(np.float32)
+        obs = np.asarray(ep.observations, dtype=np.float32)
+        act = np.asarray(ep.actions).reshape(-1)
+        rew = np.asarray(ep.rewards, dtype=np.float32).reshape(-1)
+        if obs.ndim != 2 or not len(obs) or not (len(obs) == len(act) == len(rew)):
+            raise ValueError('Invalid episode shapes or empty episode.')
+        if not np.isfinite(obs).all() or not np.isfinite(rew).all() or not np.isfinite(act).all():
+            raise ValueError('Nonfinite dataset values.')
+        if not np.equal(act, np.floor(act)).all() or ((act < 0) | (act >= N_ACTIONS)).any():
+            raise ValueError('Expected discrete actions 0..4.')
         if obs_mean is not None:
-            obs = (obs - obs_mean) / obs_std
+            obs = ((obs - obs_mean) / obs_std).astype(np.float32)
+            if not np.isfinite(obs).all():
+                raise ValueError('Nonfinite standardized observations.')
         obs_list.append(obs)
-        act_list.append(ep.actions.reshape(-1).astype(np.int64))
-        rew_list.append(ep.rewards.reshape(-1).astype(np.float32))
-
-        T = obs.shape[0]
-        terminals = np.zeros(T, dtype=np.float32)
-        timeouts = np.zeros(T, dtype=np.float32)
+        act_list.append(act.astype(np.int64))
+        rew_list.append(rew)
+        terminals, timeouts = np.zeros(len(obs), np.float32), np.zeros(len(obs), np.float32)
         if ep.terminated:
             terminals[-1] = 1.0
         else:
-            timeouts[-1] = 1.0
+            timeouts[-1] = 1.0  # Continuing-process collection cutoff, NOT terminal.
         term_list.append(terminals)
         timeout_list.append(timeouts)
-
-    return (
-        np.concatenate(obs_list, axis=0),
-        np.concatenate(act_list, axis=0),
-        np.concatenate(rew_list, axis=0),
-        np.concatenate(term_list, axis=0),
-        np.concatenate(timeout_list, axis=0),
-    )
+    return tuple(np.concatenate(v, axis=0) for v in
+                 (obs_list, act_list, rew_list, term_list, timeout_list))
 
 
 def build_dataset(episodes, obs_mean=None, obs_std=None) -> MDPDataset:
     obs, act, rew, term, timeout = episodes_to_arrays(episodes, obs_mean, obs_std)
     return MDPDataset(observations=obs, actions=act, rewards=rew,
-                       terminals=term, timeouts=timeout)
+                      terminals=term, timeouts=timeout)
 
 
 def action_accuracy(algo, episodes, obs_mean, obs_std, episode_indices=None) -> dict:
-    correct, total = 0, 0
-    per_policy_correct = {p: 0 for p in POLICY_ORDER}
-    per_policy_total = {p: 0 for p in POLICY_ORDER}
-
+    if episode_indices is not None and len(episodes) != len(episode_indices):
+        raise ValueError('Episode indices must align with episode list.')
+    correct = total = 0
+    pc, pt = dict.fromkeys(POLICY_ORDER, 0), dict.fromkeys(POLICY_ORDER, 0)
+    hist = np.zeros(N_ACTIONS, dtype=np.int64)
+    nonrandom_correct = nonrandom_total = 0
     for i, ep in enumerate(episodes):
-        obs = ep.observations.astype(np.float32)
-        obs = (obs - obs_mean) / obs_std
-        true_actions = ep.actions.reshape(-1).astype(np.int64)
-        pred_actions = algo.predict(obs)
-        n_correct = int(np.sum(pred_actions == true_actions))
-        correct += n_correct
-        total += len(true_actions)
-
+        obs = ((np.asarray(ep.observations, np.float32)-obs_mean)/obs_std).astype(np.float32)
+        if not np.isfinite(obs).all():
+            raise ValueError('Nonfinite evaluation observations.')
+        truth = np.asarray(ep.actions).reshape(-1).astype(np.int64)
+        pred = np.asarray(algo.predict(obs)).reshape(-1)
+        if pred.shape != truth.shape:
+            raise ValueError(f'Prediction shape {pred.shape} != target {truth.shape}.')
+        if not np.isfinite(pred).all() or not np.equal(pred, np.floor(pred)).all():
+            raise ValueError('Predictions are not finite discrete actions.')
+        pred = pred.astype(np.int64)
+        if ((pred < 0) | (pred >= N_ACTIONS)).any():
+            raise ValueError('Predicted action outside 0..4.')
+        nc = int(np.sum(pred == truth))
+        correct += nc; total += len(truth)
+        hist += np.bincount(pred, minlength=N_ACTIONS)
         if episode_indices is not None:
-            policy = policy_for_episode_index(episode_indices[i])
-            per_policy_correct[policy] += n_correct
-            per_policy_total[policy] += len(true_actions)
-
-    result = {"overall": correct / total if total > 0 else float("nan")}
+            p = policy_for_episode_index(episode_indices[i])
+            pc[p] += nc; pt[p] += len(truth)
+            if p != 'random':
+                nonrandom_correct += nc; nonrandom_total += len(truth)
+    result = {'overall': correct/total if total else None,
+              'prediction_counts': hist.tolist(), 'n_transitions': total}
     if episode_indices is not None:
-        for p in POLICY_ORDER:
-            t = per_policy_total[p]
-            result[p] = per_policy_correct[p] / t if t > 0 else float("nan")
+        result.update({p: pc[p]/pt[p] if pt[p] else None for p in POLICY_ORDER})
+        result['policy_transition_counts'] = pt
+        result['nonrandom'] = nonrandom_correct/nonrandom_total if nonrandom_total else None
     return result
 
 
+def validate_training_cfg(cfg):
+    steps = int(cfg.get('n_steps', N_STEPS))
+    epoch = int(cfg.get('n_steps_per_epoch', N_STEPS_PER_EPOCH))
+    if steps <= 0 or epoch <= 0 or steps % epoch:
+        raise ValueError('n_steps must be a positive multiple of n_steps_per_epoch.')
+    if float(cfg.get('learning_rate', 0.001)) <= 0 or int(cfg.get('batch_size', 100)) <= 0:
+        raise ValueError('Positive learning rate and batch size required.')
+    if float(cfg.get('beta', 0.5)) < 0:
+        raise ValueError('BC beta must be nonnegative.')
+    return steps, epoch
+
+
+def make_bc(cfg):
+    validate_training_cfg(cfg)
+    return DiscreteBCConfig(
+        batch_size=int(cfg.get('batch_size', 100)),
+        learning_rate=float(cfg.get('learning_rate', 0.001)),
+        beta=float(cfg.get('beta', 0.5)),
+        encoder_factory=d3rlpy.models.VectorEncoderFactory(
+            hidden_units=list(cfg.get('hidden_units', [256, 256])), activation='relu'),
+    ).create(device=cfg.get('device', False))
+
+
+def validation_selected_fit(seed, train_ds, val_episodes, val_indices,
+                            obs_mean, obs_std, cfg, best_path, metric='overall'):
+    steps, epoch_steps = validate_training_cfg(cfg)
+    d3rlpy.seed(seed)  # Before construction; independent seeds for every candidate.
+    algo = make_bc(cfg)
+    best_score, best_epoch, best_val = -np.inf, None, None
+    history, stale = [], 0
+    patience = int(cfg.get('patience', 0))  # 0 disables early stopping.
+    if patience < 0:
+        raise ValueError('patience must be nonnegative.')
+    for epoch, losses in algo.fitter(train_ds, n_steps=steps,
+            n_steps_per_epoch=epoch_steps, show_progress=bool(cfg.get('show_progress', True))):
+        val = action_accuracy(algo, val_episodes, obs_mean, obs_std, val_indices)
+        score = val.get(metric)
+        if score is None or not np.isfinite(score):
+            raise ValueError(f'No finite validation score for {metric}.')
+        history.append({'epoch': int(epoch), 'validation_score': float(score), 'losses': losses})
+        if score > best_score:
+            best_score, best_epoch, best_val = float(score), int(epoch), val
+            algo.save(str(best_path)); stale = 0
+        else:
+            stale += 1
+        if patience and stale >= patience:
+            break
+    if best_epoch is None:
+        raise RuntimeError('Training yielded no validation checkpoint.')
+    best_algo = d3rlpy.load_learnable(str(best_path), device=cfg.get('device', False))
+    return best_algo, best_val, {'best_epoch': best_epoch,
+        'best_validation_score': best_score, 'selection_metric': metric,
+        'trained_epochs': len(history), 'history': history}
+
+
+def tune_bc(train_ds, val_episodes, val_indices, obs_mean, obs_std, cfg, metric):
+    grid = cfg.get('tuning_grid', {
+        'learning_rate': [0.001, 0.0003], 'beta': [0.0, 0.5],
+        'hidden_units': [[128, 128], [256, 256]], 'n_steps': [20_000, 40_000]})
+    keys = list(grid)
+    if not keys or any(not grid[k] for k in keys):
+        raise ValueError('Tuning grid cannot be empty.')
+    if not set(keys) <= {'learning_rate', 'beta', 'hidden_units', 'n_steps'}:
+        raise ValueError('Unsupported BC tuning key.')
+    rows = []
+    with tempfile.TemporaryDirectory(prefix='bc_validation_tuning_') as folder:
+        for candidate, values in enumerate(itertools.product(*(grid[k] for k in keys))):
+            trial = {**cfg, **dict(zip(keys, values))}
+            best_path = Path(folder)/f'candidate{candidate}.d3'
+            _, _, fit_info = validation_selected_fit(TRAINING_SEEDS[0], train_ds,
+                val_episodes, val_indices, obs_mean, obs_std, trial, best_path, metric)
+            rows.append({'candidate': candidate, 'settings': dict(zip(keys, values)),
+                         'validation_score': fit_info['best_validation_score'],
+                         'best_epoch': fit_info['best_epoch']})
+            print('[bc_baseline] Tuning:', rows[-1])
+    winner = max(rows, key=lambda r: r['validation_score'])
+    return {**cfg, **winner['settings']}, {'seed': TRAINING_SEEDS[0], 'metric': metric,
+         'selection': 'validation only; test never accessed', 'candidates': rows, 'winner': winner}
+
+
 def run_one_seed(seed: int, train_ds, val_episodes, val_indices,
-                  test_episodes, test_indices, obs_mean, obs_std,
-                  cfg: dict, model_dir: str = "models/bc") -> dict:
-    print(f"\n[bc_baseline] === Seed {seed} ===")
-
-    d3rlpy.seed(seed)
-
-    algo = DiscreteBCConfig(
-        batch_size=cfg.get("batch_size", 100),
-        learning_rate=cfg.get("learning_rate", 0.001),
-        beta=cfg.get("beta", 0.5),
-    ).create(device=False)
-
-    algo.fit(
-        train_ds,
-        n_steps=cfg.get("n_steps", N_STEPS),
-        n_steps_per_epoch=cfg.get("n_steps_per_epoch", N_STEPS_PER_EPOCH),
-        show_progress=True,
-    )
-
-    val_acc = action_accuracy(algo, val_episodes, obs_mean, obs_std, val_indices)
+                 test_episodes, test_indices, obs_mean, obs_std,
+                 cfg: dict, dataset_path: Path, model_dir='models/bc') -> dict:
+    out_dir = Path(model_dir); out_dir.mkdir(parents=True, exist_ok=True)
+    model_path = out_dir/f'bc_seed{seed}.d3'
+    algo, val_acc, fit_info = validation_selected_fit(seed, train_ds, val_episodes,
+        val_indices, obs_mean, obs_std, cfg, model_path, cfg.get('selection_metric', 'overall'))
+    # Test is assessed ONLY after the checkpoint has been chosen on validation.
     test_acc = action_accuracy(algo, test_episodes, obs_mean, obs_std, test_indices)
+    from src.rl.policy_io import save_scaler_sidecar  # Deliberately local.
+    save_scaler_sidecar(model_path, obs_mean, obs_std, Path(dataset_path))
+    meta = {'seed': seed, 'algo': 'DiscreteBC', 'dataset': str(dataset_path),
+        'resolved_config': cfg, 'selection': fit_info,
+        'n_steps': cfg.get('n_steps', N_STEPS),
+        'n_steps_per_epoch': cfg.get('n_steps_per_epoch', N_STEPS_PER_EPOCH),
+        'batch_size': cfg.get('batch_size', 100),
+        'learning_rate': cfg.get('learning_rate', 0.001), 'beta': cfg.get('beta', 0.5),
+        'val_accuracy': val_acc, 'test_accuracy': test_acc,
+        'split_seed': SPLIT_SEED, 'seeded_via': 'd3rlpy.seed before create',
+        'filtered_training': bool(cfg.get('exclude_random', False))}
+    write_json(model_path.with_suffix('.meta.json'), meta)
+    print(f'[bc_baseline] seed={seed} validation={val_acc["overall"]:.4f} '
+          f'test={test_acc["overall"]:.4f} best_epoch={fit_info["best_epoch"]}')
+    return {'seed': seed, 'val_accuracy': val_acc, 'test_accuracy': test_acc,
+            'model_path': str(model_path), 'best_epoch': fit_info['best_epoch']}
 
-    print(f"[bc_baseline] Seed {seed}: val_accuracy={val_acc['overall']:.4f}, "
-          f"test_accuracy={test_acc['overall']:.4f}")
-    print(f"[bc_baseline] Seed {seed} val by policy: "
-          + ", ".join(f"{p}={val_acc[p]:.4f}" for p in POLICY_ORDER))
-    print(f"[bc_baseline] Seed {seed} test by policy: "
-          + ", ".join(f"{p}={test_acc[p]:.4f}" for p in POLICY_ORDER))
 
-    out_dir = Path(model_dir)
-    out_dir.mkdir(parents=True, exist_ok=True)
-    model_path = out_dir / f"bc_seed{seed}.d3"
-    algo.save(str(model_path))
+def load_split_and_scaler(dataset_path, order, n_per_policy):
+    with open(dataset_path, 'rb') as f:
+        episodes = list(ReplayBuffer.load(f, buffer=InfiniteBuffer()).episodes)
+    configure_policy_layout(order, n_per_policy, len(episodes))
+    indices = split_episode_indices(len(episodes))
+    groups = [[episodes[int(i)] for i in part] for part in indices]
+    obs, *_ = episodes_to_arrays(groups[0])
+    mean, std = obs.mean(axis=0), obs.std(axis=0)
+    std[std < 1e-6] = 1.0
+    if not np.isfinite(mean).all() or not np.isfinite(std).all():
+        raise ValueError('Invalid train-only scaler.')
+    return episodes, indices, groups, mean, std
 
-    meta_path = out_dir / f"bc_seed{seed}.meta.json"
-    with open(meta_path, "w") as f:
-        json.dump({
-            "seed": seed,
-            "algo": "DiscreteBC",
-            "n_steps": cfg.get("n_steps", N_STEPS),
-            "n_steps_per_epoch": cfg.get("n_steps_per_epoch", N_STEPS_PER_EPOCH),
-            "batch_size": cfg.get("batch_size", 100),
-            "learning_rate": cfg.get("learning_rate", 0.001),
-            "beta": cfg.get("beta", 0.5),
-            "val_accuracy_overall": val_acc["overall"],
-            "test_accuracy_overall": test_acc["overall"],
-            "seeded_via": "d3rlpy.seed(seed), called before .create()",
-        }, f, indent=2)
 
-    print(f"[bc_baseline] Seed {seed}: saved -> {model_path}")
-
-    return {
-        "seed": seed,
-        "val_accuracy": val_acc,
-        "test_accuracy": test_acc,
-        "model_path": str(model_path),
-    }
+def record_split(indices, mean, std):
+    return {'split_seed': SPLIT_SEED, 'train_indices': indices[0].tolist(),
+        'val_indices': indices[1].tolist(), 'test_indices': indices[2].tolist(),
+        'obs_mean': mean.tolist(), 'obs_std': std.tolist(),
+        'train_index_sha256': hashlib.sha256(indices[0].astype('<i8').tobytes()).hexdigest()}
 
 
 def main():
-    ap = argparse.ArgumentParser()
-    ap.add_argument("--config", default="config/rl_config.yaml")
-    ap.add_argument("--dataset", default="data/processed/offline_rl_dataset.h5")
-    ap.add_argument("--out", default="reports/bc_baseline_results.json")
-    ap.add_argument("--model-dir", default="models/bc",
-                     help="Directory to save each seed's DiscreteBC model + "
-                          "metadata sidecar.")
+    ap = argparse.ArgumentParser(description=__doc__)
+    ap.add_argument('--config', default='config/rl_config.yaml')
+    ap.add_argument('--dataset', default='data/processed/offline_rl_dataset.h5')
+    ap.add_argument('--out', default='reports/bc_baseline_results.json')
+    ap.add_argument('--model-dir', default='models/bc')
+    ap.add_argument('--overwrite', action='store_true', help='Explicitly permit replacing existing checkpoints/reports.')
+    ap.add_argument('--tune', action='store_true', help='16 validation-only candidates by default.')
+    ap.add_argument('--exclude-random', action='store_true', help='Separate filtered-data BC baseline.')
+    ap.add_argument('--selection-metric', choices=['overall', 'nonrandom'], default=None)
+    ap.add_argument('--policy-order', nargs='+', default=POLICY_ORDER.copy())
+    ap.add_argument('--n-per-policy', type=int, default=N_PER_POLICY)
     args = ap.parse_args()
-
     with open(args.config) as f:
-        full_cfg = yaml.safe_load(f)
-    bc_cfg = full_cfg.get("bc", {})
+        full_cfg = yaml.safe_load(f) or {}
+    cfg = dict(full_cfg.get('bc', {}))
+    refuse_existing_outputs(args.model_dir, 'bc', args.out, args.overwrite)
+    # Preflight sidecar dependency before spending time on training.
+    from src.rl.policy_io import save_scaler_sidecar
+    episodes, indices, groups, mean, std = load_split_and_scaler(
+        args.dataset, args.policy_order, args.n_per_policy)
+    train_idx, val_idx, test_idx = indices
+    train_eps, val_eps, test_eps = groups
+    exclude = args.exclude_random or bool(cfg.get('exclude_random', False))
+    if exclude:
+        if 'random' not in POLICY_ORDER:
+            raise ValueError('--exclude-random requested without a random policy label.')
+        train_eps = [ep for ep, i in zip(train_eps, train_idx)
+                     if policy_for_episode_index(i) != 'random']
+    metric = args.selection_metric or cfg.get('selection_metric', 'nonrandom' if exclude else 'overall')
+    cfg.update({'exclude_random': exclude, 'selection_metric': metric})
 
-    print(f"[bc_baseline] Loading dataset from {args.dataset}...")
-    with open(args.dataset, "rb") as f:
-        ds = ReplayBuffer.load(f, buffer=InfiniteBuffer())
-    episodes = list(ds.episodes)
-    n_episodes = len(episodes)
-    print(f"[bc_baseline] Loaded {n_episodes} episodes.")
+    # ---- env-var overrides injected by scripts/adapters.py ----
+    # bc_baseline.py has no CLI flag for lr / hidden_units / n_steps; the
+    # sweep adapter communicates them through the environment. Applied
+    # here, after the YAML-derived cfg is final and before any training
+    # call reads it.
+    import os as _os
+    _lr     = _os.environ.get("BC_LR_OVERRIDE")
+    _steps  = _os.environ.get("BC_STEPS_OVERRIDE")
+    _hidden = _os.environ.get("BC_HIDDEN_OVERRIDE")
+    if _lr or _steps or _hidden:
+        if _lr:
+            cfg['learning_rate'] = float(_lr)
+        if _steps:
+            cfg['n_steps'] = int(_steps)
+        if _hidden:
+            cfg['hidden_units'] = [int(x) for x in _hidden.split(",")]
+        print(f"[bc_baseline] env overrides applied: "
+              f"learning_rate={cfg.get('learning_rate')} "
+              f"n_steps={cfg.get('n_steps')} "
+              f"hidden_units={cfg.get('hidden_units')}")
+    # -----------------------------------------------------------
 
-    train_idx, val_idx, test_idx = split_episode_indices(n_episodes)
-    print(f"[bc_baseline] Episode split (fixed seed={SPLIT_SEED}): "
-          f"{len(train_idx)} train / {len(val_idx)} val / {len(test_idx)} test")
-
-    train_episodes = [episodes[i] for i in train_idx]
-    val_episodes = [episodes[i] for i in val_idx]
-    test_episodes = [episodes[i] for i in test_idx]
-
-    train_obs_raw, _, _, _, _ = episodes_to_arrays(train_episodes)
-    obs_mean = train_obs_raw.mean(axis=0)
-    obs_std = train_obs_raw.std(axis=0)
-    obs_std[obs_std < 1e-6] = 1.0
-    print(f"[bc_baseline] Train obs mean: {obs_mean}")
-    print(f"[bc_baseline] Train obs std:  {obs_std}")
-
-    train_ds = build_dataset(train_episodes, obs_mean, obs_std)
-
-    results = []
-    for seed in TRAINING_SEEDS:
-        result = run_one_seed(seed, train_ds, val_episodes, val_idx,
-                               test_episodes, test_idx, obs_mean, obs_std,
-                               bc_cfg, model_dir=args.model_dir)
-        results.append(result)
-
-    val_overall = [r["val_accuracy"]["overall"] for r in results]
-    test_overall = [r["test_accuracy"]["overall"] for r in results]
-    summary = {
-        "per_seed": results,
-        "val_accuracy_mean": float(np.mean(val_overall)),
-        "val_accuracy_std": float(np.std(val_overall)),
-        "test_accuracy_mean": float(np.mean(test_overall)),
-        "test_accuracy_std": float(np.std(test_overall)),
-        "n_train_episodes": len(train_idx),
-        "n_val_episodes": len(val_idx),
-        "n_test_episodes": len(test_idx),
-        "split_seed": SPLIT_SEED,
-        "training_seeds": TRAINING_SEEDS,
-        "policy_order_assumption": POLICY_ORDER,
-        "n_per_policy_assumption": N_PER_POLICY,
-        "model_dir": args.model_dir,
-    }
-
-    print("\n[bc_baseline] === Summary across 3 seeds ===")
-    print(f"  Val accuracy:  {summary['val_accuracy_mean']:.4f} "
-          f"± {summary['val_accuracy_std']:.4f}")
-    print(f"  Test accuracy: {summary['test_accuracy_mean']:.4f} "
-          f"± {summary['test_accuracy_std']:.4f}")
-    for p in POLICY_ORDER:
-        p_val = [r["val_accuracy"][p] for r in results]
-        p_test = [r["test_accuracy"][p] for r in results]
-        print(f"  [{p}] val: {np.mean(p_val):.4f} ± {np.std(p_val):.4f}   "
-              f"test: {np.mean(p_test):.4f} ± {np.std(p_test):.4f}")
-
-    Path(args.out).parent.mkdir(parents=True, exist_ok=True)
-    with open(args.out, "w") as f:
-        json.dump(summary, f, indent=2)
-    print(f"[bc_baseline] Saved -> {args.out}")
+    train_ds = build_dataset(train_eps, mean, std)
+    tuning = {'enabled': False}
+    if args.tune:
+        cfg, tuning = tune_bc(train_ds, val_eps, val_idx, mean, std, cfg, metric)
+    rows = [run_one_seed(seed, train_ds, val_eps, val_idx, test_eps, test_idx,
+             mean, std, cfg, Path(args.dataset), args.model_dir) for seed in TRAINING_SEEDS]
+    vals = [r['val_accuracy']['overall'] for r in rows]
+    tests = [r['test_accuracy']['overall'] for r in rows]
+    summary = {'per_seed': rows, 'resolved_config': cfg, 'tuning': tuning,
+        'val_accuracy_mean': float(np.mean(vals)), 'val_accuracy_std': float(np.std(vals)),
+        'test_accuracy_mean': float(np.mean(tests)), 'test_accuracy_std': float(np.std(tests)),
+        'std_convention': 'population standard deviation, ddof=0',
+        'n_train_episodes': len(train_idx), 'n_train_episodes_for_fit': len(train_eps),
+        'n_val_episodes': len(val_idx), 'n_test_episodes': len(test_idx),
+        'split': record_split(indices, mean, std), 'split_seed': SPLIT_SEED,
+        'training_seeds': TRAINING_SEEDS,
+        'policy_order_assumption': POLICY_ORDER.copy(), 'n_per_policy_assumption': N_PER_POLICY,
+        'dataset': args.dataset, 'model_dir': args.model_dir}
+    write_json(args.out, summary)
+    print(f'[bc_baseline] Test mean={np.mean(tests):.4f}; std={np.std(tests):.4f}')
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()

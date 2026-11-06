@@ -1,5 +1,5 @@
 # config/rl_config.yaml
-# Phase 4-5: synthetic RL dataset generation + CQL/BC training config.
+# Phase 4-5: synthetic RL dataset generation + CQL/BC/BCQ training config.
 
 state_space:
   # Order matters -- this is the exact feature vector order used by
@@ -62,7 +62,6 @@ cql:
   n_quantiles: 32
   n_epochs: 50
 
- 
 bc:
   # Discrete BC hyperparameters -- see bc_baseline.py's module docstring
   # for the verified DiscreteBCConfig signature this maps onto.
@@ -74,5 +73,29 @@ bc:
                           # knobs. Do not conflate the two when tuning.
   n_steps: 20000
   n_steps_per_epoch: 2000
- 
 
+# Discrete BCQ. No tau: DiscreteBCQConfig exposes target_update_interval
+# (hard updates) only; the soft-target tau is a continuous-action feature
+# in d3rlpy 2.x. target_update_interval is set to 500 rather than 8000
+# because the 20,000-step budget here is much shorter than the Atari-scale
+# runs that default is calibrated for; 8000 would give only 2 target syncs.
+# oversample_factor defaults to 1 because BCQ's behaviour-cloning head
+# would otherwise learn the duplicated negative-tail action as more common
+# in high-demand states, raising its probability and making it more likely
+# to pass the action_flexibility mask. Run a matched oversample_factor: 3
+# variant separately to compare against the CQL pipeline.
+bcq:
+  model_dir: models_10seed/epsilon/bcq
+  learning_rate: 6.25e-5
+  batch_size: 100
+  gamma: 0.99
+  target_update_interval: 500
+  action_flexibility: 0.3
+  beta: 0.5
+  n_critics: 1
+  qfunc: qr
+  n_quantiles: 200
+  clip_grad_norm: 1.0
+  oversample_factor: 1
+  n_steps: 20000
+  n_steps_per_epoch: 2000

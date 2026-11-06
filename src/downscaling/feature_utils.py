@@ -18,7 +18,9 @@ GRID_SIZE = 64
 MONTHLY_SOURCES = [
     "chirps",
     "gldas",
+    "sentinel2_ndvi",
     "grace",
+    
 ]
 
 STATIC_SOURCES = [
