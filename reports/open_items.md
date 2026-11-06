@@ -11,7 +11,7 @@
 - [x] Phase-5 provenance note
 
 ## Still open (P0)
-- [ ] ROI written justification
+- [x] ROI written justification: reports/roi_justification.md (bbox contains 9 states; Maharashtra-led 3-state core; Vidarbha-heavy district density)
 - [x] Final report citations grounded: see reports/final_report_claims.md
 - [ ] Q-value -> plain-language advice module (if explainability claimed)
 
@@ -118,5 +118,5 @@ All four claims verified against committed artefacts:
 
 Remaining P0 items:
 
-- [ ] ROI written justification (unchanged)
 - [ ] Q-value -> plain-language advice module (if explainability claimed)
+
