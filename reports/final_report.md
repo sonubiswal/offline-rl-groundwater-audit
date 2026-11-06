@@ -433,12 +433,163 @@ contribution is not the numerical skill of the downscaler; it is the
 audit trail that shows what the number is and what it is not.
 ## 5. Time-Series Model (Phase 3)
 
-TODO (~800 words). Cite final_report_claims.md Claim 5 (per-well LSTM).
-- The grid ConvLSTM infeasibility (7 contiguous sequences)
-- The pivot to per-well LSTM
-- R^2 = 0.575 vs persistence 0.439
-- The +0.136 above persistence is the defensible contribution, not the raw 0.575
+Phase 2 treats each month independently: the model sees this month's
+covariates plus last month's kriged value, and predicts this month's
+surface. But groundwater has memory. This quarter's level is strongly
+related to the last few quarters. Phase 3 asks whether a model that sees
+a sequence of months can beat a model that sees only one month plus the
+previous value.
 
+The answer, for this dataset, is a qualified yes — but the model that
+delivers the yes is not the one the original plan expected.
+
+### 5.1 The grid ConvLSTM: what was attempted and what was found
+
+The original plan was a grid-to-grid ConvLSTM: a convolutional LSTM that
+reads a sequence of whole maps and predicts the next whole map, tracking
+spatial patterns over time. Architecturally it was built and verified
+against the specification. It could not be trained, and the reason is
+data availability, not model capacity.
+
+Rather than assume, a diagnostic script inspected all 38 available
+monthly kriged maps one by one and asked a single question: does this
+date have a complete set of satellite inputs (Sentinel-1, Sentinel-2,
+CHIRPS, GRACE, GLDAS, SRTM, all present)? Twenty-five did; thirteen did
+not. But the twenty-five were not consecutive. They fell into five
+non-contiguous runs, separated by gaps caused by three independent
+events:
+
+  - Sentinel-2 did not exist before June 2015.
+  - GRACE had a mission handover gap of approximately nine months,
+    July 2017 to April 2018, when the original mission ended and its
+    replacement was being commissioned.
+  - A roughly seven-month gap in 2020 is plausibly a COVID-19 field-
+    campaign disruption. This is plausible, not verified.
+
+A sequence model needs six consecutive quarters of input plus one to
+predict — seven in a row. Only one of the five contiguous runs is long
+enough to yield training sequences. The entire usable training set is
+seven whole-map sequences. That is not enough to train a grid ConvLSTM.
+
+An attempt was made anyway. Each map was cut into 16x16 patches to
+multiply the number of training examples, a legitimate way to get more
+gradient signal from a small dataset but not a way to create new
+information. The split was done at the whole-map level before cutting,
+so patches from the same map could not sit on both sides of the
+train/test boundary. Validation R-squared came back at -0.0655, worse
+than simply predicting the average. Training loss kept falling while
+validation loss rose — the classic signature of memorising seven examples.
+
+The result is not evidence that ConvLSTMs fail on groundwater. It is
+evidence that the project's satellite record does not provide enough
+contiguous months to train one. Shortening the lookback to two quarters
+was considered and computed: it would raise the usable sequence count to
+fifteen, still one to two orders of magnitude short of what this class
+of model needs, and would also destroy the whole reason for using a
+sequence model (two quarters is barely more memory than Phase 2's single
+previous-value feature). The limit is data availability.
+
+### 5.2 The pivot: per-well LSTM
+
+A grid model needs every satellite layer present across the whole region
+simultaneously. A per-well model needs coverage at one pixel, on that
+well's own reading dates. That is a categorically weaker requirement,
+and it recovers 12 usable dates that the grid model had to throw away —
+nearly half the usable coverage.
+
+The per-well model is a 2-layer LSTM with hidden size 64, dropout 0.2,
+reading a sequence of six time-varying inputs per well plus two fixed
+terrain values:
+
+  - water depth, rainfall, crop demand proxy, and season as a
+    sine/cosine pair (six time-varying inputs)
+  - elevation and slope at the well's location (two static inputs)
+
+It predicts the change from the well's own last reading, not the absolute
+depth. This was a deliberate design choice, motivated by the depth-
+compression problem documented in Section 4.5: starting from the well's
+own last reading removes the need to reconstruct absolute depth from
+satellites alone, which is where the tree-based downscaler was weakest.
+
+The lookback is four quarters. This is a practical default inherited from
+what the grid model could not do; it was not tuned. Section 12 records
+that no sweep over 2, 3, 5, or 6 quarters was run.
+
+### 5.3 The result, and why the obvious headline is the wrong one
+
+The per-well LSTM scored R-squared = 0.575 against true held-out wells,
+compared to Phase 2's 0.198 on the same wells. It looks like a rout. It
+is not, for two reasons that must always travel with the number.
+
+**Reason 1: the comparison is not apples-to-apples.** Phase 2 predicts
+at any location, including places with no well. That is the project's
+actual objective, because it is what produces a map. The LSTM can only
+work where a well already has a reading history. It cannot answer "how
+deep is the water at this unmonitored spot?" — only "given this well's
+history, what will it read next?" These are complementary tasks, not
+competing ones. Presenting this as "the LSTM beats the downscaler" would
+misrepresent both.
+
+**Reason 2: the honest baseline is "nothing changed."** Because the LSTM
+starts from the well's own last reading, a large part of its apparent
+skill could be pure persistence — water tables do not move much quarter
+to quarter. So a persistence baseline was computed on the identical
+sequences.
+
+  Metric                     "Nothing changed"   Per-well LSTM   Improvement
+  R-squared                                0.439             0.575        +0.136
+  Error (m)                                4.283             3.726       -13.0%
+  Typical error (m)                        2.500             2.023       -19.1%
+
+Persistence alone reaches 0.439. The defensible contribution of the LSTM
+is the +0.136 above persistence — about 24% of the remaining unexplained
+variance — not the raw 0.575. And that gap is consistent with something
+Phase 2 had already found independently: the previous month's value was
+v1's second-largest feature. Memory is real; this measures how much.
+
+### 5.4 Scope notes
+
+Three honest caveats about the per-well result:
+
+**Coverage.** 609 of 710 held-out wells (85.8%) had enough surviving
+readings to be evaluated. The remaining 101 wells had too few readings
+after dropping missing covariates. The result should not be assumed
+uniform across all wells; it describes the 609 that could be tested.
+
+**Comparison baseline.** The comparison table in Section 5.3 uses the
+old Phase 2 figure of 0.198, because Phase 3 was run before the v2
+downscaler rebuild. It has not been re-run against the v2 figure of 0.187.
+The difference is negligible (0.011 in R-squared) but should be stated.
+
+**Depth stratification.** The delta-target design was specifically
+chosen to address the depth-compression bias documented in Section 4.5.
+Whether it actually resolved the bias, or merely relocated it, was not
+checked — a depth-stratified analysis of the per-well LSTM was never run.
+Section 12 records this as future work.
+
+### 5.5 What this section contributes
+
+The per-well LSTM establishes that groundwater has measurable temporal
+memory that a sequence model can exploit: a +0.136 improvement over
+persistence is real and reproducible. It also establishes, by direct
+attempt, that the grid-level ConvLSTM the original plan proposed cannot
+be trained on this satellite record — not because the method is wrong,
+but because seven whole-map training sequences is not enough data.
+
+The distinction matters. A report that said "ConvLSTM doesn't work"
+would be making a claim about the method. This report says "the grid
+ConvLSTM could not be trained on this dataset because of a specific,
+diagnosed data-contiguity limit." That is a statement about the data, and
+it is fully supported by the diagnostic.
+
+### 5.6 Summary
+
+Two models were tried. The grid-level one failed for a documented reason
+(seven usable training sequences, R-squared = -0.0655). The per-well one
+succeeded on its own terms (R-squared = 0.575, +0.136 above persistence),
+but on a narrower problem than Phase 2 solves: it predicts at wells with
+history, not at unmonitored locations. The per-well result complements
+Phase 2, it does not replace it.
 ## 6. Synthetic RL Environment (Phase 4)
 
 TODO (~1200 words). Cite assumptions A1-A6 in reports/open_items.md and final_report_claims.md cross-cutting caveats.
@@ -874,6 +1025,7 @@ TODO. Include:
 
 TODO. Paste reports/open_items.md as-is. This is a statement of what remains open,
 not an apology.
+
 
 
 
