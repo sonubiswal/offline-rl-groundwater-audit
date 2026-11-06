@@ -34,14 +34,201 @@ TODO (~1500 words). Cite:
 
 ## 3. Validation Methodology
 
-TODO (~1500 words). The single most important section. Structure:
-- 3.1 The circularity problem
-- 3.2 The held-out-well design (710 wells, 17.5%)
-- 3.3 The automated test that enforces zero overlap
-- 3.4 The held-out-never-rasterised rule
-- 3.5 The cross-validation protocol (spatially blocked, not date-grouped)
-- 3.6 What this design can and cannot prove
+This section describes how the project avoids circular ground truth. It
+is the most important methodological section in the report, because every
+downstream result — every R-squared, every confidence interval, every
+policy comparison — is only as trustworthy as the holdout it was measured
+against.
 
+The design has five parts: a well-disjoint split that is created before
+any interpolation touches the data, an automated test that enforces the
+disjointness, a rule that held-out wells are never rasterised onto the
+grid, a cross-validation protocol that mimics the holdout rather than
+answers a different question, and an honest statement of what the whole
+design can and cannot prove.
+
+### 3.1 The circularity problem
+
+Groundwater observations in the CGWB dataset are sparse. 4,063 wells over
+approximately 700,000 square kilometers is about one well per 200 square
+kilometers. To produce a map, something has to fill in the gaps between
+wells. The obvious tool is kriging: a smooth interpolation that estimates
+depth at unmeasured locations from nearby measured locations.
+
+The problem is that if you krige from all wells and then measure the
+kriged surface against a random split of readings, the readings used to
+build the surface are in the test set. The R-squared is measuring memory,
+not prediction. This is the circularity problem.
+
+The same problem recurs in subtler forms. If held-out wells are written
+into a raster grid cell that the model is later asked to predict, the cell
+carries the answer. If the model's hyperparameters are tuned against the
+held-out wells, the holdout stops being a holdout. If cross-validation
+folds group by date rather than by space, the folds answer a question
+that the real evaluation does not ask — can you forecast the future from
+the past, rather than can you interpolate between known wells.
+
+The rest of this section is what was done to prevent each of these.
+
+### 3.2 The held-out-well design
+
+Wells are split, not readings. A single CGWB well is read roughly four
+times per year, and the readings for one well are highly correlated with
+each other. If you split readings randomly, a model that has seen a well's
+2019 readings will look brilliant at its 2020 readings without learning
+anything about groundwater. Holding out whole wells removes that shortcut.
+
+The split is spatially stratified, not purely random. The study region's
+bounding box is divided into a 10x10 grid of cells, and from each cell
+roughly 17.5% of wells are held out. This ensures that held-out wells are
+spread across the region rather than clustered in low-density areas,
+which would bias the test toward the sparse districts.
+
+The final split:
+
+  training wells    3,353   (82.6% of readings)
+  training readings  76,154
+  held-out wells      710   (17.5% of readings)
+  held-out readings  16,073
+  random seed            42
+
+The proportion is 17.5% because a bug was caught during early runs. The
+initial split produced 98.4% of wells in the test set due to an
+off-by-one in the fraction calculation. The bug was found by checking
+output rather than assuming it, and the fix produced the current 17.5%
+split. The seed 42 was chosen as a reproducibility anchor; it has no
+statistical meaning beyond that.
+
+Both ID files (train_well_ids.csv and held_out_ids.csv) are committed to
+version control. They are immutable from the moment they were created.
+Re-running the split script with the same seed produces the same split;
+re-running it with a different seed would produce a different split and
+would silently reintroduce the circular ground truth problem this entire
+methodology exists to prevent.
+
+### 3.3 The automated test that enforces zero overlap
+
+The split is enforced by an automated test, not by convention. The test
+(tests/test_held_out_split.py) contains eight assertions. The one that
+matters most is test_split_zero_overlap, which asserts that the
+intersection of the training and held-out ID sets is empty. If a future
+change causes any well to appear in both sets, this test fails and the
+build fails.
+
+The eight tests are:
+
+  test_load_wells_drops_missing_and_implausible
+  test_assign_grid_cells_within_bounds
+  test_split_zero_overlap
+  test_split_fraction_roughly_correct
+  test_split_is_spatially_distributed
+  test_split_is_idempotent
+  test_split_handles_repeated_readings_per_well
+  test_assert_no_overlap_raises_on_bad_input
+
+The test suite passed on the last commit before this report (62 passed,
+1 skipped, 0 failed in 56.68 seconds). The one skipped test is a
+strict-archive audit that requires sidecars for every checkpoint; it is
+skipped because the archive contains a small number of pre-fix
+checkpoints, not because the test is broken.
+
+The presence of an automated test is not the same as having a well-designed
+split — a passing test with a bad split would just be a test for a bad
+split. But the combination of a documented, version-controlled split and
+an automated test that catches accidental re-creation is what makes the
+project's honesty claim mechanically enforceable rather than aspirational.
+
+### 3.4 The held-out-never-rasterised rule
+
+Every input to the model is rasterised onto a 64x64 grid. Rainfall,
+soil moisture, NDVI, elevation, satellite-derived covariates, and the
+GRACE anomaly are all pixel-level fields. Training wells are placed onto
+the grid by counting how many fall in each cell and averaging them, so
+they influence the model's target at their cells.
+
+Held-out wells are not rasterised. They are read as individual points,
+only at the moment of scoring. If a held-out well's value were written
+into a grid cell, that cell would carry the answer the model is supposed
+to guess. The grid would be a target the model could learn to reproduce
+trivially, and no test would detect the leak because the split would
+still be well-disjoint.
+
+This rule is enforced in code (held-out wells are loaded from a separate
+file and are never merged into the grid stack). It is also stated in the
+project's validation documentation (reports/roi_justification.md and
+reports/final_report_claims.md) so that any future contributor reading
+the code or the docs finds the rule before finding a way to break it.
+
+### 3.5 The cross-validation protocol
+
+Hyperparameter selection happens inside the training data only. Held-out
+wells are never touched during tuning.
+
+The first version of the cross-validation protocol grouped folds by date:
+train on some years, test on others. Every configuration scored strongly
+negative R-squared under this protocol. That looked like the models were
+broken. They were not. Date-grouped folds answer a different, much harder
+question than the one the real test asks. Our real test holds out wells,
+and most held-out readings fall on dates the model has already seen via
+other wells. So the correct protocol measures "can you interpolate between
+wells you know", not "can you forecast the future from the past".
+
+Once folds were reorganized spatially — blocks of grid cells, held out as
+units — the numbers became positive and meaningful. The protocol is now
+documented in reports/validation_methodology.md and is used for every
+downscaler selection decision.
+
+Two further lessons from the cross-validation work are relevant here.
+First, cross-validated R-squared is systematically about three times too
+optimistic relative to the held-out well result (0.50-0.64 CV vs 0.187
+held-out). CV is a tool for ranking models, never a number to quote as
+performance. Second, the CV figure depends on the block size: four blocks
+gives 0.497, sixteen gives about 0.58, sixty-four gives about 0.63. Finer
+blocks put test cells closer to training cells, and the score rises for
+reasons that have nothing to do with the model. Any single CV figure
+without a stated block size is not defensible and does not appear in this
+report.
+
+### 3.6 What this design can and cannot prove
+
+The design proves one thing: that the model can predict the depth at a
+held-out well that is interleaved with training wells, in a region the
+model has been trained on, in a time period the model has seen.
+
+The design does not prove three things:
+
+- It does not prove spatial extrapolation. The median held-out well is
+  5.8 km from the nearest training well, and 99.8% are within 25 km. This
+  is an interpolation test, not an extrapolation test. Under a stricter
+  quadrant holdout (Section 10.3), plain kriging beats the learned layer
+  in three of four quadrants, which tells us what spatial extrapolation
+  would look like.
+
+- It does not prove temporal forecasting. Date-grouped validation is
+  negative in every configuration, for both model versions. The model
+  interpolates inside 2013 to 2022; it has not been shown to forecast
+  anything.
+
+- It does not prove real-world applicability. The held-out wells are
+  in situ observations, not farmer decisions. Even if the model predicted
+  perfect water depth, the downstream policy layer depends on a synthetic
+  simulator with six documented assumptions.
+
+The rest of this report is careful to state what each result proves in
+these terms. Section 10.3 restates the spatial-extrapolation caveat.
+Section 10.6 restates the temporal caveat. Section 10.4 restates the
+simulator caveat. The methodological discipline established here is
+what makes those restatements credible rather than defensive.
+
+### 3.7 Summary
+
+The circularity problem is real, common, and easy to fall into. This
+project's defense against it is: a well-disjoint split created before
+any interpolation, enforced by an automated test, held-out wells never
+rasterised onto the grid, cross-validation that mimics the real holdout,
+and an honest statement of what the whole design proves and does not
+prove. Every subsequent result in this report inherits the strength of
+this design and is bounded by its limits.
 ## 4. Downscaling (Phase 2)
 
 TODO (~1000 words). Cite final_report_claims.md Claim 1.
@@ -495,5 +682,6 @@ TODO. Include:
 
 TODO. Paste reports/open_items.md as-is. This is a statement of what remains open,
 not an apology.
+
 
 
