@@ -970,11 +970,141 @@ That paragraph is the full finding. Anything stronger than it overstates
 the evidence; anything weaker than it hides what was actually observed.
 ## 9. Explainability
 
-TODO (~800 words). Cite reports/explainability_methodology.md.
-- The Q-gap confidence rule
-- The five action labels tied to the code line 148
-- What the module can and cannot do (four items)
+This section describes the layer that turns the trained CQL critic into
+plain-language advice. It is a translation layer, not a validation layer.
+That distinction is the whole point of the section and is the reason the
+report presents advice with explicit confidence levels and explicit
+limitations.
 
+### 9.1 What the module does
+
+The module (src/explainability/qvalue_translation.py) exposes a single
+function, translate_to_advice, that takes a dictionary mapping each
+discrete action to a Q-value from the critic and returns:
+
+  - recommended_action  the action with the highest Q-value
+  - confidence_level    "high", "medium", or "low"
+  - plain_language_text one sentence naming the recommended action and
+                        the confidence
+  - q_gap               the difference between the best and second-best
+                        Q-values
+  - alternatives        the next three actions with their Q-values and
+                        the deltas from the best
+
+The module is deterministic, has no dependencies beyond the standard
+library, and is covered by eight unit tests
+(tests/test_qvalue_translation.py). The tests check the confidence rule,
+the ranking of alternatives, the empty-input and single-action
+exceptions, and the fact that the confidence level comes from the Q-gap
+rather than from any hardcoded template.
+
+### 9.2 Why confidence comes from the Q-gap
+
+The confidence level is not a template choice. It is derived from the
+Q-gap: how much better the best action scores than the second-best.
+
+  gap >= 0.5  -> "high"
+  gap >= 0.1  -> "medium"
+  gap  < 0.1  -> "low"
+
+A large gap means the critic distinguishes the best action clearly. A
+small gap means it does not, and the recommendation is a coin flip that
+should not be presented as decisive. The thresholds (0.5, 0.1) are
+heuristic. They were calibrated against the observed reward scale: per-
+episode return on the no_oracle_alpha1 family is approximately 9.4 over
+20 steps, so per-step reward is approximately 0.47. A Q-gap of 0.5 is
+roughly one step of reward; a gap of 0.1 is roughly one fifth of a step.
+The module accepts tau_high and tau_low as keyword arguments so a user
+with a different critic scale can override them.
+
+The module uses only the Q-gap, not absolute Q-values. That makes it
+scale-invariant to the critic's overall offset and means it does not
+have to know whether the critic's value function is calibrated. It is
+about relative preference, not absolute value.
+
+### 9.3 The action labels come from the code, not from a template
+
+The five actions are pumping intensities, and their meaning is fixed by
+line 148 of src/rl/synthetic_reward.py:
+
+  pumping_fraction = action / (n_actions - 1),  n_actions = 5
+
+So the five actions are exactly 0.00, 0.25, 0.50, 0.75, and 1.00 of
+maximum pumping. The labels in ACTION_LABELS reflect that mapping and
+are copied into the plain-language output:
+
+  action 0 -> "no pumping this quarter"
+  action 1 -> "pump 25 percent of maximum extraction"
+  action 2 -> "pump 50 percent of maximum extraction"
+  action 3 -> "pump 75 percent of maximum extraction"
+  action 4 -> "pump 100 percent of maximum extraction (justified only
+               when crop demand is high; otherwise the depletion penalty
+               dominates)"
+
+Action 4 is not "more is better." Crop revenue in the reward function
+caps at the crop's water demand, so pumping past demand gives no extra
+revenue but still incurs the depletion penalty. The label text says so.
+This is the one place where the plain-language layer adds a fact that
+is not in the raw Q-value, and it adds it in the direction of less
+extraction, not more.
+
+### 9.4 What this module cannot do
+
+The module is deliberately modest. It cannot do four things, and the
+report does not claim that it does.
+
+First, it cannot tell you whether the critic is correct. It reads
+Q-values and reports which action the critic prefers. If the critic
+over-values a harmful action, the module will recommend that action with
+high confidence, and it will present the recommendation in English.
+
+Second, it cannot validate the reward function. The reward function is a
+stylised bucket model with assumptions A1 to A6 (Section 10.4). The
+advice inherits every one of those assumptions. If the reward function
+is wrong in some direction, the advice is wrong in the same direction.
+
+Third, it cannot guarantee that the recommended action is safe for the
+aquifer. Safety would require a calibrated physical model, not a stylised
+simulator. The Q-values come from the stylised simulator, so the advice
+comes from the stylised simulator.
+
+Fourth, it cannot replace held-out validation. The advice is not
+validated against real farmer outcomes, because no such dataset exists
+at the required resolution. The advice's quality is bounded by the
+quality of the critic, the reward function, and the simulator, and all
+three have documented limitations.
+
+### 9.5 The consequences for how the advice should be read
+
+The report's position on the advice layer is straightforward. The module
+is a translation of what the critic already believes. It does not
+endorse. A user of the system who receives a recommendation should treat
+it as a starting point for local expertise, not as a substitute for it.
+
+The confidence level is the most useful signal in the output. When the
+confidence is "low", the critic is close to indifferent between the top
+actions, and the user should expect the recommendation to change
+substantially with small changes in state. When the confidence is
+"high", the critic is confident about the ranking, but confidence in the
+ranking is not evidence that the ranking is correct — a confident but
+wrong critic will produce confident but wrong advice.
+
+The report does not present the module as a decision-support system for
+real use. It presents it as a demonstration that the Q-value outputs can
+be turned into plain-language outputs with a documented confidence
+metric, and as a way to make the offline RL layer auditable in natural
+language. Section 12 records calibrated validation of this layer as
+future work, dependent on real farmer decision data that does not
+currently exist.
+
+### 9.6 Summary
+
+The explainability layer is small and honest. It translates the critic's
+Q-values into one sentence and a confidence level, using action labels
+copied from the reward function and thresholds calibrated against the
+observed reward scale. It is covered by eight unit tests. It does not
+validate the critic, the reward function, the simulator, or real-world
+safety, and the report does not claim that it does.
 ## 10. Limitations
 
 This section lists every limitation that materially affects how a result
@@ -1377,6 +1507,7 @@ TODO. Include:
 
 TODO. Paste reports/open_items.md as-is. This is a statement of what remains open,
 not an apology.
+
 
 
 
