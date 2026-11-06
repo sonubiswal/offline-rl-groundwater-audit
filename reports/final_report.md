@@ -25,13 +25,196 @@ TODO (~1000 words). Structure:
 
 ## 2. Data and Region of Interest
 
-TODO (~1500 words). Cite:
-- reports/roi_justification.md (all numbers there)
-- The nine-state bbox, Maharashtra-led 3-state core
-- The four satellite layers (GRACE, Sentinel-1, Sentinel-2, CHIRPS, GLDAS, SRTM)
-- The CGWB well data: 92,227 readings, 4,063 wells, 2013-01-01 to 2022-07-28
-- The manifest with SHA-256 and retrieval URL
+This section describes the input data: the satellite layers, the CGWB
+well records, and the region of interest. Every number in this section
+is measured from the committed raw file and appears in
+reports/roi_justification.md. The section is deliberately explicit about
+what the region is and what it is not, because the internal project
+explainer described the region as "Maharashtra" and that shorthand
+overstates the administrative cleanliness of the data.
 
+### 2.1 Region of interest: a nine-state bounding box
+
+The study region is a bounding box, not a state boundary:
+
+  Latitude:   15.60 N to 22.00 N
+  Longitude:  72.60 E to 80.90 E
+
+The box was chosen to cover a dense, contiguous, and hydrologically
+connected belt of CGWB observation wells, not to match any
+administrative outline. It is a rectangle, and it is not the shape of
+Maharashtra.
+
+Within this box, the CGWB well records fall across nine states:
+
+  State                                          Wells  Readings  % of readings
+  Maharashtra                                     2073     44936          48.7%
+  Telangana                                        809     19764          21.4%
+  Karnataka                                        517     11679          12.7%
+  Andhra Pradesh                                   228      5182           5.6%
+  Gujarat                                          206      4782           5.2%
+  Madhya Pradesh                                   152      4260           4.6%
+  Chhattisgarh                                      32       572           0.6%
+  The Dadra And Nagar Haveli And Daman And Diu      29       629           0.7%
+  Goa                                               17       423           0.5%
+
+Three states — Maharashtra, Telangana, and Karnataka — account for 82.8%
+of the readings and 83.7% of the distinct wells. The remaining six states
+are peripheral contributions to the rectangle, not central to the study.
+
+The honest description of the region is "a Maharashtra-led three-state
+core with six peripheral states at low density." Describing the region
+as "Maharashtra" would overstate administrative cleanliness and
+understate the geographic heterogeneity the model actually sees.
+Section 10.10 records this as a limitation. Any claim in this report
+about "groundwater in Maharashtra" is qualified accordingly.
+
+### 2.2 District-level density in Maharashtra
+
+Within Maharashtra, the top fifteen districts by distinct well count:
+
+  District       Wells   Readings
+  Amravati         116       2420
+  Yavatmal         108       2317
+  Nagpur           104       2403
+  Nashik            92       2172
+  Chandrapur        80       1923
+  Ahmednagar        80       1631
+  Wardha            76       1726
+  Thane             74       1535
+  Buldhana          73       1636
+  Ratnagiri         73       1773
+  Solapur           71       1602
+  Jalgaon           70       1334
+  Nanded            70       1477
+  Satara            69       1399
+  Pune              63       1343
+
+The density is Vidarbha-heavy: Amravati, Yavatmal, Nagpur, Chandrapur,
+Wardha, and Buldhana are all in or near Vidarbha. The Marathwada region
+that was cited as an example in the original project plan (Aurangabad,
+Latur, Beed, Parbhani) is present in the data but is not the densest
+block. The northern and eastern districts dominate.
+
+This is an honest description of the data, not the assumption that was
+in the original plan. The ROI was finalized by measurement, not by
+choosing the example region the master prompt suggested.
+
+### 2.3 The CGWB well data
+
+The well data is the CGWB Changes in Depth to Water Level dataset,
+retrieved from the India Data Portal:
+
+  File:          data/raw/cgwb_raw.csv
+  Size:          65.43 MB
+  Rows:          550,850
+  SHA-256:       5fbcc59d8a917a5dc9d9d8b7d56f3db69297f5910b2966f72838f337ec0409bc
+  Retrieved:     2026-09-17T08:13:34Z
+  Source URL:    https://ckandev.indiadataportal.com/dataset/8ceb3cea-a8a9-4624-af75-fc92429d8fa5/resource/580a8f6e-3d86-4ca7-ac7d-cd5df12b443c/download/cgwb-changes-in-depth-to-water-level.csv
+
+Provenance is recorded in data/raw/cgwb_raw.manifest.csv, which is
+committed alongside the raw file. This is the only direct measurement of
+groundwater in the project; every other input is a hint that helps the
+model place the well readings between wells.
+
+The raw file's columns are id, date, state_name, state_code,
+district_name, district_code, station_name, latitude, longitude, basin,
+sub_basin, source, currentlevel, level_diff.
+
+Filtering to the ROI bounding box yields 92,227 rows. That is the exact
+count in the interim well file (data/interim/cgwb_wells.csv). There is
+no additional geographic filter downstream; the interim file's columns
+are well_id, lat, lon, date, depth_m, and it is a direct projection of
+the bbox filter.
+
+Sample statistics for the interim file:
+
+  Distinct wells          4,063
+  Total readings         92,227
+  Mean readings per well     22.7
+  Min readings per well         1
+  Max readings per well       116
+
+The unbalanced distribution means most wells contribute very few
+readings. This limits the per-well time-series modelling of Phase 3 to
+wells with at least six consecutive quarters, which reduces the usable
+well count for that phase. Phase 3's diagnostic records the exact count.
+
+### 2.4 Time range
+
+  First reading:  2013-01-01
+  Last reading:   2022-07-28
+  Total span:     approximately 9 years 7 months
+
+The bounds are set by the CGWB dataset collection itself, not by project
+choice. They are cross-checked against the satellite layers, which have
+their own coverage constraints:
+
+**Sentinel-2.** Launched June 2015. There is no Sentinel-2 NDVI data
+before that date. The pipeline either drops the NDVI channel for early
+dates or substitutes a coarser-resolution NDVI product; the v2 age-days
+features record how stale each matched value is.
+
+**GRACE.** The original GRACE mission ended and was replaced by GRACE-FO.
+There is a mission handover gap of approximately nine months from July
+2017 to April 2018. Roughly one sixth of the study time range has no
+GRACE reading.
+
+**Sentinel-1.** Continuous coverage throughout the study period.
+
+**CHIRPS, GLDAS, SRTM.** Continuous coverage throughout the study period.
+
+The satellite coverage gaps are the reason the grid ConvLSTM could not
+be trained (Section 5.1). They are also recorded in
+reports/phase5_provenance.md as a limitation of Phase 3's data.
+
+### 2.5 The satellite inputs
+
+Six satellite-derived layers feed the estimation pipeline:
+
+  GRACE-FO mascon (NASA):      Changes in total water storage, ~300 km
+                                native resolution. The target the pipeline
+                                is trying to sharpen to a finer grid.
+  Sentinel-1 (ESA):            Radar backscatter, surface wetness, ~10 m.
+  Sentinel-2 (ESA):            NDVI, vegetation greenness, ~10 m. Used in
+                                v1, dropped in v2 (Section 4.6).
+  CHIRPS (UCSB-CHG):           Daily rainfall, ~5 km.
+  GLDAS (NASA):                Soil moisture (top 10 cm), 0.25 deg.
+  SRTM (USGS):                 Elevation and slope, 30 m, static.
+
+In the adopted v2 configuration, the sixteen features fed to the learned
+downscaler are: chirps, gldas, grace, srtm_elevation, srtm_slope,
+month_sin, month_cos, chirps_roll3, gldas_roll3, target_lag1,
+age_days_chirps, age_days_gldas, age_days_sentinel1, age_days_grace,
+row_norm, col_norm.
+
+The age-days features were added in v2 to record how stale each matched
+satellite value is. Because a monthly composite is sometimes missing, the
+pipeline reaches back up to 400 days to find a usable value; without an
+age column the model would treat a year-old rainfall figure as if it were
+this month's. The age columns let it discount stale inputs.
+
+The row_norm and col_norm features (the cell's position on the 64x64 grid)
+are controversial and are discussed in Section 4.
+
+### 2.6 What this section establishes
+
+Three things, for the rest of the report:
+
+First, the data is what the project says it is: 92,227 readings from
+4,063 wells across a nine-state bounding box, over a defined 2013-2022
+time range, with documented satellite coverage gaps and a committed
+provenance manifest.
+
+Second, the region is not Maharashtra. It is a Maharashtra-led three-state
+core with six peripheral states at low density. This will be repeated in
+Section 10.10 and in the report's limitations.
+
+Third, the data has been filtered and cleaned before any model was trained.
+The bbox filter that produced the interim file is exactly the bbox that
+produced the 92,227 figure. There is no double filtering, no accidental
+widening or narrowing, and no discrepancy between the number the project
+quotes and the number the committed file contains.
 ## 3. Validation Methodology
 
 This section describes how the project avoids circular ground truth. It
@@ -1507,6 +1690,7 @@ TODO. Include:
 
 TODO. Paste reports/open_items.md as-is. This is a statement of what remains open,
 not an apology.
+
 
 
 
