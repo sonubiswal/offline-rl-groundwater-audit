@@ -12,7 +12,7 @@
 
 ## Still open (P0)
 - [ ] ROI written justification
-- [ ] Final report citing canonical numbers from this commit
+- [x] Final report citations grounded: see reports/final_report_claims.md
 - [ ] Q-value -> plain-language advice module (if explainability claimed)
 
 ## Still open (P1)
@@ -94,3 +94,29 @@ Conclusions:
 - Alpha is NOT in this audit; see separate alpha provenance note.
 
 
+
+
+## Step 2 closed
+
+All four claims verified against committed artefacts:
+
+1. Downscaling: R^2 = 0.187 vs kriging 0.155; +0.104 m, CI [0.051, 0.157].
+   CLOSED.
+
+2. Conformal intervals: empirical 0.8936 (C0) / 0.8918 (C1) at nominal
+   0.90, well-disjoint split enforced. CLOSED.
+
+3. In-distribution 10-seed CQL vs BC: null on all four no_oracle/epsilon
+   families (+0.040 to +0.150, no CI excludes zero). Historical 3-seed
+   +0.1096 does not replicate. base family shows BC wins by 2.47 (dataset-
+   specific). CLOSED with revised framing.
+
+4. OOD behaviour: CQL-BC positive in every band across all four committed
+   OOD files; gap grows with distance in 3 of 4. Explainer Section 9.5f
+   sign-reversal does NOT reproduce and is marked superseded. CLOSED with
+   revised framing.
+
+Remaining P0 items:
+
+- [ ] ROI written justification (unchanged)
+- [ ] Q-value -> plain-language advice module (if explainability claimed)
