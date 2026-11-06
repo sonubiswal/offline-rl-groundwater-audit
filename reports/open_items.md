@@ -49,3 +49,22 @@
   Caveats for report: interval width ~13.5 m vs RMSE 5.30 m; mild degradation at
   10-20 km (0.874); pred_y out-of-sample is guaranteed by the held-out split test,
   not by run_conformal.py itself.
+
+## Revision findings recorded during Step 2 verification
+
+### 10-seed CQL − BC is null on both training regimes (e1_canonical_vs_sweep.json)
+
+- canonical:         CQL − BC = -0.0129, 95% CI [-0.1011, +0.0686], excludes zero = false
+- sweep_default:     CQL − BC = -0.0574, 95% CI [-0.1282, +0.0044], excludes zero = false
+- BC canonical − BC sweep: -0.0445, 95% CI [-0.1039, 0.0], excludes zero = false
+  (only seeds 123/1234/12345 differ between the two BC families)
+
+Interpretation: the historical 3-seed CQL advantage (+0.1096) does NOT survive
+the 10-seed replication. CQL is not better than BC at 10 seeds on either regime.
+The final report must state this as a null result, not as an advantage.
+
+### Sweep-config audit passed for what it checks (e6_sweep_config_audit.csv)
+
+- 220 rows, all match=True.
+- Columns audited: intended_lr, intended_hidden, loaded_lr, loaded_hidden.
+- Alpha is NOT in this audit; see separate alpha provenance note (below).
