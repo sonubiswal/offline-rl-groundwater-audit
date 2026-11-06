@@ -116,8 +116,3 @@ All four claims verified against committed artefacts:
    sign-reversal does NOT reproduce and is marked superseded. CLOSED with
    revised framing.
 
-Remaining P0 items:
-
-- [x] Q-value -> plain-language advice module: src/explainability/qvalue_translation.py, tests/test_qvalue_translation.py (8 tests), reports/explainability_methodology.md
-
-
