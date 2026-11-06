@@ -1,0 +1,382 @@
+{
+  "cql_minus_bc_discounted_bootstrap": {
+    "bootstrap_seed": 2027,
+    "ci_contains_zero": false,
+    "ci_lower": -2.573273982772384,
+    "ci_upper": -1.5320507261144694,
+    "confidence_level": 0.95,
+    "n_bootstrap": 5000,
+    "observed_difference": -2.0327437419022973,
+    "probability_bootstrap_difference_positive": 0.0
+  },
+  "cql_minus_bc_paired_bootstrap": {
+    "bootstrap_seed": 2026,
+    "ci_contains_zero": false,
+    "ci_lower": -3.1038420981508446,
+    "ci_upper": -1.8605271983232183,
+    "confidence_level": 0.95,
+    "n_bootstrap": 5000,
+    "observed_difference": -2.4730556033694318,
+    "probability_bootstrap_difference_positive": 0.0
+  },
+  "direct_rollout": {
+    "BC_seed123": {
+      "discounted_return_mean": 9.993926660666899,
+      "discounted_return_std": 6.658505406685556,
+      "gamma": 0.99,
+      "n_episodes": 500,
+      "policy": "BC_seed123",
+      "return_mean": 10.684851739020182,
+      "return_std": 7.901495670239209,
+      "seed": 9999
+    },
+    "BC_seed1234": {
+      "discounted_return_mean": 11.183333657049621,
+      "discounted_return_std": 4.4383155801934215,
+      "gamma": 0.99,
+      "n_episodes": 500,
+      "policy": "BC_seed1234",
+      "return_mean": 12.113880345326693,
+      "return_std": 5.237021358345292,
+      "seed": 9999
+    },
+    "BC_seed12345": {
+      "discounted_return_mean": 11.48960528727776,
+      "discounted_return_std": 3.886016704706323,
+      "gamma": 0.99,
+      "n_episodes": 500,
+      "policy": "BC_seed12345",
+      "return_mean": 12.470022675294803,
+      "return_std": 4.567426402743004,
+      "seed": 9999
+    },
+    "BC_seed2024": {
+      "discounted_return_mean": 10.890926411164033,
+      "discounted_return_std": 5.290025704798965,
+      "gamma": 0.99,
+      "n_episodes": 500,
+      "policy": "BC_seed2024",
+      "return_mean": 11.758545659183111,
+      "return_std": 6.21543562315095,
+      "seed": 9999
+    },
+    "BC_seed42": {
+      "discounted_return_mean": 9.601675591515482,
+      "discounted_return_std": 7.220909049714088,
+      "gamma": 0.99,
+      "n_episodes": 500,
+      "policy": "BC_seed42",
+      "return_mean": 10.223098620761968,
+      "return_std": 8.565931809645233,
+      "seed": 9999
+    },
+    "BC_seed5678": {
+      "discounted_return_mean": 11.505446617423235,
+      "discounted_return_std": 3.9145818954744396,
+      "gamma": 0.99,
+      "n_episodes": 500,
+      "policy": "BC_seed5678",
+      "return_mean": 12.498197885192697,
+      "return_std": 4.595199933648199,
+      "seed": 9999
+    },
+    "BC_seed7": {
+      "discounted_return_mean": 11.46034035469546,
+      "discounted_return_std": 4.025508123432443,
+      "gamma": 0.99,
+      "n_episodes": 500,
+      "policy": "BC_seed7",
+      "return_mean": 12.436808623413905,
+      "return_std": 4.733163746661319,
+      "seed": 9999
+    },
+    "BC_seed777": {
+      "discounted_return_mean": 11.362293280249366,
+      "discounted_return_std": 4.417013402436967,
+      "gamma": 0.99,
+      "n_episodes": 500,
+      "policy": "BC_seed777",
+      "return_mean": 12.340835947533538,
+      "return_std": 5.104905792856515,
+      "seed": 9999
+    },
+    "BC_seed99": {
+      "discounted_return_mean": 11.63001024952131,
+      "discounted_return_std": 4.2192800121847425,
+      "gamma": 0.99,
+      "n_episodes": 500,
+      "policy": "BC_seed99",
+      "return_mean": 12.646371244332823,
+      "return_std": 4.88707617527947,
+      "seed": 9999
+    },
+    "BC_seed99999": {
+      "discounted_return_mean": 11.145276261716921,
+      "discounted_return_std": 4.647032710952957,
+      "gamma": 0.99,
+      "n_episodes": 500,
+      "policy": "BC_seed99999",
+      "return_mean": 12.066789288500152,
+      "return_std": 5.490016670112374,
+      "seed": 9999
+    },
+    "CQL_seed123": {
+      "discounted_return_mean": 9.136834013022838,
+      "discounted_return_std": 8.29232479785815,
+      "gamma": 0.99,
+      "n_episodes": 500,
+      "policy": "CQL_seed123",
+      "return_mean": 9.633757602359266,
+      "return_std": 9.830578907968242,
+      "seed": 9999
+    },
+    "CQL_seed1234": {
+      "discounted_return_mean": 9.007398044347381,
+      "discounted_return_std": 8.347736838235845,
+      "gamma": 0.99,
+      "n_episodes": 500,
+      "policy": "CQL_seed1234",
+      "return_mean": 9.460623513658117,
+      "return_std": 9.906526371850056,
+      "seed": 9999
+    },
+    "CQL_seed12345": {
+      "discounted_return_mean": 8.833241060965738,
+      "discounted_return_std": 8.52137911692284,
+      "gamma": 0.99,
+      "n_episodes": 500,
+      "policy": "CQL_seed12345",
+      "return_mean": 9.258992893044269,
+      "return_std": 10.112437404227306,
+      "seed": 9999
+    },
+    "CQL_seed2024": {
+      "discounted_return_mean": 9.090833712970605,
+      "discounted_return_std": 8.253619393550055,
+      "gamma": 0.99,
+      "n_episodes": 500,
+      "policy": "CQL_seed2024",
+      "return_mean": 9.574959312636729,
+      "return_std": 9.790109468365845,
+      "seed": 9999
+    },
+    "CQL_seed42": {
+      "discounted_return_mean": 9.338644396579591,
+      "discounted_return_std": 7.92326472559379,
+      "gamma": 0.99,
+      "n_episodes": 500,
+      "policy": "CQL_seed42",
+      "return_mean": 9.870002837924556,
+      "return_std": 9.393118272399557,
+      "seed": 9999
+    },
+    "CQL_seed5678": {
+      "discounted_return_mean": 8.760553157321981,
+      "discounted_return_std": 8.68317946345885,
+      "gamma": 0.99,
+      "n_episodes": 500,
+      "policy": "CQL_seed5678",
+      "return_mean": 9.168842464669524,
+      "return_std": 10.300984605694293,
+      "seed": 9999
+    },
+    "CQL_seed7": {
+      "discounted_return_mean": 8.865901353829601,
+      "discounted_return_std": 8.55353836836132,
+      "gamma": 0.99,
+      "n_episodes": 500,
+      "policy": "CQL_seed7",
+      "return_mean": 9.297117901183073,
+      "return_std": 10.149208980710435,
+      "seed": 9999
+    },
+    "CQL_seed777": {
+      "discounted_return_mean": 8.931632527304863,
+      "discounted_return_std": 8.556279465361623,
+      "gamma": 0.99,
+      "n_episodes": 500,
+      "policy": "CQL_seed777",
+      "return_mean": 9.37375570140599,
+      "return_std": 10.149591844195925,
+      "seed": 9999
+    },
+    "CQL_seed99": {
+      "discounted_return_mean": 9.009979157621876,
+      "discounted_return_std": 8.391986933912234,
+      "gamma": 0.99,
+      "n_episodes": 500,
+      "policy": "CQL_seed99",
+      "return_mean": 9.46318918712913,
+      "return_std": 9.958471486710032,
+      "seed": 9999
+    },
+    "CQL_seed99999": {
+      "discounted_return_mean": 8.960379528292654,
+      "discounted_return_std": 8.529524598957426,
+      "gamma": 0.99,
+      "n_episodes": 500,
+      "policy": "CQL_seed99999",
+      "return_mean": 9.407604580854901,
+      "return_std": 10.116988452733203,
+      "seed": 9999
+    },
+    "conservative": {
+      "discounted_return_mean": 11.61197581754111,
+      "discounted_return_std": 1.0494073020356378,
+      "gamma": 0.99,
+      "n_episodes": 500,
+      "policy": "conservative",
+      "return_mean": 12.666684304047688,
+      "return_std": 1.1408190631511756,
+      "seed": 9999
+    },
+    "greedy_extraction": {
+      "discounted_return_mean": 8.696308682108079,
+      "discounted_return_std": 9.084848985798413,
+      "gamma": 0.99,
+      "n_episodes": 500,
+      "policy": "greedy_extraction",
+      "return_mean": 9.094008968598095,
+      "return_std": 10.769225976192766,
+      "seed": 9999
+    },
+    "random": {
+      "discounted_return_mean": 8.533847531743463,
+      "discounted_return_std": 4.233733464598317,
+      "gamma": 0.99,
+      "n_episodes": 500,
+      "policy": "random",
+      "return_mean": 8.987487770352708,
+      "return_std": 4.908234834080836,
+      "seed": 9999
+    }
+  },
+  "experiment": "Phase 5 learned-policy and hand-coded-policy comparison",
+  "models": {
+    "BC": {
+      "123": "C:\\trishna-opal\\models_10seed\\base\\bc\\bc_seed123.d3",
+      "1234": "C:\\trishna-opal\\models_10seed\\base\\bc\\bc_seed1234.d3",
+      "12345": "C:\\trishna-opal\\models_10seed\\base\\bc\\bc_seed12345.d3",
+      "2024": "C:\\trishna-opal\\models_10seed\\base\\bc\\bc_seed2024.d3",
+      "42": "C:\\trishna-opal\\models_10seed\\base\\bc\\bc_seed42.d3",
+      "5678": "C:\\trishna-opal\\models_10seed\\base\\bc\\bc_seed5678.d3",
+      "7": "C:\\trishna-opal\\models_10seed\\base\\bc\\bc_seed7.d3",
+      "777": "C:\\trishna-opal\\models_10seed\\base\\bc\\bc_seed777.d3",
+      "99": "C:\\trishna-opal\\models_10seed\\base\\bc\\bc_seed99.d3",
+      "99999": "C:\\trishna-opal\\models_10seed\\base\\bc\\bc_seed99999.d3"
+    },
+    "CQL": {
+      "123": "C:\\trishna-opal\\models_10seed\\base\\cql\\cql_seed123.d3",
+      "1234": "C:\\trishna-opal\\models_10seed\\base\\cql\\cql_seed1234.d3",
+      "12345": "C:\\trishna-opal\\models_10seed\\base\\cql\\cql_seed12345.d3",
+      "2024": "C:\\trishna-opal\\models_10seed\\base\\cql\\cql_seed2024.d3",
+      "42": "C:\\trishna-opal\\models_10seed\\base\\cql\\cql_seed42.d3",
+      "5678": "C:\\trishna-opal\\models_10seed\\base\\cql\\cql_seed5678.d3",
+      "7": "C:\\trishna-opal\\models_10seed\\base\\cql\\cql_seed7.d3",
+      "777": "C:\\trishna-opal\\models_10seed\\base\\cql\\cql_seed777.d3",
+      "99": "C:\\trishna-opal\\models_10seed\\base\\cql\\cql_seed99.d3",
+      "99999": "C:\\trishna-opal\\models_10seed\\base\\cql\\cql_seed99999.d3"
+    },
+    "bc_dir": "C:\\trishna-opal\\models_10seed\\base\\bc",
+    "cql_dir": "C:\\trishna-opal\\models_10seed\\base\\cql"
+  },
+  "observation_standardization": {
+    "fitted_on": "training episodes only",
+    "mean": [
+      13.58569049835205,
+      37.29146957397461,
+      0.39369070529937744,
+      -2.8383163874767803e-12,
+      2.8383163874767803e-12,
+      0.3563271164894104
+    ],
+    "std": [
+      6.753443717956543,
+      41.474266052246094,
+      0.25919780135154724,
+      0.7071067690849304,
+      0.7071067690849304,
+      0.21446622908115387
+    ]
+  },
+  "per_seed_cql_minus_bc": {
+    "123": {
+      "bc_mean": 10.684851739020182,
+      "cql_mean": 9.633757602359266,
+      "cql_minus_bc": -1.051094136660916
+    },
+    "1234": {
+      "bc_mean": 12.113880345326693,
+      "cql_mean": 9.460623513658117,
+      "cql_minus_bc": -2.6532568316685774
+    },
+    "12345": {
+      "bc_mean": 12.470022675294803,
+      "cql_mean": 9.258992893044269,
+      "cql_minus_bc": -3.2110297822505345
+    },
+    "2024": {
+      "bc_mean": 11.758545659183111,
+      "cql_mean": 9.574959312636729,
+      "cql_minus_bc": -2.1835863465463827
+    },
+    "42": {
+      "bc_mean": 10.223098620761968,
+      "cql_mean": 9.870002837924556,
+      "cql_minus_bc": -0.3530957828374086
+    },
+    "5678": {
+      "bc_mean": 12.498197885192697,
+      "cql_mean": 9.168842464669524,
+      "cql_minus_bc": -3.3293554205231755
+    },
+    "7": {
+      "bc_mean": 12.436808623413905,
+      "cql_mean": 9.297117901183073,
+      "cql_minus_bc": -3.13969072223083
+    },
+    "777": {
+      "bc_mean": 12.340835947533538,
+      "cql_mean": 9.37375570140599,
+      "cql_minus_bc": -2.9670802461275465
+    },
+    "99": {
+      "bc_mean": 12.646371244332823,
+      "cql_mean": 9.46318918712913,
+      "cql_minus_bc": -3.1831820572036924
+    },
+    "99999": {
+      "bc_mean": 12.066789288500152,
+      "cql_mean": 9.407604580854901,
+      "cql_minus_bc": -2.6591847076452506
+    }
+  },
+  "protocol": {
+    "bootstrap_replicates": 5000,
+    "bootstrap_seed": 2026,
+    "evaluation_method": "exact direct rollout in controlled simulator",
+    "evaluation_seed": 9999,
+    "gamma": 0.99,
+    "n_evaluation_episodes": 500,
+    "split_seed": 1,
+    "training_seeds": [
+      42,
+      123,
+      2024,
+      7,
+      99,
+      777,
+      1234,
+      5678,
+      12345,
+      99999
+    ]
+  },
+  "scientific_caveat": "Direct simulator rollout provides exact evaluation only for the controlled simulator used by this experiment. It is not evidence of real-world causal groundwater-management efficacy.",
+  "software": {
+    "d3rlpy": "2.8.1",
+    "platform": "Windows-10-10.0.26200-SP0",
+    "python": "3.10.20"
+  },
+  "statistical_caveat": "The bootstrap CI quantifies episode-level uncertainty for the evaluated policies. Three training seeds should not be treated as many independent training experiments."
+}

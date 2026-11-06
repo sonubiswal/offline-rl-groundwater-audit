@@ -1,0 +1,38 @@
+{
+  "config": "no_oracle",
+  "dataset": "data/processed/offline_rl_dataset_no_oracle.h5",
+  "bc_dir": "models_10seed/no_oracle/bc",
+  "cql_dir": "models_10seed/no_oracle/cql",
+  "seeds": [
+    42,
+    123,
+    2024,
+    7,
+    99,
+    777,
+    1234,
+    5678,
+    12345,
+    99999
+  ],
+  "n_seeds": 10,
+  "n_episodes": 500,
+  "command": [
+    "C:\\Users\\Sumit Biswal\\.conda\\envs\\trishna-opal\\python.exe",
+    "src/rl/compare_policies.py",
+    "--dataset",
+    "data/processed/offline_rl_dataset_no_oracle.h5",
+    "--bc-dir",
+    "models_10seed/no_oracle/bc",
+    "--cql-dir",
+    "models_10seed/no_oracle/cql",
+    "--output-dir",
+    "C:\\trishna-opal\\reports_10seed\\no_oracle",
+    "--n-episodes",
+    "500"
+  ],
+  "git_commit": "d93833e",
+  "returncode": 0,
+  "started": "2026-10-02T17:13:03",
+  "elapsed_s": 441.8
+}
