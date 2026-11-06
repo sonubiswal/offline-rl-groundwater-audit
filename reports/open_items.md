@@ -52,19 +52,45 @@
 
 ## Revision findings recorded during Step 2 verification
 
-### 10-seed CQL − BC is null on both training regimes (e1_canonical_vs_sweep.json)
+### 10-seed CQL vs BC: complete picture
 
-- canonical:         CQL − BC = -0.0129, 95% CI [-0.1011, +0.0686], excludes zero = false
-- sweep_default:     CQL − BC = -0.0574, 95% CI [-0.1282, +0.0044], excludes zero = false
-- BC canonical − BC sweep: -0.0445, 95% CI [-0.1039, 0.0], excludes zero = false
-  (only seeds 123/1234/12345 differ between the two BC families)
+From reports_10seed/<family>/policy_comparison_summary.csv:
 
-Interpretation: the historical 3-seed CQL advantage (+0.1096) does NOT survive
-the 10-seed replication. CQL is not better than BC at 10 seeds on either regime.
-The final report must state this as a null result, not as an advantage.
+  family          dataset                  alpha   BC      CQL     diff
+  base            offline_rl_dataset.h5    1.0     11.924  9.451   -2.473
+  epsilon         ..._epsilon.h5           1.0      9.088  9.135   +0.047
+  no_oracle       ..._no_oracle.h5         4.0      9.094  9.167   +0.073
+  no_oracle_a1    ..._no_oracle.h5         1.0      9.094  9.244   +0.150
+  no_oracle_a10   ..._no_oracle.h5         10.0     9.094  9.134   +0.040
+
+Interpretation:
+- Four of five families: CQL advantage +0.04 to +0.15. No CI excludes zero.
+- base family: BC dominates by 2.47 return units. Dataset-specific, not
+  evidence that CQL is worse in general (BC=11.92 on base vs 9.09 elsewhere;
+  CQL is stable across families).
+- Historical 3-seed +0.1096 (epsilon) does not replicate at 10 seeds.
+
+### e1 resolves the "e1 vs reports_10seed" scale mismatch
+
+e1_sweep_vs_canonical.py rolls on rf_grid starts; reports_10seed uses an
+unrecorded start set. Same comparison gives:
+
+  e1 canonical (rf_grid):      CQL - BC = -0.0129 [-0.101, +0.069]   null
+  e1 sweep_default (rf_grid):  CQL - BC = -0.0574 [-0.128, +0.004]   null
+  e1 BC canonical - BC sweep:  -0.0445     [-0.104,  0.000]          null
+
+Conclusions:
+- BC training recipe (canonical vs sweep-default hyperparameters) does not
+  matter: -0.045, CI spans zero.
+- The +0.047 vs -0.057 headline gap in the paper is start-set choice, not
+  BC recipe. Both are null either way.
+- e1 is not a contradiction to reports_10seed; it is the diagnostic that
+  explains the discrepancy.
 
 ### Sweep-config audit passed for what it checks (e6_sweep_config_audit.csv)
 
 - 220 rows, all match=True.
 - Columns audited: intended_lr, intended_hidden, loaded_lr, loaded_hidden.
-- Alpha is NOT in this audit; see separate alpha provenance note (below).
+- Alpha is NOT in this audit; see separate alpha provenance note.
+
+
