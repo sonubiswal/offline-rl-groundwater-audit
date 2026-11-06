@@ -7,13 +7,46 @@ No claim is made that is not sourceable from a committed artefact.
 
 ## Abstract
 
-TODO (~250 words). Structure:
-- Problem: satellite signals are coarse; decision-making for pumping is unvalidated.
-- What we built: end-to-end pipeline, well-disjoint validation, offline RL policy evaluation.
-- What we found: downscaling adds 2% of error over kriging; CQL advantage is null at 10 seeds;
-  OOD both policies fail catastrophically.
-- What we contribute: the audit, the negative results, the calibration procedure.
+Groundwater observations in central India are sparse: approximately 4,063
+monitoring wells across a nine-state bounding box, read roughly four
+times per year, at about one well per 200 square kilometers. Satellite
+signals cover the region continuously but at coarse resolution — GRACE,
+the closest space-based groundwater proxy, has a native pixel of about
+300 km. This report describes Trishna OPAL, an end-to-end pipeline that
+combines both sources: it learns a fine-resolution estimate of water
+depth from satellite covariates and sparse well readings, then wraps that
+estimate in a synthetic offline reinforcement learning environment in
+which pumping policies can be trained and compared without experimenting
+on a real aquifer.
 
+Three results are reported, and they are reported honestly.
+
+First, the learned downscaler improves on well-level kriging by 0.104 m
+RMSE on a 14,062-reading held-out well set. The improvement is
+statistically significant but small: kriging carries approximately 98%
+of the useful signal. The learned layer polishes the remaining 2%. The
+improvement does not extend to region-level spatial extrapolation, where
+plain kriging beats the learned layer in three of four quadrants.
+
+Second, a well-disjoint split-conformal procedure produces prediction
+intervals with empirical coverage of 89.4% at nominal 90%, against a
+prior attempt that achieved only 50.4%. The intervals are honest but
+wide: 13.5 m mean width against a 5.30 m held-out RMSE. They are useful
+as bounds, not as precise estimates.
+
+Third, at 10 training seeds, Conservative Q-Learning does not outperform
+Behavioral Cloning by a statistically significant margin on any of the
+four comparable dataset families. The historical 3-seed result of +0.1096
+does not replicate. Outside the training distribution, both policies
+collapse to catastrophic returns, with CQL failing somewhat less than BC
+in the severe band. A gap of four to nineteen return units between two
+failing policies is not a working policy.
+
+The project's contribution is not a record-breaking accuracy number. It
+is an audited, reproducible, and honestly-bounded pipeline from raw
+satellite data to policy evaluation, in which every claim traces to a
+committed artefact and every limitation is measured rather than
+asserted. The report is written to be checked, not to persuade.
 ## 1. Introduction
 
 ### 1.1 The problem
@@ -2079,6 +2112,7 @@ TODO. Include:
 
 TODO. Paste reports/open_items.md as-is. This is a statement of what remains open,
 not an apology.
+
 
 
 
