@@ -1,25 +1,20 @@
 """
-ood_return_test.py
-Return-based state-distribution OOD test for Phase 5 BC and CQL policies.
+ood_return_test_meanq.py
+Return-based state-distribution OOD test for Phase 5 BC and CQL (Mean-Q critic).
 
-Complements ood_state_distribution_test.py (which compared action distributions)
-by rolling each policy forward from ID / mild / moderate / severe OOD states and
-comparing returns.
-
-Also tracks per-rollout step count and termination fraction, to check whether
-early `done` is biasing the return comparison across policies or levels.
+Applies the training scaler before every policy.predict() call, via
+src/rl/policy_io.load_policy_for_eval.
 
 Reads:
   data/processed/offline_rl_dataset.h5
+  reports/paper_exp/dataset_normal_train.h5
   reports/paper_exp/frozen_models/bc/bc_seed{42,123,2024}.d3
-  reports/paper_exp/frozen_models/cql/cql_seed{42,123,2024}.d3
+  reports/paper_exp/cql_mean/cql_seed{42,123,2024}.d3
   config/rl_config.yaml
 
 Writes:
   reports/ood_return_test_meanq.json
   reports/ood_return_test_meanq.png
-
-Read-only. Does not modify any experiment artifact.
 """
 
 from __future__ import annotations
@@ -39,13 +34,15 @@ sys.path.insert(0, str(REPO))
 import d3rlpy
 
 from src.rl.synthetic_reward import SimState, step, load_reward_config
+from src.rl.policy_io import load_policy_for_eval
 
 REPORTS = Path("reports")
 REPORTS.mkdir(exist_ok=True)
 
 DATASET = "data/processed/offline_rl_dataset.h5"
+CHECKPOINT_DATASET = "reports/paper_exp/dataset_normal_train.h5"
 MODEL_ROOT = Path("reports/paper_exp/frozen_models")
-CQL_MODEL_ROOT = Path("reports/paper_exp/cql_mean")  # Mean-Q override (see ood_return_test.py for the QR version)
+CQL_MODEL_ROOT = Path("reports/paper_exp/cql_mean")
 SEEDS = [42, 123, 2024]
 
 SPLIT_SEED = 1
@@ -70,7 +67,6 @@ PHYSICAL_BOUNDS = {
 }
 
 
-# ------------------------------------------------------------------ data
 def load_dataset():
     with h5py.File(DATASET, "r") as f:
         ep_ids = sorted(int(k.split("_")[-1]) for k in f.keys()
@@ -148,7 +144,6 @@ def sample_bands(mu, cov, inv_cov, th, rng, n_per_band=N_STATES_PER_LEVEL):
     return {k: np.array(v[:n_per_band]) for k, v in out.items()}, drawn
 
 
-# ------------------------------------------------------- simulator glue
 def array_to_state(arr) -> SimState:
     return SimState(
         gw_level=float(arr[0]),
@@ -167,10 +162,6 @@ def state_to_array(s: SimState) -> np.ndarray:
 
 
 def rollout_return(policy, start_arr, reward_cfg, rng, horizon):
-    """
-    Returns (sum_reward, n_steps_executed, terminated_early).
-    terminated_early is True iff the simulator's done flag fired before horizon.
-    """
     s = array_to_state(start_arr)
     total = 0.0
     n_steps = 0
@@ -189,10 +180,9 @@ def rollout_return(policy, start_arr, reward_cfg, rng, horizon):
 
 
 def load_policy(path: Path):
-    return d3rlpy.load_learnable(str(path))
+    return load_policy_for_eval(path, Path(CHECKPOINT_DATASET))
 
 
-# ----------------------------------------------------------------- main
 def main():
     print("[ood_return] loading dataset ...")
     episodes = load_dataset()
@@ -202,6 +192,11 @@ def main():
 
     print("[ood_return] loading reward config ...")
     reward_cfg = load_reward_config("config/rl_config.yaml")
+
+    from src.rl.policy_io import compute_scaler_from_dataset
+    obs_mean, obs_std = compute_scaler_from_dataset(Path(CHECKPOINT_DATASET))
+    print(f"[ood_return] scaler from {CHECKPOINT_DATASET}")
+    print(f"[ood_return]   mean[0]={obs_mean[0]:.6f}  std[0]={obs_std[0]:.6f}")
 
     print("[ood_return] computing training support ...")
     mu, cov, inv_cov = training_support(train_obs)
@@ -216,7 +211,10 @@ def main():
     policies = []
     for algo in ("bc", "cql"):
         for seed in SEEDS:
-            p = (CQL_MODEL_ROOT / f"{algo}_seed{seed}.d3") if algo == "cql" else (MODEL_ROOT / algo / f"{algo}_seed{seed}.d3")
+            if algo == "cql":
+                p = CQL_MODEL_ROOT / f"cql_seed{seed}.d3"
+            else:
+                p = MODEL_ROOT / algo / f"{algo}_seed{seed}.d3"
             if p.exists():
                 policies.append((algo, seed, load_policy(p)))
             else:
@@ -227,6 +225,9 @@ def main():
             "horizon": ROLLOUT_HORIZON,
             "n_states_per_band": N_STATES_PER_LEVEL,
             "mahalanobis2_thresholds": th,
+            "checkpoint_dataset": CHECKPOINT_DATASET,
+            "scaler_mean": obs_mean.tolist(),
+            "scaler_std": obs_std.tolist(),
             "reward_config": {k: (float(v) if isinstance(v, (int, float)) else v)
                               for k, v in reward_cfg.items()},
         },
@@ -277,7 +278,6 @@ def main():
         }
         print(f"{level:<10} {bc_r:>10.4f} {cql_r:>10.4f} {cql_r - bc_r:>+12.4f}")
 
-    # ---- termination diagnostic ----
     print("\n[ood_return] termination diagnostic (mean steps, terminated fraction)")
     print(f"{'level':<10} {'policy':<14} {'mean_steps':>11} {'term_frac':>10}")
     print("-" * 48)
@@ -286,7 +286,6 @@ def main():
             d = v[level]
             print(f"{level:<10} {k:<14} {d['mean_steps']:>11.2f} {d['terminated_frac']:>10.3f}")
 
-    # ---- figure ----
     levels = ["id", "mild", "moderate", "severe"]
     x = np.arange(len(levels))
     bc_means  = [results["summary"][l]["bc_mean_return"]  for l in levels]

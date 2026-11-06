@@ -3,6 +3,14 @@ a4a5_sensitivity.py
 
 3x3 sweep of A4 (sustainability_threshold_m) x A5 (drawdown coefficient).
 Reuses frozen BC/CQL checkpoints at reports/paper_exp/frozen_models/.
+
+Loads every policy through src.rl.policy_io.load_policy_for_eval, which
+applies the observation standardisation recorded in each checkpoint's
+.d3.scaler.json sidecar before calling the underlying d3rlpy model. This
+is the same loading path used by compare_policies.py, ood_return_test.py,
+and ood_return_test_meanq.py, so the entire pipeline shares one scaler
+convention.
+
 Same eval protocol as compare_policies / mode_scenario:
     N episodes per seed, eval seed 9999 + sd, paired bootstrap seed 2026.
 
@@ -27,7 +35,7 @@ REPO = Path(".").resolve()
 sys.path.insert(0, str(REPO))
 sys.path.insert(0, str(REPO / "src" / "rl"))
 
-import d3rlpy
+from src.rl.policy_io import load_policy_for_eval
 
 import run_paper_experiments as rpe
 from src.rl.synthetic_reward import SimState
@@ -37,9 +45,9 @@ from src.rl.synthetic_reward import SimState
 FROZEN_ROOT    = Path("reports/paper_exp/frozen_models")
 BC_DIR         = FROZEN_ROOT / "bc"
 CQL_DIR        = FROZEN_ROOT / "cql"
+FROZEN_DS      = Path("reports/paper_exp/dataset_normal_train.h5")  # training dataset for frozen_models
 CONFIG_PATH    = Path("config/rl_config.yaml")
 RF_TABLE       = Path("reports/rf_grid_predictions.csv")
-NORM_MANIFEST  = FROZEN_ROOT / "normalization_manifest.json"
 OUT_JSON       = Path("reports/a4a5_sensitivity.json")
 
 SEEDS         = [42, 123, 2024]
@@ -84,22 +92,21 @@ def scenario_step_p(state, action, config, n_actions, rng, scn, a5_coef):
     return ns, float(reward), float(revenue), float(supply), float(penalty), False
 
 
-# ------------------------------------------------ model → action fn
-def make_action_fn(algo, obs_mean, obs_std):
-    def fn(state_vec):
-        x = ((np.asarray(state_vec, np.float32) - obs_mean) / obs_std).reshape(1, 6)
-        return int(np.asarray(algo.predict(x)).reshape(-1)[0])
-    return fn
+# ------------------------------------------------ rollout using ScaledPolicy
+def rollout(scaled_policy, init_states, reward_cfg, scn, a5_coef, seed):
+    """Roll out a ScaledPolicy through the parameterized scenario.
 
-
-def rollout(action_fn, init_states, reward_cfg, scn, a5_coef, seed):
+    `scaled_policy` is a src.rl.policy_io.ScaledPolicy whose .action(vec)
+    method applies the training-time scaler before calling the underlying
+    d3rlpy model.
+    """
     rng = np.random.RandomState(seed)
     out = np.zeros(len(init_states))
     for i, s0 in enumerate(init_states):
         s = s0
         tot = 0.0
         for _ in range(TRAJ_LEN):
-            a = action_fn(s.to_array())
+            a = scaled_policy.action(s.to_array())
             ns, r, *_ = scenario_step_p(s, a, reward_cfg, N_ACTIONS, rng, scn, a5_coef)
             ang = np.arctan2(s.month_sin, s.month_cos) + (2 * np.pi / 4)
             ns = replace(ns, month_sin=float(np.sin(ang)), month_cos=float(np.cos(ang)))
@@ -119,20 +126,33 @@ def paired_bootstrap(a, b, n=N_BOOTSTRAP, seed=BOOT_SEED):
 
 # ------------------------------------------------ main
 def main():
-    print("[a4a5] loading config, RF table, normalization")
+    print("[a4a5] loading config, RF table, frozen-model dataset")
     cfg = yaml.safe_load(open(CONFIG_PATH))
     base_reward_cfg = dict(cfg["reward"])
     rf_df = pd.read_csv(RF_TABLE)
-    norm = json.load(open(NORM_MANIFEST))
-    obs_mean = np.asarray(norm["mean"], np.float32)
-    obs_std  = np.asarray(norm["std"],  np.float32)
+
+    if not FROZEN_DS.exists():
+        raise FileNotFoundError(
+            f"frozen-model training dataset not found: {FROZEN_DS}. "
+            "a4a5_sensitivity.py loads frozen_models checkpoints via "
+            "policy_io.load_policy_for_eval, which reads the sidecar "
+            "next to each .d3 and verifies it against the dataset path."
+        )
 
     print(f"[a4a5] frozen BC dir:  {BC_DIR}")
     print(f"[a4a5] frozen CQL dir: {CQL_DIR}")
-    bc_models  = {sd: d3rlpy.load_learnable(str(BC_DIR  / f"bc_seed{sd}.d3"),  device="cpu") for sd in SEEDS}
-    cql_models = {sd: d3rlpy.load_learnable(str(CQL_DIR / f"cql_seed{sd}.d3"), device="cpu") for sd in SEEDS}
-    bc_fn  = {sd: make_action_fn(bc_models[sd],  obs_mean, obs_std) for sd in SEEDS}
-    cql_fn = {sd: make_action_fn(cql_models[sd], obs_mean, obs_std) for sd in SEEDS}
+    print(f"[a4a5] frozen dataset: {FROZEN_DS}")
+
+    # Load policies through policy_io. Each call verifies the sidecar
+    # scaler against the dataset's training split; a mismatch raises.
+    bc_models  = {sd: load_policy_for_eval(BC_DIR  / f"bc_seed{sd}.d3",  FROZEN_DS)
+                  for sd in SEEDS}
+    cql_models = {sd: load_policy_for_eval(CQL_DIR / f"cql_seed{sd}.d3", FROZEN_DS)
+                  for sd in SEEDS}
+
+    # Report the scaler that policy_io applied (from the sidecar).
+    sidecar0 = bc_models[SEEDS[0]].obs_mean
+    print(f"[a4a5] scaler applied to frozen models: mean[0]={sidecar0[0]:.6f}")
 
     missing_scn = [s for s in SCENARIOS if s not in rpe.SCENARIOS]
     if missing_scn:
@@ -151,8 +171,8 @@ def main():
         for sd in SEEDS:
             rng = np.random.RandomState(EVAL_SEED + sd)
             init = rpe.make_init_states(rf_df, N_EPISODES, rng, gw)
-            b = rollout(bc_fn[sd],  init, reward_cfg, scn, a5, EVAL_SEED + sd)
-            c = rollout(cql_fn[sd], init, reward_cfg, scn, a5, EVAL_SEED + sd)
+            b = rollout(bc_models[sd],  init, reward_cfg, scn, a5, EVAL_SEED + sd)
+            c = rollout(cql_models[sd], init, reward_cfg, scn, a5, EVAL_SEED + sd)
             pooled_bc.append(b); pooled_cql.append(c)
 
         bc_all  = np.concatenate(pooled_bc)
