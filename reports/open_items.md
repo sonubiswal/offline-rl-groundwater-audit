@@ -41,3 +41,11 @@
 - [ ] Confirm _archive/ contents are all reproduced elsewhere and delete on disk
 - [ ] Confirm figs/ contents are superseded by figures/ and figures_final/
 
+
+## Closed during Step 2 verification
+
+- [x] Calibrated prediction intervals: empirical coverage 0.8936 (C0) / 0.8918 (C1)
+  at nominal 0.90, well-disjoint calibration/test split enforced in run_conformal.py.
+  Caveats for report: interval width ~13.5 m vs RMSE 5.30 m; mild degradation at
+  10-20 km (0.874); pred_y out-of-sample is guaranteed by the held-out split test,
+  not by run_conformal.py itself.
