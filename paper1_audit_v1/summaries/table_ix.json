@@ -1,0 +1,166 @@
+{
+  "rows": [
+    {
+      "bc": "base",
+      "cql": "base",
+      "protocol": "rf_grid",
+      "mean": 0.4089064870444465
+    },
+    {
+      "bc": "base",
+      "cql": "base",
+      "protocol": "common_eps",
+      "mean": -2.231215534260072
+    },
+    {
+      "bc": "base",
+      "cql": "base",
+      "protocol": "own_family",
+      "mean": -2.2219775326677995
+    },
+    {
+      "bc": "base",
+      "cql": "epsilon",
+      "protocol": "rf_grid",
+      "mean": 0.47159379627399567
+    },
+    {
+      "bc": "base",
+      "cql": "epsilon",
+      "protocol": "common_eps",
+      "mean": -2.5911692174689454
+    },
+    {
+      "bc": "base",
+      "cql": "epsilon",
+      "protocol": "own_family",
+      "mean": -2.531698329878058
+    },
+    {
+      "bc": "base",
+      "cql": "no_oracle",
+      "protocol": "rf_grid",
+      "mean": 0.4243607937957462
+    },
+    {
+      "bc": "base",
+      "cql": "no_oracle",
+      "protocol": "common_eps",
+      "mean": -2.4180710670679626
+    },
+    {
+      "bc": "base",
+      "cql": "no_oracle",
+      "protocol": "own_family",
+      "mean": -2.455932636397318
+    },
+    {
+      "bc": "epsilon",
+      "cql": "base",
+      "protocol": "rf_grid",
+      "mean": -0.0984520629113606
+    },
+    {
+      "bc": "epsilon",
+      "cql": "base",
+      "protocol": "common_eps",
+      "mean": 0.37402934208719407
+    },
+    {
+      "bc": "epsilon",
+      "cql": "base",
+      "protocol": "own_family",
+      "mean": 0.37402934208719407
+    },
+    {
+      "bc": "epsilon",
+      "cql": "epsilon",
+      "protocol": "rf_grid",
+      "mean": -0.03576475368181135
+    },
+    {
+      "bc": "epsilon",
+      "cql": "epsilon",
+      "protocol": "common_eps",
+      "mean": 0.014075658878321086
+    },
+    {
+      "bc": "epsilon",
+      "cql": "epsilon",
+      "protocol": "own_family",
+      "mean": 0.014075658878321086
+    },
+    {
+      "bc": "epsilon",
+      "cql": "no_oracle",
+      "protocol": "rf_grid",
+      "mean": -0.08299775616006076
+    },
+    {
+      "bc": "epsilon",
+      "cql": "no_oracle",
+      "protocol": "common_eps",
+      "mean": 0.18717380927930383
+    },
+    {
+      "bc": "epsilon",
+      "cql": "no_oracle",
+      "protocol": "own_family",
+      "mean": 0.18717380927930383
+    },
+    {
+      "bc": "no_oracle",
+      "cql": "base",
+      "protocol": "rf_grid",
+      "mean": 0.34972798959161744
+    },
+    {
+      "bc": "no_oracle",
+      "cql": "base",
+      "protocol": "common_eps",
+      "mean": -0.1683367880536332
+    },
+    {
+      "bc": "no_oracle",
+      "cql": "base",
+      "protocol": "own_family",
+      "mean": -0.480450014816533
+    },
+    {
+      "bc": "no_oracle",
+      "cql": "epsilon",
+      "protocol": "rf_grid",
+      "mean": 0.41241529882116684
+    },
+    {
+      "bc": "no_oracle",
+      "cql": "epsilon",
+      "protocol": "common_eps",
+      "mean": -0.5282904712625063
+    },
+    {
+      "bc": "no_oracle",
+      "cql": "epsilon",
+      "protocol": "own_family",
+      "mean": -0.7643956678734034
+    },
+    {
+      "bc": "no_oracle",
+      "cql": "no_oracle",
+      "protocol": "rf_grid",
+      "mean": 0.3651822963429174
+    },
+    {
+      "bc": "no_oracle",
+      "cql": "no_oracle",
+      "protocol": "common_eps",
+      "mean": -0.3551923208615235
+    },
+    {
+      "bc": "no_oracle",
+      "cql": "no_oracle",
+      "protocol": "own_family",
+      "mean": -0.6133940165286378
+    }
+  ]
+}

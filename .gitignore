@@ -81,3 +81,13 @@ reports_rebuilt/
 paper1_audit_v1.zip
 
 revision_experiments/**/*.npz
+
+# ===== Final freeze cleanup =====
+# Old archive tree; contents reproduced under reports/ and paper1_audit_v1/
+_archive/
+
+# Redundant figure iteration; canonical is figures/ + figures_final/ + paper_figures/
+figs/
+
+# Prevent future 10-seed regenerations from re-committing large return arrays
+reports_*/**/returns/

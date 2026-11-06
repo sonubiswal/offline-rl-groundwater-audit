@@ -1,0 +1,33 @@
+{
+  "endpoint": {
+    "removed": 4.8383,
+    "full": 5.0929,
+    "removed_minus_full": -0.2546,
+    "ci": [
+      -0.411,
+      -0.0982
+    ]
+  },
+  "bands": {
+    "in_dist": {
+      "removed": 1.1675,
+      "full": 1.2265,
+      "diff": -0.059
+    },
+    "mild": {
+      "removed": 3.3187,
+      "full": 3.477,
+      "diff": -0.1582
+    },
+    "moderate": {
+      "removed": 6.7263,
+      "full": 7.0554,
+      "diff": -0.3291
+    },
+    "severe": {
+      "removed": 6.0059,
+      "full": 6.3194,
+      "diff": -0.3136
+    }
+  }
+}

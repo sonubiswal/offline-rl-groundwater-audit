@@ -1,0 +1,6 @@
+d3rlpy==2.8.1
+h5py==3.16.0
+matplotlib==3.10.9
+numpy==2.2.6
+pandas==2.3.3
+scipy==1.15.3
