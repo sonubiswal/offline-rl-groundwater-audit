@@ -1,4 +1,4 @@
-# Python
+﻿# Python
 __pycache__/
 *.py[cod]
 *.egg-info/
@@ -33,7 +33,7 @@ Thumbs.db
 *.tmp
 *.log
 
-# Model checkpoints � regenerable from seed + config (see reports/paper_exp/*.json)
+# Model checkpoints ï¿½ regenerable from seed + config (see reports/paper_exp/*.json)
 models/
 models_*/
 *.d3
@@ -51,10 +51,10 @@ data/raw/*/
 data/raw/*.csv
 !data/raw/fetch_log.csv
 !data/raw/*.manifest.csv
-# Quarantine — excluded on purpose
+# Quarantine â€” excluded on purpose
 _quarantine/
 
-# Intermediate and processed data — too large, regenerable
+# Intermediate and processed data â€” too large, regenerable
 data/interim/
 data/processed/
 
@@ -62,10 +62,22 @@ _quarantine/
 data/interim/
 data/processed/
 
-# Old git backup — not part of the repo
+# Old git backup â€” not part of the repo
 .git_old_backup/
 
-# Large intermediate NDVI predictions — not part of the RL audit
+# Large intermediate NDVI predictions â€” not part of the RL audit
 reports/ndvi_imputation_predictions.csv
 # Local helper scripts
 make_zenodo_bundle.ps1
+
+# ===== Post-revision freeze additions (2026-11-06) =====
+
+# Stale duplicate report trees (~100 MB + ~2.5 MB)
+reports_2/
+reports_rebuilt/
+
+
+# Duplicate of paper1_audit_v1/ folder
+paper1_audit_v1.zip
+
+revision_experiments/**/*.npz
