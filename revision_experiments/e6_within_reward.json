@@ -1,0 +1,228 @@
+{
+  "protocol": {
+    "a4_fixed": 15.0,
+    "a5_grid": [
+      1.0,
+      1.5,
+      2.0,
+      2.5,
+      3.0
+    ],
+    "reward_weights": {
+      "w1": 1.0,
+      "w2": 2.0,
+      "w3": 0.5
+    },
+    "gw": 25.0,
+    "scenarios": [
+      "normal",
+      "drought",
+      "high"
+    ],
+    "n_episodes": 200,
+    "seeds": [
+      42,
+      123,
+      2024
+    ]
+  },
+  "cells": [
+    {
+      "a4": 15.0,
+      "a5": 1.0,
+      "scenario": "normal",
+      "gw": 25.0,
+      "bc_return": -22.607659220732955,
+      "cql_return": -14.978668972528455,
+      "cql_minus_bc": 7.628990248204497,
+      "ci_lower": 6.864959955947615,
+      "ci_upper": 8.403585510633302,
+      "ci_contains_zero": false
+    },
+    {
+      "a4": 15.0,
+      "a5": 1.0,
+      "scenario": "drought",
+      "gw": 25.0,
+      "bc_return": -23.52612953197225,
+      "cql_return": -15.951161228587468,
+      "cql_minus_bc": 7.574968303384782,
+      "ci_lower": 6.810307270525737,
+      "ci_upper": 8.359369667374724,
+      "ci_contains_zero": false
+    },
+    {
+      "a4": 15.0,
+      "a5": 1.0,
+      "scenario": "high",
+      "gw": 25.0,
+      "bc_return": -21.97952625223258,
+      "cql_return": -14.289682190432496,
+      "cql_minus_bc": 7.689844061800086,
+      "ci_lower": 6.9253083710427585,
+      "ci_upper": 8.460644575368775,
+      "ci_contains_zero": false
+    },
+    {
+      "a4": 15.0,
+      "a5": 1.5,
+      "scenario": "normal",
+      "gw": 25.0,
+      "bc_return": -38.12444000452364,
+      "cql_return": -24.523070527261666,
+      "cql_minus_bc": 13.601369477261978,
+      "ci_lower": 12.108612958060723,
+      "ci_upper": 15.11714909083294,
+      "ci_contains_zero": false
+    },
+    {
+      "a4": 15.0,
+      "a5": 1.5,
+      "scenario": "drought",
+      "gw": 25.0,
+      "bc_return": -39.26003804111731,
+      "cql_return": -25.694731491187024,
+      "cql_minus_bc": 13.56530654993029,
+      "ci_lower": 12.046076444531998,
+      "ci_upper": 15.107770201715,
+      "ci_contains_zero": false
+    },
+    {
+      "a4": 15.0,
+      "a5": 1.5,
+      "scenario": "high",
+      "gw": 25.0,
+      "bc_return": -37.307034606372845,
+      "cql_return": -23.655978510434053,
+      "cql_minus_bc": 13.651056095938788,
+      "ci_lower": 12.149215318785984,
+      "ci_upper": 15.16466642669956,
+      "ci_contains_zero": false
+    },
+    {
+      "a4": 15.0,
+      "a5": 2.0,
+      "scenario": "normal",
+      "gw": 25.0,
+      "bc_return": -55.643582537167326,
+      "cql_return": -35.92465859414562,
+      "cql_minus_bc": 19.718923943021707,
+      "ci_lower": 17.24850446681262,
+      "ci_upper": 22.271370113636344,
+      "ci_contains_zero": false
+    },
+    {
+      "a4": 15.0,
+      "a5": 2.0,
+      "scenario": "drought",
+      "gw": 25.0,
+      "bc_return": -57.03654711424396,
+      "cql_return": -37.34999814111285,
+      "cql_minus_bc": 19.686548973131124,
+      "ci_lower": 17.143571874484834,
+      "ci_upper": 22.238004810783437,
+      "ci_contains_zero": false
+    },
+    {
+      "a4": 15.0,
+      "a5": 2.0,
+      "scenario": "high",
+      "gw": 25.0,
+      "bc_return": -54.64754202588811,
+      "cql_return": -34.964480858171825,
+      "cql_minus_bc": 19.68306116771628,
+      "ci_lower": 17.209790407031743,
+      "ci_upper": 22.17746842272279,
+      "ci_contains_zero": false
+    },
+    {
+      "a4": 15.0,
+      "a5": 2.5,
+      "scenario": "normal",
+      "gw": 25.0,
+      "bc_return": -74.2157945868203,
+      "cql_return": -48.974459980799296,
+      "cql_minus_bc": 25.241334606020995,
+      "ci_lower": 21.663112794644643,
+      "ci_upper": 28.71305363814202,
+      "ci_contains_zero": false
+    },
+    {
+      "a4": 15.0,
+      "a5": 2.5,
+      "scenario": "drought",
+      "gw": 25.0,
+      "bc_return": -75.77010210686926,
+      "cql_return": -50.631175019049245,
+      "cql_minus_bc": 25.13892708782001,
+      "ci_lower": 21.4628609214861,
+      "ci_upper": 28.67297695024135,
+      "ci_contains_zero": false
+    },
+    {
+      "a4": 15.0,
+      "a5": 2.5,
+      "scenario": "high",
+      "gw": 25.0,
+      "bc_return": -73.1550711382838,
+      "cql_return": -47.75395102378118,
+      "cql_minus_bc": 25.401120114502636,
+      "ci_lower": 21.86941139925969,
+      "ci_upper": 28.852482966353158,
+      "ci_contains_zero": false
+    },
+    {
+      "a4": 15.0,
+      "a5": 3.0,
+      "scenario": "normal",
+      "gw": 25.0,
+      "bc_return": -95.20785800771344,
+      "cql_return": -65.39012725287833,
+      "cql_minus_bc": 29.81773075483512,
+      "ci_lower": 25.054048735928166,
+      "ci_upper": 34.600050815426755,
+      "ci_contains_zero": false
+    },
+    {
+      "a4": 15.0,
+      "a5": 3.0,
+      "scenario": "drought",
+      "gw": 25.0,
+      "bc_return": -96.945711330955,
+      "cql_return": -67.00168356146146,
+      "cql_minus_bc": 29.944027769493527,
+      "ci_lower": 25.15796332716763,
+      "ci_upper": 34.78967617116632,
+      "ci_contains_zero": false
+    },
+    {
+      "a4": 15.0,
+      "a5": 3.0,
+      "scenario": "high",
+      "gw": 25.0,
+      "bc_return": -93.72137872674313,
+      "cql_return": -63.82221585162256,
+      "cql_minus_bc": 29.899162875120563,
+      "ci_lower": 25.161731544642855,
+      "ci_upper": 34.656803312966474,
+      "ci_contains_zero": false
+    }
+  ],
+  "ratio_summary": {
+    "normal": {
+      "min": 7.628990248204497,
+      "max": 29.81773075483512,
+      "ratio": 3.9084767164111662
+    },
+    "drought": {
+      "min": 7.574968303384782,
+      "max": 29.944027769493527,
+      "ratio": 3.9530235071892514
+    },
+    "high": {
+      "min": 7.689844061800086,
+      "max": 29.899162875120563,
+      "ratio": 3.8881364348657006
+    }
+  }
+}

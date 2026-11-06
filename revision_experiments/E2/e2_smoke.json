@@ -1,0 +1,68 @@
+{
+  "protocol": {
+    "dataset": "C:\\trishna-opal\\data\\processed\\offline_rl_dataset_epsilon.h5",
+    "seeds": [
+      42,
+      123
+    ],
+    "fqe_n_steps": 2000,
+    "gamma": 1.0,
+    "target_update_interval": 200,
+    "learning_rate": 0.0003,
+    "convergence_tolerance": 0.05,
+    "terminal_forced_at_last_step": true,
+    "smoke": true,
+    "git_commit": "d93833e",
+    "d3rlpy": "2.8.1",
+    "run_time": "2026-10-02T19:53:38"
+  },
+  "convergence": {
+    "all_seeds_converged": true,
+    "bc_tail_drift": [
+      0.005450585997772937,
+      0.02254484731521612
+    ],
+    "cql_tail_drift": [
+      0.009234022805637307,
+      0.021132588846665558
+    ],
+    "diff_tail_range": [
+      0.0316314697265625,
+      0.013116836547851562
+    ]
+  },
+  "primary_episode_starts": {
+    "per_seed_diffs": [
+      0.12454417970445421,
+      -0.08388922267489964
+    ],
+    "seed_mean": 0.020327478514777286,
+    "seed_ci_lower": -1.303871263756824,
+    "seed_ci_upper": 1.3445262207863786,
+    "seed_ci_excludes_zero": false,
+    "n_seeds": 2,
+    "n_seeds_positive": 1,
+    "state_bootstrap_ci": [
+      0.007398524536026849,
+      0.03376227716604868
+    ],
+    "n_states": 225
+  },
+  "secondary_random_states": {
+    "per_seed_diffs": [
+      0.19468038026057183,
+      0.2959335302971303
+    ],
+    "seed_mean": 0.24530695527885107,
+    "seed_ci_lower": -0.39796467200774344,
+    "seed_ci_upper": 0.8885785825654455,
+    "seed_ci_excludes_zero": false,
+    "n_seeds": 2,
+    "n_seeds_positive": 2,
+    "state_bootstrap_ci": [
+      0.17607307525775395,
+      0.321590346425143
+    ],
+    "n_states": 500
+  }
+}

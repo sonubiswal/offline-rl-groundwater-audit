@@ -1,0 +1,39 @@
+{
+  "rows": [
+    {
+      "estimator": "Rollout",
+      "unit": "episode bootstrap (pooled)",
+      "obs": 0.04704596769368403,
+      "lo": 0.018220617604980643,
+      "hi": 0.07659798600771521
+    },
+    {
+      "estimator": "Rollout",
+      "unit": "seed $t$-interval",
+      "obs": 0.047045967693684035,
+      "lo": -0.048097631514397776,
+      "hi": 0.14218956690176585
+    },
+    {
+      "estimator": "Rollout",
+      "unit": "hierarchical (seed $\\to$ episode)",
+      "obs": 0.047045967693684035,
+      "lo": -0.03564053713767722,
+      "hi": 0.13270166760817462
+    },
+    {
+      "estimator": "FQE",
+      "unit": "seed $t$-interval",
+      "obs": 0.3478421063654953,
+      "lo": 0.08815667401754285,
+      "hi": 0.6075275387134478
+    },
+    {
+      "estimator": "FQE",
+      "unit": "state bootstrap (secondary)",
+      "obs": 0.3478421063654953,
+      "lo": 0.27450502785352526,
+      "hi": 0.43888803625361056
+    }
+  ]
+}

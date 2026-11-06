@@ -1,0 +1,41 @@
+E3 - Cross-combination verification (base vs no_oracle)
+============================================================
+Evaluation starts: 500 episodes from offline_rl_dataset_epsilon.h5
+Horizon: 20  Seeds: [42, 123, 2024]
+
+Per-policy mean return (across 3 seeds, eval on same starts)
+------------------------------------------------------------
+  base_BC         +10.6240   (std across seeds 2.4520)
+  no_oracle_BC     +9.7924   (std across seeds 0.3702)
+  base_CQL        +10.4273   (std across seeds 1.1652)
+  no_oracle_CQL    +2.6307   (std across seeds 7.0628)
+
+BC checkpoint accuracy gap (from meta sidecars)
+------------------------------------------------------------
+  base BC       test accuracy ~0.706-0.712 (1500 eps, 30k trans)
+  no_oracle BC  test accuracy ~0.574-0.587 (1000 eps, 20k trans)
+
+2x2 cross-combination table (CQL - BC, same eval starts)
+------------------------------------------------------------
+                     base_CQL    no_oracle_CQL
+base_BC               -0.1967          -7.9933
+no_oracle_BC          +0.6349          -7.1617
+
+Comparison to the paper's Table VIII
+------------------------------------------------------------
+  paper:  base BC   x base CQL       = -1.20
+  E3:     base BC   x base CQL       = -0.1967
+  paper:  base BC   x no_oracle CQL  = -2.03
+  E3:     base BC   x no_oracle CQL  = -7.9933
+  paper:  no_oracle BC x base CQL    = +1.41
+  E3:     no_oracle BC x base CQL    = +0.6349
+  paper:  no_oracle BC x no_oracle CQL = +0.58
+  E3:     no_oracle BC x no_oracle CQL = -7.1617
+
+Verdict
+------------------------------------------------------------
+  base BC - no_oracle BC  = +0.8316
+  base CQL - no_oracle CQL = +7.7966
+  CQL family gap >= BC family gap: does NOT support the
+  baseline-quality explanation. Investigate before
+  revising the paper.

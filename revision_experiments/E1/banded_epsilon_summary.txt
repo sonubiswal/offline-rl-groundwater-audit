@@ -1,0 +1,26 @@
+E1 - Banded diagnostic on epsilon checkpoints
+============================================================
+Dataset:      offline_rl_dataset_epsilon.h5
+Episodes:     1500  (train 1050)
+States/band:  200
+Horizon:      20
+
+band               BC         cql_main  cql_qr32_verify cql_meanq_verify    d(CQL_main - BC)
+--------------------------------------------------------------------------------------------
+id           -29.4683         -50.2489         -56.5484         -63.5460               -20.7806
+mild         -53.5419         -74.1645         -82.6451         -91.4253               -20.6225
+moderate     -74.2209         -94.2487        -105.5615        -120.7842               -20.0278
+severe       -93.3424        -116.5631        -129.4126        -147.6747               -23.2207
+
+Comparison to the paper's reported numbers
+------------------------------------------------------------
+epsilon rollout    CQL-BC (paper)          : +0.3402
+epsilon banded     CQL-BC in-distribution   : -20.7806
+expanded banded    CQL-BC in-distribution   : -16.0057  (paper)
+expanded banded    CQL-BC severe OOD        : -38.3978  (paper)
+
+Interpretation
+------------------------------------------------------------
+E1: epsilon policies under banded evaluation give a NEGATIVE
+    in-distribution CQL-BC. The band partition is isolated as
+    a cause of the sign reversal.

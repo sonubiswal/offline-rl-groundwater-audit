@@ -1,0 +1,53 @@
+{
+  "config": {
+    "eval_dataset": "C:\\trishna-opal\\data\\processed\\offline_rl_dataset_epsilon.h5",
+    "n_eval_starts": 500,
+    "horizon": 20,
+    "seeds": [
+      42,
+      123,
+      2024
+    ],
+    "reward_config": {
+      "w1_crop_revenue": 1.0,
+      "w2_depletion_penalty": 2.0,
+      "w3_domestic_supply": 0.5,
+      "sustainability_threshold_m": 15.0,
+      "depletion_penalty_exponent": 2.0
+    }
+  },
+  "per_family_seed": {
+    "base_BC|42": 12.664318662241815,
+    "base_BC|123": 7.175570616278478,
+    "base_BC|2024": 12.03207246143651,
+    "no_oracle_BC|42": 10.30750898984768,
+    "no_oracle_BC|123": 9.615768055629776,
+    "no_oracle_BC|2024": 9.453817099613934,
+    "base_CQL|42": 10.974378906000057,
+    "base_CQL|123": 11.499863055478265,
+    "base_CQL|2024": 8.807682219374554,
+    "no_oracle_CQL|42": -5.698492151235583,
+    "no_oracle_CQL|123": 11.569613935020406,
+    "no_oracle_CQL|2024": 2.0209822504406456
+  },
+  "per_family_mean": {
+    "base_BC": 10.623987246652268,
+    "no_oracle_BC": 9.792364715030464,
+    "base_CQL": 10.427308060284291,
+    "no_oracle_CQL": 2.630701344741823
+  },
+  "per_family_std": {
+    "base_BC": 2.452021853775244,
+    "no_oracle_BC": 0.3702136733890563,
+    "base_CQL": 1.1651678838247992,
+    "no_oracle_CQL": 7.062845978877277
+  },
+  "cross_combination": {
+    "base_BC|base_CQL": -0.19667918636797665,
+    "base_BC|no_oracle_CQL": -7.993285901910445,
+    "no_oracle_BC|base_CQL": 0.6349433452538271,
+    "no_oracle_BC|no_oracle_CQL": -7.161663370288641
+  },
+  "bc_family_gap": 0.8316225316218038,
+  "cql_family_gap": 7.7966067155424685
+}
