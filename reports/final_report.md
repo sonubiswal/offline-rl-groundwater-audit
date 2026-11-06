@@ -791,12 +791,183 @@ than BC. That is also not evidence that CQL is better. It is evidence
 that both are broken outside the training distribution.
 ## 8. Out-of-Distribution Behaviour
 
-TODO (~1000 words). Cite final_report_claims.md Claim 4.
-- The four OOD files, their per-band numbers
-- The endpoint contrast that survives the paired CI test (weights 1,2,0.5) and the one that does not (1,2,0.0)
-- The explainer Section 9.5f claim and its supersession
-- The framing: both fail catastrophically, CQL fails slightly less
+This section reports what happens when the two learned policies are
+evaluated on states that are progressively further from the training
+distribution. It is a short section because the honest conclusion is
+short: under all four committed OOD evaluation files, CQL's return
+exceeds BC's in every band, and the gap grows with distance — but the
+magnitudes are such that both policies are effectively failing. The
+section also records that the internal project explainer's claim of a
+sign reversal in the OOD regime does not reproduce in any committed
+artefact, and is marked superseded.
 
+### 8.1 The OOD evaluation design
+
+Four out-of-distribution evaluation files are committed to the repository:
+
+  ood_scaled_result.json            (primary critic)
+  ood_scaled_meanq_result.json      (second critic, mean-Q head)
+  ood_w3_full_eval_only.json        (reward weights 1.0, 2.0, 0.5)
+  ood_w3_zero_eval_only.json        (reward weights 1.0, 2.0, 0.0)
+
+Each file bins held-out states into four bands by increasing statistical
+distance from the training distribution:
+
+  in_dist    states drawn from the training distribution
+  mild       mild shift from the training distribution
+  moderate   moderate shift
+  severe     severe shift
+
+Distance is measured with Mahalanobis distance against the training-state
+covariance. Each band contains enough states to evaluate both policies
+in every file. The two `ood_w3` files additionally vary the reward
+weighting used at evaluation time, without retraining.
+
+### 8.2 The per-band numbers
+
+Return means and CQL-BC gaps by band, from each file:
+
+Primary critic (ood_scaled_result.json):
+
+  Band         BC        CQL       CQL-BC
+  in_dist     -12.09     -6.78     +5.31
+  mild        -40.70    -37.11     +3.59
+  moderate    -65.55    -59.61     +5.94
+  severe      -90.71    -86.22     +4.49
+
+Second critic (ood_scaled_meanq_result.json):
+
+  Band         BC        CQL       CQL-BC
+  in_dist     -10.15     -5.91     +4.24
+  mild        -39.58    -32.80     +6.78
+  moderate    -65.09    -54.02    +11.07
+  severe      -92.37    -73.19    +19.18
+
+Reward weights [1.0, 2.0, 0.5] (ood_w3_full_eval_only.json):
+
+  Band         CQL-BC    95% CI
+  in_dist      +1.23    [ 0.12,  2.38]
+  mild         +3.48    [ 1.89,  5.13]
+  moderate     +7.06    [ 3.90, 10.43]
+  severe       +6.32    [ 1.88, 10.96]
+
+Reward weights [1.0, 2.0, 0.0] (ood_w3_zero_eval_only.json):
+
+  Band         CQL-BC    95% CI
+  in_dist      +1.17    [ 0.12,  2.26]
+  mild         +3.32    [ 1.81,  4.87]
+  moderate     +6.73    [ 3.67,  9.95]
+  severe       +6.01    [ 1.71, 10.54]
+
+The pattern is consistent across all four files: CQL's return exceeds
+BC's in every band, including in-distribution, and the gap grows with
+distributional distance in three of the four files.
+
+### 8.3 The endpoint contrast
+
+The endpoint contrast asks a sharper question than the per-band gaps: as
+we move from in_dist to severe, does CQL's advantage grow? It is
+computed as severe-band gap minus in_dist-band gap, on a per-seed basis.
+
+Under reward weights [1.0, 2.0, 0.5], the endpoint contrast is +5.09
+with 95% CI [0.05, 10.14]. The interval excludes zero. Under this
+reward weighting, the growth of CQL's advantage with distance is
+statistically significant.
+
+Under reward weights [1.0, 2.0, 0.0], the endpoint contrast is +4.84
+with 95% CI [-0.08, 9.76]. The interval includes zero. Under this
+weighting, the growth is not significant.
+
+So the growth-with-distance finding is real under one reward weighting
+and not real under another. That is consistent with the finding in
+Section 10.4 that reward-weight choices have an outsize effect on
+observed metrics: two arbitrary constants can move the answer by more
+than the effect being measured.
+
+### 8.4 Both policies fail catastrophically
+
+The numbers above are drawn from a band structure with deeply negative
+absolute returns. BC's return falls from -12.09 at in_dist to -90.71 at
+severe under the primary critic. CQL's falls from -6.78 to -86.22. Both
+policies are scoring dramatically worse than they do on the training
+distribution, and their absolute performance has collapsed.
+
+A +4 to +19 return-unit gap between two policies whose returns are both
+in the -80 to -90 range is not evidence that either policy is working.
+It is evidence that one policy is failing somewhat less catastrophically
+than the other. The distinction matters for how the result should be
+read.
+
+The per-seed deltas confirm the caveat. In the weights [1.0, 2.0, 0.5]
+file, the per-seed endpoint contrasts are:
+
+  -4.51, +2.08, +7.60, +18.57, +3.73, +2.78, +10.26, +5.25, -4.91, +10.07
+
+Two of the ten seeds show a negative endpoint contrast (CQL's advantage
+shrinks with distance rather than growing). The mean is positive
+because the other eight seeds dominate it, but the underlying effect is
+not uniform.
+
+Correct framing: outside the training distribution, both policies fail
+catastrophically. CQL fails somewhat less than BC on average, with wide
+per-seed variance, and the magnitude of the difference depends on the
+reward weighting used at evaluation. This is not a working policy.
+
+### 8.5 FQE and rollout disagree on the OOD scale
+
+Section 7.4 established that FQE and direct rollout disagree on the
+in-distribution comparison by +0.44 (e8_estimator_contrast.json, 95% CI
+[0.11, 0.76]). The disagreement persists on the OOD evaluation. FQE's
+value-function approximations become less reliable at greater distance
+from the training distribution, and the direction of the bias is
+consistent with the direction of the CQL advantage — FQE systematically
+over-estimates the CQL-BC gap, and it does so more at greater distance.
+
+This is evidence that offline policy evaluation is itself unreliable in
+the OOD regime. It is not evidence for or against either policy. When
+the estimator's bias is the same size as the effect being measured, the
+correct conclusion is that the estimator cannot settle the question.
+
+### 8.6 The internal explainer's Section 9.5f claim is superseded
+
+An earlier internal project document (Trishna-OPAL-Team-Explainer.pdf,
+Section 9.5f) claimed that the CQL advantage "reverses" out of
+distribution. The claim was illustrated with a table showing CQL-BC
+values of approximately -16.01 in-distribution and -38.40 in the severe
+band, with the same negative sign across all four bands.
+
+No committed artefact reproduces that table. All four committed OOD
+files show CQL-BC positive in every band, with the gap typically growing
+rather than reversing with distance.
+
+The explainer's provenance for the -16.01 and -38.40 numbers is not
+recoverable from the committed code or data. The most likely explanation
+is that it described an earlier code branch, or an FQE-only estimator,
+that the current artefacts have replaced. Whatever its provenance, the
+claim is not supported by the evidence on file.
+
+Section 10.9 records this supersession as a limitation. Section 11.2
+lists "CQL reverses out-of-distribution" as a claim the report does not
+make. reports/phase5_provenance.md documents the supersession with the
+dates and the file references. Any future reader who encounters the
+explainer's §9.5f table should treat it as historical, not as current.
+
+### 8.7 Summary
+
+The honest statement of the OOD result is:
+
+  Under four independent evaluation configurations, CQL's mean return
+  exceeds BC's in every distributional band, and the gap grows with
+  distance in three of four files. The endpoint contrast survives the
+  paired confidence interval test under one reward weighting but not
+  under another. But both policies collapse to catastrophic returns in
+  the severe band (BC approximately -90, CQL approximately -86). A gap
+  of four to nineteen units between two failing policies is not a
+  working policy. And the internal explainer's claim of a sign reversal
+  does not reproduce in any committed artefact.
+
+That paragraph is the full finding. Anything stronger than it overstates
+the evidence; anything weaker than it hides what was actually observed.
 ## 9. Explainability
 
 TODO (~800 words). Cite reports/explainability_methodology.md.
@@ -1206,6 +1377,7 @@ TODO. Include:
 
 TODO. Paste reports/open_items.md as-is. This is a statement of what remains open,
 not an apology.
+
 
 
 
